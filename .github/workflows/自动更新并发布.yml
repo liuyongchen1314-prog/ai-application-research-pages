@@ -2,15 +2,12 @@ name: 自动更新并发布研究网页
 
 on:
   schedule:
-    - cron: '*/5 * * * *'    # 首次发布临时触发，首轮通过后删除
     - cron: '55 8 * * 1-5'   # 北京时间工作日16:55
   workflow_dispatch:
-  issues:
-    types: [opened]
   push:
     branches: [main]
     paths:
-      - 'config/**'
+      - 'config/公司估值配置.b64'
       - 'scripts/**'
       - '.github/workflows/自动更新并发布.yml'
 
