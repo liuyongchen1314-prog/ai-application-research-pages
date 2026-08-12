@@ -55,9 +55,12 @@ def five_day_intraday(code,snapshot):
     for day in days:
         if not isinstance(day,dict): continue
         d=str(day.get('date') or '')
-        if d!=snapshot: continue
+        dkey=''.join(ch for ch in d if ch.isdigit())
+        skey=''.join(ch for ch in snapshot if ch.isdigit())
+        if dkey!=skey: continue
         rows=day.get('data') or []
         if isinstance(rows,dict): rows=rows.get('data') or []
+        if isinstance(rows,str): rows=rows.replace('\n','|').split('|')
         for line in rows:
             p=str(line).split(' ')
             if len(p)>=3:
