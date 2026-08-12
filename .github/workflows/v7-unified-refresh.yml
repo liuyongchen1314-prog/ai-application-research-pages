@@ -96,14 +96,14 @@ jobs:
       - name: 监控突发风险
         if: contains(fromJSON('["all","final"]'), steps.scope.outputs.mode)
         run: python scripts/v7_guard.py risk
-      - name: 验证市场日期与覆盖
-        if: contains(fromJSON('["all","us","asia"]'), steps.scope.outputs.mode)
-        run: python scripts/v7_guard.py validate --mode ${{ steps.scope.outputs.mode == 'all' && 'all' || steps.scope.outputs.mode }}
       - name: 使用独立行动层重算操作策略
         if: job.status == 'success' && steps.scope.outputs.mode != 'live'
         run: |
           python scripts/rebuild_strategy.py
           python scripts/validate_strategy.py
+      - name: 验证市场日期与覆盖
+        if: contains(fromJSON('["all","us","asia"]'), steps.scope.outputs.mode)
+        run: python scripts/v7_guard.py validate --mode ${{ steps.scope.outputs.mode == 'all' && 'all' || steps.scope.outputs.mode }}
       - name: 记录实际完成时间
         if: always()
         env:
