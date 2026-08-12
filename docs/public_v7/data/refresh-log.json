@@ -4,6 +4,12 @@
     {
       "mode": "final",
       "status": "failure",
+      "finished_at_utc": "2026-08-12T10:02:15.389812+00:00",
+      "finished_at_beijing": "2026-08-12T18:02:15.389812+08:00"
+    },
+    {
+      "mode": "final",
+      "status": "failure",
       "finished_at_utc": "2026-08-12T09:58:24.291579+00:00",
       "finished_at_beijing": "2026-08-12T17:58:24.291579+08:00"
     },
