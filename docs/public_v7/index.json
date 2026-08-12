@@ -1,11 +1,13 @@
 {
   "schema": "v7-public-index-3",
   "data_schema": "v7-public-market-1",
-  "release": "V7.9.1",
+  "release": "V7.9.3",
   "latest": "data/latest-v7.json",
-  "snapshot_sha256": "25c92e26e85e71255088cd1f421eb5928c4144bd03233f4d680d5de5e0ec756d",
+  "live_markets": "data/live-markets.json",
+  "live_markets_sha256": "57bc13e87f3a2b2d74a23ac312c5f97b0924df25ac2434a32d69fad67c923956",
+  "snapshot_sha256": "0ac37df3d04d77d35580dc6b6e326e943c1c30fe9621a1edab0c874ba71e5219",
   "snapshot_date": "2026-08-12",
-  "generated_at_cn": "2026-08-12T16:06:24.098064+08:00",
+  "generated_at_cn": "2026-08-12T18:17:24.517391+08:00",
   "coverage": {
     "histories": 142,
     "quotes": 142,

@@ -1,0 +1,153 @@
+{
+  "schema": "v793-live-markets-1",
+  "release": "V7.9.3",
+  "generated_at": "2026-08-12T10:16:18.823085+00:00",
+  "generated_at_beijing": "2026-08-12T18:16:18.823085+08:00",
+  "formal_snapshot_date": "2026-08-12",
+  "separate_from_valuation": true,
+  "market_count": 4,
+  "markets": {
+    "china": {
+      "status": "realtime",
+      "items": [
+        {
+          "symbol": "sh000001",
+          "name": "上证指数",
+          "price": 3946.68,
+          "previous_close": 3934.09,
+          "change_pct": 0.0032002318198107726,
+          "date": "2026-08-12",
+          "as_of": "20260812161402",
+          "source": "腾讯即时行情",
+          "realtime": true
+        },
+        {
+          "symbol": "sz399006",
+          "name": "创业板指",
+          "price": 3602.08,
+          "previous_close": 3549.16,
+          "change_pct": 0.014910570388486422,
+          "date": "2026-08-12",
+          "as_of": "20260812161445",
+          "source": "腾讯即时行情",
+          "realtime": true
+        },
+        {
+          "symbol": "sh000688",
+          "name": "科创50",
+          "price": 1736.99,
+          "previous_close": 1709.5,
+          "change_pct": 0.01608072535829197,
+          "date": "2026-08-12",
+          "as_of": "20260812161414",
+          "source": "腾讯即时行情",
+          "realtime": true
+        }
+      ]
+    },
+    "hk": {
+      "status": "realtime",
+      "items": [
+        {
+          "symbol": "hkHSI",
+          "name": "恒生指数",
+          "price": 25440.17,
+          "previous_close": 25652.82,
+          "change_pct": -0.008289536978780543,
+          "date": "2026-08-12",
+          "as_of": "2026/08/12 18:01:07",
+          "source": "腾讯即时行情",
+          "realtime": true
+        },
+        {
+          "symbol": "hkHSTECH",
+          "name": "恒生科技",
+          "price": 4776.44,
+          "previous_close": 4824.42,
+          "change_pct": -0.009945236940399171,
+          "date": "2026-08-12",
+          "as_of": "2026/08/12 16:08:34",
+          "source": "腾讯即时行情",
+          "realtime": true
+        }
+      ]
+    },
+    "us": {
+      "status": "realtime",
+      "items": [
+        {
+          "symbol": "^IXIC",
+          "name": "纳斯达克",
+          "price": 26445.445,
+          "previous_close": 26605.357,
+          "change_pct": -0.006010518859040359,
+          "date": "2026-08-11",
+          "as_of": "2026-08-11T17:15:59-04:00",
+          "source": "海外即时行情",
+          "realtime": true
+        },
+        {
+          "symbol": "^SOX",
+          "name": "费城半导体",
+          "price": 12098.472,
+          "previous_close": 11993.861,
+          "change_pct": 0.008722045386385435,
+          "date": "2026-08-11",
+          "as_of": "2026-08-11T17:15:59-04:00",
+          "source": "海外即时行情",
+          "realtime": true
+        },
+        {
+          "symbol": "SMH",
+          "name": "AI芯片ETF",
+          "price": 572.93,
+          "previous_close": 569.41,
+          "change_pct": 0.006181837340405005,
+          "date": "2026-08-11",
+          "as_of": "2026-08-11T16:00:00-04:00",
+          "source": "海外即时行情",
+          "realtime": true
+        }
+      ]
+    },
+    "korea": {
+      "status": "realtime",
+      "items": [
+        {
+          "symbol": "^KS11",
+          "name": "韩国KOSPI",
+          "price": 6579.04,
+          "previous_close": 6345.53,
+          "change_pct": 0.03679913261776413,
+          "date": "2026-08-12",
+          "as_of": "2026-08-12T18:05:30+09:00",
+          "source": "海外即时行情",
+          "realtime": true
+        },
+        {
+          "symbol": "^KQ11",
+          "name": "韩国KOSDAQ",
+          "price": 858.91,
+          "previous_close": 854.47,
+          "change_pct": 0.005196203494563845,
+          "date": "2026-08-12",
+          "as_of": "2026-08-12T18:05:30+09:00",
+          "source": "海外即时行情",
+          "realtime": true
+        },
+        {
+          "symbol": "000660.KS",
+          "name": "SK海力士",
+          "price": 1504000.0,
+          "previous_close": 1425000.0,
+          "change_pct": 0.055438596491228065,
+          "date": "2026-08-12",
+          "as_of": "2026-08-12T15:30:01+09:00",
+          "source": "海外即时行情",
+          "realtime": true
+        }
+      ]
+    }
+  },
+  "errors": {}
+}
