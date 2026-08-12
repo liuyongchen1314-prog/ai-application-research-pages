@@ -3,6 +3,12 @@
   "runs": [
     {
       "mode": "all",
+      "status": "failure",
+      "finished_at_utc": "2026-08-12T10:24:31.841850+00:00",
+      "finished_at_beijing": "2026-08-12T18:24:31.841850+08:00"
+    },
+    {
+      "mode": "all",
       "status": "success",
       "finished_at_utc": "2026-08-12T10:20:37.063416+00:00",
       "finished_at_beijing": "2026-08-12T18:20:37.063416+08:00"
