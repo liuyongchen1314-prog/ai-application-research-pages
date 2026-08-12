@@ -169,4 +169,22 @@ def synchronize_runtime_views(data: dict) -> None:
             if action:
                 company["action"] = action.get("action") or company.get("action")
             if current and action:
-                _rewrite_g
+                _rewrite_generated_copy(company, current, action)
+
+
+def save_snapshot(data: dict) -> None:
+    """Write the only runtime snapshot. Pretty, mirror and full-history copies are forbidden."""
+    synchronize_runtime_views(data)
+    data["embedded_snapshot"] = data.get("snapshot_date") or data.get("embedded_snapshot")
+    _normalize_fund_flow_summary(data)
+    data["version"] = RELEASE
+    data["frontend_release"] = RELEASE
+    if isinstance(data.get("refresh_summary"), dict):
+        data["refresh_summary"]["version"] = RELEASE
+    data.setdefault("public_data", {})["unified_market_urls"] = [
+        "https://liuyongchen1314-prog.github.io/ai-application-research-pages/data/latest-v7.json",
+        "https://liuyongchen1314-prog.github.io/ai-application-research-pages/mirror/latest-v7.json",
+    ]
+    data["public_data"]["repository"] = "liuyongchen1314-prog/ai-application-research-pages"
+    data["public_data"]["schedule_cn"] = "美股06:50；A股/港股/韩国16:35；财报估值18:10；公告审计22:10"
+    atomic_write(LATEST, json.dumps(data, ensure_ascii=False, separators=(",", ":")))

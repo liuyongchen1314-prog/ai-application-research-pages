@@ -181,4 +181,11 @@ def main() -> None:
         "contract_sha256": sha256_bytes(CONTRACT.read_bytes()),
         "frontend_sha256": sha256_bytes(app.encode("utf-8")),
         "html_sha256": sha256_bytes(html.encode("utf-8")),
-        "note": "完整估值只存在于正式�
+        "note": "完整估值只存在于正式快照；本文件仅保存审计计数与哈希，不复制142家公司全量结果。",
+    }
+    atomic_text(AUDIT, json.dumps(audit, ensure_ascii=False, indent=2))
+    print(json.dumps({"status": "PASS", "release": "V7.9.3", "companies": 142, "snapshot_sha256": snapshot_hash, "html_bytes": len(html.encode("utf-8"))}, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    main()

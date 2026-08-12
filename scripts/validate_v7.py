@@ -121,4 +121,10 @@ def main():
   us=(d.get('market_context') or {}).get('us') or {}
   if not us.get('items'):fail('美国当前数据为空；禁止用旧缓存冒充')
   expected=expected_completed_session('us')
-  if str(
+  if str((fr.get('us') or {}).get('date') or '')!=expected:fail(f'美国完整交易日不一致: 当前{(fr.get("us") or {}).get("date")}, 应为{expected}')
+  ny=dt.datetime.now(dt.timezone.utc).astimezone(ZoneInfo('America/New_York'));usd=str((fr.get('us') or {}).get('date') or '')
+  if ny.time()<dt.time(16,15) and usd>=ny.date().isoformat():fail(f'美国数据包含尚未收盘的当日盘中K线: {usd}')
+ for g in ('us','korea'):
+  if (fr.get(g) or {}).get('fresh') and not ((d.get('market_context') or {}).get(g) or {}).get('items'):fail(f'{g}新鲜度与当前数据矛盾')
+ print(json.dumps({'status':'PASS','mode':a.mode,'companies':total,'coverage':cov,'market_freshness':fr,'fund_flow_status':(d.get('fund_flow_summary') or {}).get('status','数据不足')},ensure_ascii=False))
+if __name__=='__main__':main()

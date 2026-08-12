@@ -182,4 +182,94 @@ def strategy_terms(action: str, valuation: dict[str, Any], tech: dict[str, Any])
     risk = entry - stop if entry and stop and entry > stop else None
     reward = high - entry if entry else None
     rr = reward / risk if risk and reward and reward > 0 else None
-    strict_stop = valuat
+    strict_stop = valuation.get("evidence_state") != "正式闭环"
+    return {
+        "first_buy_zone_low": first_zone[0] if first_zone else None,
+        "first_buy_zone_high": first_zone[1] if first_zone else None,
+        "breakout_level": pivot,
+        "initial_position": initial,
+        "add_condition": "仅在首次仓位盈利且放量站稳突破位后，再加计划仓位的15%–20%" if action in {"重点参与", "试仓"} else "不加仓",
+        "reduce_condition": "跌破50日线或估值进入上沿以上，先减1/3；放量破坏结构继续减" if action not in {"回避/退出", "暂不参与"} else "不适用",
+        "stop_loss": stop,
+        "invalidation": "收盘跌破结构止损且次日不能收回；不向亏损仓位摊低成本" if stop else "无法定义",
+        "risk_reward_ratio": rr,
+        "strict_stop_due_to_evidence": strict_stop,
+    }
+
+
+def build(data: dict[str, Any]) -> dict[str, Any]:
+    valuations = data.get("valuation_current") or {}
+    histories = data.get("histories") or {}
+    companies = [
+        *((data.get("companies") or {}).get("hardware") or []),
+        *((data.get("companies") or {}).get("application") or []),
+    ]
+    metadata = {row["code"]: row for row in companies}
+    returns = {}
+    for code, item in histories.items():
+        bars = item.get("daily") if isinstance(item, dict) else []
+        if bars and len(bars) >= 220:
+            back = min(252, len(bars) - 1)
+            returns[code] = float(bars[-1][2]) / float(bars[-1 - back][2]) - 1
+    rs = percentiles(returns)
+    technicals = {
+        code: technical((histories.get(code) or {}).get("daily") or [], rs.get(code))
+        for code in valuations
+    }
+    sector_returns: dict[str, list[float]] = {}
+    for code, tech in technicals.items():
+        meta = metadata.get(code) or {}
+        key = f"{meta.get('scope')}|{meta.get('sector')}"
+        if tech.get("return_20d") is not None:
+            sector_returns.setdefault(key, []).append(tech["return_20d"])
+    medians = {key: statistics.median(values) for key, values in sector_returns.items() if values}
+    sector_rank = percentiles(medians)
+    sectors = {
+        key: {
+            "rank": sector_rank.get(key),
+            "median_20d": medians.get(key),
+            "strength": "强" if (sector_rank.get(key) or 0) >= 70 else "中" if (sector_rank.get(key) or 0) >= 35 else "弱",
+        }
+        for key in medians
+    }
+    result = {}
+    for code, valuation in valuations.items():
+        meta = metadata.get(code) or {}
+        sector_key = f"{meta.get('scope')}|{meta.get('sector')}"
+        sector = sectors.get(sector_key) or {"strength": "未知", "rank": None, "median_20d": None}
+        tech = technicals[code]
+        action, reason = strategy_action(valuation, tech, sector["strength"])
+        terms = strategy_terms(action, valuation, tech)
+        result[code] = {
+            "version": "V7.9.3",
+            "code": code,
+            "name": valuation.get("name") or meta.get("name"),
+            "scope": meta.get("scope"),
+            "sector": meta.get("sector"),
+            "snapshot_date": data.get("snapshot_date"),
+            "reference_price": finite(valuation.get("price_as_of")) or finite(tech.get("price")),
+            "reference_price_date": valuation.get("price_date") or data.get("snapshot_date"),
+            "action": action,
+            "home_label": "可关注" if action in {"重点参与", "试仓"} else "等待" if action == "等待突破" else "持有" if action == "持有" else "偏贵" if action == "减仓" else "回避",
+            "reason": reason,
+            "valuation_position": valuation_position(finite(valuation.get("price_as_of")) or finite(tech.get("price")), float(valuation["current_low"]), float(valuation["current_high"])),
+            "valuation_confidence": valuation.get("confidence_display"),
+            "evidence_state": valuation.get("evidence_state"),
+            "sector_strength": sector["strength"],
+            "sector_rank": sector.get("rank"),
+            "technical": tech,
+            **terms,
+        }
+    return {
+        "schema": "v79-strategy-1",
+        "version": "V7.9.3",
+        "snapshot_date": data.get("snapshot_date"),
+        "market": {
+            "scope": "142家公司人工智能全链环境",
+            "advancing_20d_ratio": sum((t.get("return_20d") or 0) > 0 for t in technicals.values()) / len(technicals),
+            "stage2_ratio": sum(bool(t.get("strict_stage2")) for t in technicals.values()) / len(technicals),
+            "note": "宽基日期未与8月11日同步时，不冒充当日大盘结论。",
+        },
+        "sectors": sectors,
+        "companies": result,
+    }
