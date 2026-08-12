@@ -5,17 +5,17 @@ on:
   push:
     branches: [main]
     paths:
-      - 'frontend/**'
-      - 'tests/**'
-      - 'package.json'
-      - 'package-lock.json'
       - '.github/workflows/v793-browser-regression.yml'
+  workflow_run:
+    workflows: ['V7.9.3 八时点行情、财报、估值与策略更新']
+    types: [completed]
 
 permissions:
   contents: read
 
 jobs:
   browser:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
