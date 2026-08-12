@@ -47,6 +47,11 @@ def main() -> None:
             fail(f"{code}: card differs from quote")
         if company.get("valuation_status") != value.get("status"):
             fail(f"{code}: card differs from valuation status")
+        expected_card_six = value.get("forward_scenario") or "暂不估算"
+        if company.get("six") != expected_card_six:
+            fail(f"{code}: company card keeps a stale six-month range")
+        if any(key in company for key in ("year_end", "next_year_start", "twelve")):
+            fail(f"{code}: cancelled forward target leaked into company card")
         if value.get("twelve_public") is not False:
             fail(f"{code}: twelve-month target is still public")
         if value.get("forward_public_horizon_months") != 6:
@@ -56,6 +61,14 @@ def main() -> None:
             fail(f"{code}: unavailable forward scenario exposes a number")
         if forward_status in ("formal", "research") and not value.get("forward_scenario"):
             fail(f"{code}: displayable six-month scenario is missing")
+        if forward_status == "research":
+            calc = value.get("forward_scenario_calculation") or {}
+            if calc.get("route") != "current_research_range_roll_forward_by_ntm_eps_and_pe":
+                fail(f"{code}: six-month scenario is not rolled from the same current basis")
+            expected_low = value.get("current_low", 0) * (1 + (calc.get("value_low_change_pct") or 0))
+            expected_high = value.get("current_high", 0) * (1 + (calc.get("value_high_change_pct") or 0))
+            if abs(expected_low - value.get("six_low", 0)) > 1e-6 or abs(expected_high - value.get("six_high", 0)) > 1e-6:
+                fail(f"{code}: six-month scenario does not reconcile to current value")
         if action.get("reference_price") != quote.get("price") or action.get("reference_price_date") != quote.get("date"):
             fail(f"{code}: strategy reference differs from quote")
         visible = json.dumps({"one_liner": company.get("one_liner"), "details": company.get("details"), "signal": company.get("signal")}, ensure_ascii=False)

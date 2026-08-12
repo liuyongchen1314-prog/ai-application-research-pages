@@ -101,9 +101,12 @@ def ntm_eps(on_date: dt.date, forecasts: dict[int, float]) -> float | None:
 
 
 def pe_at(record: dict[str, Any], months: float) -> tuple[float, float] | None:
-    p0 = pair(record, "pe_base_current") or pair(record, "pe_current")
-    p6 = pair(record, "pe_base_six") or pair(record, "pe_six") or p0
-    p12 = pair(record, "pe_base_twelve") or pair(record, "pe_twelve") or p6
+    # Only immutable model inputs may drive a new calculation.  `pe_current`,
+    # `pe_six` and `pe_twelve` are generated outputs from earlier runs and must
+    # never silently become the next run's inputs.
+    p0 = pair(record, "pe_base_current")
+    p6 = pair(record, "pe_base_six")
+    p12 = pair(record, "pe_base_twelve")
     if p0 is None or p6 is None or p12 is None:
         return None
     total = finite((record.get("dynamic_pe_breakdown") or {}).get("total"))
@@ -247,6 +250,63 @@ def forward_scenario_status(
     return "unavailable", "前瞻盈利或模型证据未闭环，暂不公开数值"
 
 
+def change_pct(current: float, future: float) -> float:
+    if current <= 0:
+        raise ValueError("forward scenario comparison requires a positive current value")
+    return future / current - 1.0
+
+
+def research_forward_range(
+    record: dict[str, Any],
+    current: tuple[float, float],
+    forecasts: dict[int, float],
+    as_of: dt.date,
+    target: dt.date,
+    pe_months: float,
+) -> tuple[tuple[float, float], dict[str, Any]]:
+    """Roll a non-formal current research range forward on one consistent basis.
+
+    V7.9 imports a reviewed-but-not-formal current range.  It must not compare
+    that range with stale V7.6 six-month output fields.  Instead, move each
+    current endpoint by the change in point-in-time NTM EPS and the matching PE
+    endpoint.  This preserves the current research anchor without pretending it
+    was formally rebuilt, while making the time comparison internally coherent.
+    """
+    current_eps = ntm_eps(as_of, forecasts)
+    future_eps = ntm_eps(target, forecasts)
+    current_pe = pe_at(record, 0.0)
+    future_pe = pe_at(record, pe_months)
+    if current_eps is None or future_eps is None or current_pe is None or future_pe is None:
+        raise ValueError(f"{record.get('code')} missing same-basis forward inputs")
+    if min(current_eps, future_eps, *current_pe, *future_pe) <= 0:
+        raise ValueError(f"{record.get('code')} has non-positive same-basis forward inputs")
+    eps_factor = future_eps / current_eps
+    low_factor = eps_factor * future_pe[0] / current_pe[0]
+    high_factor = eps_factor * future_pe[1] / current_pe[1]
+    future = ordered(
+        current[0] * low_factor,
+        current[1] * high_factor,
+        str(record.get("code")),
+    )
+    drivers = {
+        "route": "current_research_range_roll_forward_by_ntm_eps_and_pe",
+        "current_ntm_eps": current_eps,
+        "future_ntm_eps": future_eps,
+        "eps_change_pct": change_pct(current_eps, future_eps),
+        "current_pe": list(current_pe),
+        "future_pe": list(future_pe),
+        "pe_low_change_pct": change_pct(current_pe[0], future_pe[0]),
+        "pe_high_change_pct": change_pct(current_pe[1], future_pe[1]),
+        "value_low_change_pct": change_pct(current[0], future[0]),
+        "value_high_change_pct": change_pct(current[1], future[1]),
+    }
+    return future, drivers
+
+
+def pct_text(value: float) -> str:
+    return f"{value * 100:+.1f}%"
+
+
 def current_model_range(
     record: dict[str, Any], forecasts: dict[int, float], as_of: dt.date
 ) -> tuple[tuple[float, float], str]:
@@ -334,6 +394,12 @@ def rebuild_record(record: dict[str, Any], financial: dict[str, Any], quote: dic
         out.pop(trading_field, None)
     for legacy_field in ("model_kind_v71", "model_kind_v72", "model_kind_v73"):
         out.pop(legacy_field, None)
+    for generated_field in (
+        "ntm_current", "ntm_six", "ntm_year_end", "ntm_next_year_start", "ntm_twelve",
+        "pe_current", "pe_six", "pe_year_end", "pe_next_year_start", "pe_twelve",
+        "forward_scenario_calculation",
+    ):
+        out.pop(generated_field, None)
     out.pop("legacy_ranges", None)
     out["model_kind_frozen"] = out.pop("model_kind", None) or "sector_specific"
     consensus = financial.get("consensus") if isinstance(financial.get("consensus"), dict) else {}
@@ -351,6 +417,7 @@ def rebuild_record(record: dict[str, Any], financial: dict[str, Any], quote: dic
     calculated: dict[str, tuple[float, float]] = {}
     current, calculation_route = current_model_range(record, forecasts, as_of)
     calculated["current"] = current
+    public_forward_status, public_forward_reason = forward_scenario_status(record, forecasts)
     pe_capable = (
         evidence_ready(record)
         and model_kind(record) == "earnings_multiple"
@@ -365,28 +432,51 @@ def rebuild_record(record: dict[str, Any], financial: dict[str, Any], quote: dic
             eps_anchor = ntm_eps(target, forecasts)
             pe_range = pe_at(record, months)
             if eps_anchor is None or pe_range is None:
-                calculated[label] = scenario_range(record, months)
-            else:
-                calculated[label] = (eps_anchor * pe_range[0], eps_anchor * pe_range[1])
-                out[f"ntm_{label}"] = eps_anchor
-                out[f"pe_{label}"] = list(pe_range)
+                raise ValueError(f"{record.get('code')} formal forward inputs do not close")
+            calculated[label] = (eps_anchor * pe_range[0], eps_anchor * pe_range[1])
+            out[f"ntm_{label}"] = eps_anchor
+            out[f"pe_{label}"] = list(pe_range)
+        elif public_forward_status == "research":
+            calculated[label], _ = research_forward_range(
+                record, current, forecasts, as_of, target, months
+            )
         else:
-            try:
-                calculated[label] = scenario_range(record, months)
-            except ValueError:
-                calculated[label] = current
+            # No public forward evidence means no new forward calculation.  Do
+            # not interpolate last run's generated ranges: that creates drift.
+            calculated[label] = current
     # Preserve the explicit six-month view as a useful operational horizon.
     six_month_date = add_calendar_months(as_of, 6)
-    six_months = months_between(as_of, six_month_date)
-    if pe_capable:
-        six_eps, six_pe = ntm_eps(six_month_date, forecasts), pe_at(record, six_months)
-        six = (six_eps * six_pe[0], six_eps * six_pe[1]) if six_eps is not None and six_pe else scenario_range(record, six_months)
+    forward_drivers: dict[str, Any] | None = None
+    if public_forward_status == "formal":
+        six_eps, six_pe = ntm_eps(six_month_date, forecasts), pe_at(record, 6.0)
+        if six_eps is None or six_pe is None:
+            raise ValueError(f"{record.get('code')} formal six-month inputs do not close")
+        six = ordered(six_eps * six_pe[0], six_eps * six_pe[1], str(record.get("code")))
+        forward_drivers = {
+            "route": "six_month_ntm_eps_x_six_month_pe",
+            "current_ntm_eps": ntm_eps(as_of, forecasts),
+            "future_ntm_eps": six_eps,
+            "current_pe": list(pe_at(record, 0.0) or ()),
+            "future_pe": list(six_pe),
+            "value_low_change_pct": change_pct(current[0], six[0]),
+            "value_high_change_pct": change_pct(current[1], six[1]),
+        }
+    elif public_forward_status == "research":
+        six, forward_drivers = research_forward_range(
+            record, current, forecasts, as_of, six_month_date, 6.0
+        )
+        public_forward_reason = (
+            "以当前研究区间为基准同口径滚动："
+            f"NTM EPS {pct_text(forward_drivers['eps_change_pct'])}，"
+            f"PE假设 {pct_text(forward_drivers['pe_low_change_pct'])}/"
+            f"{pct_text(forward_drivers['pe_high_change_pct'])}，"
+            f"合理价值 {pct_text(forward_drivers['value_low_change_pct'])}/"
+            f"{pct_text(forward_drivers['value_high_change_pct'])}"
+        )
     else:
-        try:
-            six = scenario_range(record, six_months)
-        except ValueError:
-            six = current
-    public_forward_status, public_forward_reason = forward_scenario_status(record, forecasts)
+        # Historical values remain in the delta archive.  The current record
+        # must not retain a generated value that could become a future input.
+        six = current
     public_forward_range = fmt_range(*six) if public_forward_status != "unavailable" else None
     buy_low, buy_high = current[0] * 0.85, current[0]
     price = finite(quote.get("price")) or finite(record.get("price_as_of"))
@@ -405,6 +495,7 @@ def rebuild_record(record: dict[str, Any], financial: dict[str, Any], quote: dic
         "forward_scenario": public_forward_range,
         "forward_scenario_date": six_month_date.isoformat(),
         "forward_scenario_note": public_forward_reason,
+        "forward_scenario_calculation": forward_drivers,
         "twelve_public": False,
         "year_end_low": calculated["year_end"][0], "year_end_high": calculated["year_end"][1], "year_end": fmt_range(*calculated["year_end"]),
         "year_end_date": targets["year_end"].isoformat(),
@@ -435,7 +526,11 @@ def rebuild_record(record: dict[str, Any], financial: dict[str, Any], quote: dic
         "valuation_basis": "正式模型复算" if evidence_ready(record) else "低置信度数值研究区间",
         "price_feedback_policy": "价格、回撤、趋势和量价只触发复核，不反推合理价",
     })
-    out["institution_check"] = institutional_check(out, consensus, calculated["twelve"])
+    out["institution_check"] = (
+        institutional_check(out, consensus, calculated["twelve"])
+        if public_forward_status != "unavailable"
+        else None
+    )
     data_inputs = dict(out.get("data_inputs") or {})
     data_inputs.update({
         "report_date": latest_report.get("report_date") or data_inputs.get("report_date"),

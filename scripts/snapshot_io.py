@@ -48,7 +48,8 @@ def _rewrite_generated_copy(company: dict, current: dict, action: dict) -> None:
     forward_status = current.get("forward_scenario_status")
     if forward_status in ("formal", "research") and current.get("forward_scenario"):
         forward_text = (
-            f"六个月研究情景{current['forward_scenario']}（截至{current.get('forward_scenario_date') or '待更新'}）"
+            f"六个月研究情景{current['forward_scenario']}（截至{current.get('forward_scenario_date') or '待更新'}）；"
+            f"{current.get('forward_scenario_note') or '盈利与估值假设见后台审计'}"
         )
     else:
         forward_text = "六个月情景暂不估算"
@@ -161,9 +162,13 @@ def synchronize_runtime_views(data: dict) -> None:
             current = valuation.get(code) or {}
             if current:
                 company["current"] = current.get("current") or company.get("current")
-                company["year_end"] = current.get("year_end") or company.get("year_end")
-                company["next_year_start"] = current.get("next_year_start") or company.get("next_year_start")
-                company["twelve"] = current.get("twelve_month") or current.get("twelve") or company.get("twelve")
+                company["six"] = current.get("forward_scenario") or "暂不估算"
+                # These remain inside the valuation audit object only.  Keeping
+                # stale card-level copies allowed old UI paths to leak cancelled
+                # year-end and twelve-month targets back into the public page.
+                company.pop("year_end", None)
+                company.pop("next_year_start", None)
+                company.pop("twelve", None)
                 current["price_as_of"] = company.get("price")
                 current["price_date"] = company.get("price_date")
                 status, gate = _classify(company.get("price"), current)

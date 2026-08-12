@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from valuation_core import LATEST, RELEASE
+from valuation_core import LATEST, RELEASE, load_inputs, rebuild
 
 
 def main() -> None:
@@ -52,10 +52,20 @@ def main() -> None:
             errors.append(f"{code}: unavailable forward scenario still exposes a number")
         if forward_status in ("formal", "research") and not row.get("forward_scenario"):
             errors.append(f"{code}: displayable forward scenario has no range")
+        if forward_status in ("formal", "research") and not isinstance(row.get("forward_scenario_calculation"), dict):
+            errors.append(f"{code}: displayable forward scenario has no calculation audit")
         if forward_status == "research" and (
             row.get("revision_gate") != "通过" or row.get("realization_gate") != "通过"
         ):
             errors.append(f"{code}: research scenario bypasses forecast or realization gate")
+        if forward_status == "research":
+            calc = row.get("forward_scenario_calculation") or {}
+            if calc.get("route") != "current_research_range_roll_forward_by_ntm_eps_and_pe":
+                errors.append(f"{code}: research scenario reused a stale absolute range")
+            expected_low = row.get("current_low", 0) * (1 + (calc.get("value_low_change_pct") or 0))
+            expected_high = row.get("current_high", 0) * (1 + (calc.get("value_high_change_pct") or 0))
+            if abs(expected_low - row.get("six_low", 0)) > 1e-6 or abs(expected_high - row.get("six_high", 0)) > 1e-6:
+                errors.append(f"{code}: research scenario does not reconcile to its current range")
         if not isinstance(row.get("current_low"), (int, float)) or not isinstance(row.get("current_high"), (int, float)):
             errors.append(f"{code}: non-numeric current range")
         elif row.get("current_low", 0) <= 0 or row.get("current_low", 0) >= row.get("current_high", 0):
@@ -75,6 +85,11 @@ def main() -> None:
             errors.append(f"{code}: report date reused as forecast date")
     if errors:
         raise SystemExit("\n".join(errors[:50]))
+    input_data, input_config = load_inputs()
+    repeated = rebuild(input_data, input_config)
+    if repeated != values:
+        drifted = [code for code in values if repeated.get(code) != values.get(code)]
+        raise SystemExit(f"valuation rebuild is not idempotent: {len(drifted)} records drift")
     print(json.dumps({
         "status": "PASS",
         "release": RELEASE,
