@@ -82,6 +82,10 @@ def validate_contract(data: dict, contract: dict) -> None:
             raise SystemExit(f"{code} 估值对象混入交易字段: {sorted(leaked)}")
         if record.get("formal_closed") and record.get("evidence_state") != "正式闭环":
             raise SystemExit(f"{code} 正式闭环标记缺少对应证据状态")
+        if record.get("twelve_public") is not False:
+            raise SystemExit(f"{code} 仍在公开未来12个月目标")
+        if record.get("forward_public_horizon_months") != 6:
+            raise SystemExit(f"{code} 公开前瞻时间不是6个月")
     allowed = set(contract["strategy_contract"]["allowed_actions"])
     for code, record in strategy.items():
         if record.get("action") not in allowed:
@@ -174,6 +178,8 @@ def main() -> None:
         "model_family_counts": model_families,
         "numeric_ranges": sum(bool(x.get("current_low") and x.get("current_high")) for x in data["valuation_current"].values()),
         "formal_closed": sum(bool(x.get("formal_closed")) for x in data["valuation_current"].values()),
+        "public_six_month_scenarios": sum(x.get("forward_scenario_status") in ("formal", "research") for x in data["valuation_current"].values()),
+        "public_twelve_month_targets": sum(x.get("twelve_public") is not False for x in data["valuation_current"].values()),
         "evidence_state_counts": {state: sum(x.get("evidence_state") == state for x in data["valuation_current"].values()) for state in sorted({x.get("evidence_state") for x in data["valuation_current"].values()})},
         "action_counts": data.get("strategy_meta", {}).get("action_counts", {}),
         "valuation_strategy_separated": True,

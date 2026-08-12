@@ -42,7 +42,12 @@ def main() -> None:
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "companies": len(valuation),
         "single_source": True,
-        "calendar_targets": ["current", "2026-12-31", "2027-02-28", "12_month"],
+        "public_targets": ["current_research_range", "six_month_value_scenario"],
+        "internal_audit_targets": ["2026-12-31", "2027-02-28", "12_month"],
+        "public_six_month_scenarios": sum(
+            row.get("forward_scenario_status") in ("formal", "research") for row in valuation.values()
+        ),
+        "public_twelve_month_targets": 0,
         "queued_companies": data.get("revaluation_queue") or [],
         "numeric_research_ranges": sum(
             bool(row.get("current_low") and row.get("current_high")) for row in valuation.values()

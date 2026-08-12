@@ -344,6 +344,17 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
     const a = rangeNumbers(s);
     return a.length >= 2 ? (a[0] + a[1]) / 2 : null;
   }
+  function v79ForwardScenario(v) {
+    const status = String(v?.forward_scenario_status || "unavailable");
+    const available = ["formal", "research"].includes(status) && !!v?.forward_scenario;
+    return {
+      available,
+      label: status === "formal" ? "6个月正式情景" : "6个月研究情景",
+      range: available ? v.forward_scenario : "暂不估算",
+      date: v?.forward_scenario_date || "",
+      note: v?.forward_scenario_note || "前瞻盈利或模型证据未闭环",
+    };
+  }
   function v7ValStatus(c) {
     const v = window.__V7_VALUATION__?.[c.code];
     if (!v || v.blocked) return "估值输入未闭环";
@@ -416,7 +427,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
         ) {
           const tx = x.blocked
             ? `旧区间已停用。缺少：${(x.missing_inputs || []).join("、")}。`
-            : `估值日${x.valuation_as_of || x.price_date || "待更新"}。当前合理区间${x.current || V74_VALUATION_PENDING}；未来情景区间${x.forward_ranges_formal ? (x.twelve || V74_VALUATION_PENDING) : "仍待证据复核"}；安全边际区${x.buy_zone || V74_VALUATION_PENDING}。详细方法与版本变化已记录在后台文件。`;
+            : (() => { const f=v79ForwardScenario(x); return `估值日${x.valuation_as_of || x.price_date || "待更新"}。当前研究区间${x.current || V74_VALUATION_PENDING}；${f.label}${f.range}${f.date ? `（截至${f.date}）` : ""}；安全边际区${x.buy_zone || V74_VALUATION_PENDING}。六个月情景不是股价预测，未来12个月目标已取消公开展示。`; })();
           if ("body" in d) d.body = tx;
           else d.content = tx;
         }
@@ -2965,14 +2976,14 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
     v73BindFilters(bar);
     const head = body.closest("table").querySelector("thead tr");
     head.innerHTML =
-      "<th>公司 / 最新价</th><th>板块 / 质量</th><th>当前 / 前瞻合理区间</th><th>估值位置 / 证据</th><th>盈利预期</th><th>趋势</th><th>行动</th><th>最关键原因</th><th>详情</th>";
+      "<th>公司 / 最新价</th><th>板块 / 质量</th><th>当前研究区间 / 6个月情景</th><th>估值位置 / 证据</th><th>盈利预期</th><th>趋势</th><th>行动</th><th>最关键原因</th><th>详情</th>";
     body.innerHTML = rows
       .map((c) => {
         const v = window.__V7_VALUATION__?.[c.code] || {},
           a = v73Action(c),
           trend = v74TrendSignal(c);
-        const s=strategyFor(c);
-        return `<tr><td><span class="company">${esc(c.name)}</span><div class="v74-live-price">${num(c.price)} <span class="${classFor(c.change)}">${pct(c.change)}</span></div><div class="code">${esc(c.code)}｜${esc(c.price_date || latestPriceDate())}</div></td><td>${esc(c.sector)}<div class="small muted">质量 ${num(c.quality)}｜${esc(c.tier||'—')}</div></td><td class="range"><b>${esc(v.current || V74_VALUATION_PENDING)}</b><div class="v74-calendar-price">年底 ${esc(v.year_end || V74_VALUATION_PENDING)}｜明年2月 ${esc(v.next_year_start || V74_VALUATION_PENDING)}｜12个月 ${esc(v.twelve || V74_VALUATION_PENDING)}</div></td><td><b>${esc(v.status || V74_VALUATION_PENDING)}</b><div class="small muted">${esc(v.confidence || "D")}级｜${esc(v.evidence_state || v.audit_status || "待复核")}</div></td><td>${esc(v.revision_gate || "数据不足")}<div class="small muted">财报 ${esc(v.realization_gate || "数据不足")}</div></td><td><span class="v74-mini-trend tone-${trend.tone}"><b>${esc(trend.label)}</b><em>${trend.score == null ? "—" : trend.score + "分"}</em></span><div class="small muted">${esc(c.sepa?.stage || "待判断")}</div></td><td><span class="v73-action a-${a}">${esc(a)}</span></td><td>${esc(s.reason || v73Reason(c))}</td><td><button class="detail-btn" data-detail="${esc(c.code)}">查看</button></td></tr>`;
+        const s=strategyFor(c), f=v79ForwardScenario(v);
+        return `<tr><td><span class="company">${esc(c.name)}</span><div class="v74-live-price">${num(c.price)} <span class="${classFor(c.change)}">${pct(c.change)}</span></div><div class="code">${esc(c.code)}｜${esc(c.price_date || latestPriceDate())}</div></td><td>${esc(c.sector)}<div class="small muted">质量 ${num(c.quality)}｜${esc(c.tier||'—')}</div></td><td class="range"><b>当前 ${esc(v.current || V74_VALUATION_PENDING)}</b><div class="v74-calendar-price">${esc(f.label)} ${esc(f.range)}${f.available && f.date ? `｜截至 ${esc(f.date)}` : ""}</div></td><td><b>${esc(v.status || V74_VALUATION_PENDING)}</b><div class="small muted">${esc(v.confidence || "D")}级｜${esc(v.evidence_state || v.audit_status || "待复核")}</div></td><td>${esc(v.revision_gate || "数据不足")}<div class="small muted">财报 ${esc(v.realization_gate || "数据不足")}</div></td><td><span class="v74-mini-trend tone-${trend.tone}"><b>${esc(trend.label)}</b><em>${trend.score == null ? "—" : trend.score + "分"}</em></span><div class="small muted">${esc(c.sepa?.stage || "待判断")}</div></td><td><span class="v73-action a-${a}">${esc(a)}</span></td><td>${esc(s.reason || v73Reason(c))}</td><td><button class="detail-btn" data-detail="${esc(c.code)}">查看</button></td></tr>`;
       })
       .join("");
     body.querySelectorAll("[data-detail]").forEach(
@@ -3046,8 +3057,8 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
       analystCount = d.analyst_count ?? institution?.analyst_count,
       strategy=strategyFor(c),
       formal=!!v.formal_closed,
-      forward=formal&&v.forward_ranges_formal;
-    card.innerHTML = `<div class="v74-detail-heading"><h3>估值证据与独立行动</h3><span>估值模型 V7.9.3</span></div><div class="v7-detail-model-grid"><div><span>当前合理区间</span><b>${esc(v.current || V74_VALUATION_PENDING)}</b></div><div><span>安全边际区</span><b>${esc(v.buy_zone || "—")}</b></div><div><span>未来情景</span><b>${forward?esc(v.twelve||"—"):"待复核，不作正式目标"}</b></div><div><span>证据状态</span><b>${esc(v.evidence_state||v.audit_status||"待复核")}</b></div></div><div class="v74-detail-pills"><span>置信度 ${esc(v.confidence || "—")}</span><span>${formal?"正式闭环":"研究区间"}</span><span>行情日 ${esc(v.price_date||c.price_date||"—")}</span></div><p><b>估值位置：</b>${esc(v.status || V74_VALUATION_PENDING)}｜<b>独立行动：</b>${esc(strategy.action||"等待突破")}｜<b>趋势：</b>${esc(trend.label)} ${trend.score == null ? "" : trend.score + "分"}</p><p><b>行动原因：</b>${esc(strategy.reason||"等待趋势、量价和风险条件共同确认")}</p><p><b>主模型：</b>${esc(v.primary_model || "—")}｜<b>交叉验证：</b>${esc(v.cross_check_model || "—")}｜<b>依据：</b>${esc(v.valuation_basis || v.model_note || "—")}</p><p><b>关键数据：</b>2026年预测EPS ${compactNumber(eps26)}｜2027年预测EPS ${compactNumber(eps27)}｜最新扣非/归母利润同比 ${compactNumber(profitYoy, 1)}%｜覆盖机构 ${Number.isFinite(+analystCount) ? Math.round(+analystCount) : "—"}家</p><p><b>机构交叉：</b>${institution ? `${esc(institution.range)}｜${institution.overlap ? "与模型有重叠" : "与模型差异较大，需复核"}` : "暂无结构化目标带"}。机构只作交叉验证，不反推合理价。</p><p class="small muted">行情变化只更新估值位置；只有财报、盈利预期、股本、公司行动或业务结构等估值输入改变，才重算合理价值。完整模型和版本变化记录在后台审计文件中。</p>`;
+      forward=v79ForwardScenario(v);
+    card.innerHTML = `<div class="v74-detail-heading"><h3>估值证据与独立行动</h3><span>估值模型 V7.9.3</span></div><div class="v7-detail-model-grid"><div><span>当前研究区间</span><b>${esc(v.current || V74_VALUATION_PENDING)}</b></div><div><span>安全边际区</span><b>${esc(v.buy_zone || "—")}</b></div><div><span>${esc(forward.label)}</span><b>${esc(forward.range)}</b></div><div><span>证据状态</span><b>${esc(v.evidence_state||v.audit_status||"待复核")}</b></div></div><div class="v74-detail-pills"><span>置信度 ${esc(v.confidence || "—")}</span><span>${formal?"正式闭环":"研究区间"}</span><span>行情日 ${esc(v.price_date||c.price_date||"—")}</span></div><p><b>估值位置：</b>${esc(v.status || V74_VALUATION_PENDING)}｜<b>独立行动：</b>${esc(strategy.action||"等待突破")}｜<b>趋势：</b>${esc(trend.label)} ${trend.score == null ? "" : trend.score + "分"}</p><p><b>行动原因：</b>${esc(strategy.reason||"等待趋势、量价和风险条件共同确认")}</p><p><b>六个月情景说明：</b>${esc(forward.note)}${forward.available && forward.date ? `｜截至 ${esc(forward.date)}` : ""}。这是盈利与估值假设下的合理价值测算，不是未来股价预测；未来12个月目标已取消公开展示。</p><p><b>主模型：</b>${esc(v.primary_model || "—")}｜<b>交叉验证：</b>${esc(v.cross_check_model || "—")}｜<b>依据：</b>${esc(v.valuation_basis || v.model_note || "—")}</p><p><b>关键数据：</b>2026年预测EPS ${compactNumber(eps26)}｜2027年预测EPS ${compactNumber(eps27)}｜最新扣非/归母利润同比 ${compactNumber(profitYoy, 1)}%｜覆盖机构 ${Number.isFinite(+analystCount) ? Math.round(+analystCount) : "—"}家</p><p><b>机构交叉：</b>${institution ? `${esc(institution.range)}｜${institution.overlap ? "与模型有重叠" : "与模型差异较大，需复核"}` : "暂无结构化目标带"}。机构只作交叉验证，不反推合理价。</p><p class="small muted">行情变化只更新估值位置；只有财报、盈利预期、股本、公司行动或业务结构等估值输入改变，才重算合理价值。完整模型和版本变化记录在后台审计文件中。</p>`;
     body.prepend(card);
   };
 

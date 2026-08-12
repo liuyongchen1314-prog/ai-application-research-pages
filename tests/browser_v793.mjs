@@ -101,12 +101,26 @@ for (const profile of [
     await page.waitForSelector("#panel-valuation table");
     const valuation = await page.evaluate(() => ({
       columns: document.querySelectorAll("#panel-valuation thead th").length,
+      heading: document.querySelector("#panel-valuation thead")?.textContent || "",
+      text: document.querySelector("#panel-valuation tbody")?.textContent || "",
       tableWidth: document.querySelector("#panel-valuation table")?.scrollWidth || 0,
       bodyWidth: document.body.scrollWidth,
       viewportWidth: document.documentElement.clientWidth,
+      sixMonthScenarios: Object.values(window.__V7_VALUATION__ || {}).filter((row) => ["formal", "research"].includes(row.forward_scenario_status)).length,
+      twelveMonthTargets: Object.values(window.__V7_VALUATION__ || {}).filter((row) => row.twelve_public !== false).length,
     }));
     check(valuation.columns === 9, `valuation table has ${valuation.columns} columns, expected 9`);
+    check(valuation.heading.includes("当前研究区间 / 6个月情景"), "valuation table does not use the six-month scenario contract");
+    check(!/(未来12个月|明年2月|年底)/.test(valuation.text), "valuation table still exposes old long-horizon targets");
+    check(valuation.sixMonthScenarios > 0 && valuation.sixMonthScenarios < 142, "six-month scenarios are not gated company by company");
+    check(valuation.twelveMonthTargets === 0, "twelve-month targets remain public");
     check(valuation.bodyWidth <= valuation.viewportWidth + 2, "valuation table leaks horizontal overflow to the body");
+    await page.click("#valuationBody [data-detail]");
+    await page.waitForSelector("#modal.open .v7-detail-model");
+    const detailValuation = await page.$eval("#modalBody .v7-detail-model", (node) => node.textContent);
+    check(detailValuation.includes("6个月"), "company detail does not show the six-month scenario decision");
+    check(!detailValuation.includes("12个月目标价"), "company detail still presents a twelve-month target price");
+    await page.click("#detailBack");
     report.initial = initial;
     report.valuation = valuation;
     report.pageErrors = pageErrors;

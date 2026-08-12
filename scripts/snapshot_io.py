@@ -45,11 +45,18 @@ def _rewrite_generated_copy(company: dict, current: dict, action: dict) -> None:
             f"{core}；最新价{company.get('price', '—')}，{RELEASE}当前合理区间{current.get('current', '待核验')}，"
             f"估值状态为“{current.get('status', '待核验')}”；当前行动为“{action.get('action', '等待突破')}”。"
         )
+    forward_status = current.get("forward_scenario_status")
+    if forward_status in ("formal", "research") and current.get("forward_scenario"):
+        forward_text = (
+            f"六个月研究情景{current['forward_scenario']}（截至{current.get('forward_scenario_date') or '待更新'}）"
+        )
+    else:
+        forward_text = "六个月情景暂不估算"
     valuation_text = (
         f"估值日{current.get('valuation_as_of') or current.get('price_date') or '待更新'}。"
-        f"当前合理区间{current.get('current') or '待核验'}；年底{current.get('year_end') or '待核验'}；"
-        f"明年2月{current.get('next_year_start') or '待核验'}；未来12个月{current.get('twelve') or '待核验'}。"
-        f"证据状态：{current.get('evidence_state') or '待复核'}；合理区间不随股价自动漂移。"
+        f"当前研究区间{current.get('current') or '待核验'}；{forward_text}。"
+        f"证据状态：{current.get('evidence_state') or '待复核'}。"
+        "六个月情景是盈利与估值假设下的合理价值测算，不是股价预测；未来12个月目标已取消公开展示。"
     )
     for detail in company.get("details") or []:
         title = str(detail.get("title") or detail.get("chapter") or "")

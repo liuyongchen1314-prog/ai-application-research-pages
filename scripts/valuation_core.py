@@ -10,6 +10,7 @@ closed until its evidence gate is complete.
 from __future__ import annotations
 
 import copy
+import calendar
 import datetime as dt
 import json
 import math
@@ -222,6 +223,30 @@ def evidence_ready(record: dict[str, Any]) -> bool:
     return bool(record.get("formal_closed")) and record.get("evidence_state") == "正式闭环"
 
 
+def forward_scenario_status(
+    record: dict[str, Any], forecasts: dict[int, float]
+) -> tuple[str, str]:
+    """Decide whether a six-month value scenario is fit for public display."""
+    if evidence_ready(record) and bool(record.get("forward_ranges_formal")):
+        return "formal", "正式证据与前瞻模型均已闭环"
+    research_ready = all(
+        (
+            record.get("evidence_state") in ("部分闭环", "条件成立"),
+            model_kind(record) == "earnings_multiple",
+            forecasts.get(2026) is not None,
+            forecasts.get(2027) is not None,
+            pair(record, "pe_base_current") is not None,
+            pair(record, "pe_base_six") is not None,
+            record.get("revision_gate") == "通过",
+            record.get("realization_gate") == "通过",
+            not record.get("missing_inputs"),
+        )
+    )
+    if research_ready:
+        return "research", "盈利预测、PE与财报兑现门已通过；仅作六个月研究情景"
+    return "unavailable", "前瞻盈利或模型证据未闭环，暂不公开数值"
+
+
 def current_model_range(
     record: dict[str, Any], forecasts: dict[int, float], as_of: dt.date
 ) -> tuple[tuple[float, float], str]:
@@ -255,6 +280,14 @@ def current_model_range(
 
 def months_between(start: dt.date, target: dt.date) -> float:
     return max(0.0, (target - start).days / 30.4375)
+
+
+def add_calendar_months(value: dt.date, months: int) -> dt.date:
+    index = value.year * 12 + (value.month - 1) + months
+    year, month_index = divmod(index, 12)
+    month = month_index + 1
+    day = min(value.day, calendar.monthrange(year, month)[1])
+    return dt.date(year, month, day)
 
 
 def classify(price: float | None, low: float, high: float, buy_low: float) -> tuple[str, str]:
@@ -307,11 +340,13 @@ def rebuild_record(record: dict[str, Any], financial: dict[str, Any], quote: dic
     latest_report = financial.get("latest_report") if isinstance(financial.get("latest_report"), dict) else {}
     forecasts = {year: eps for year, eps in ((2026, finite(record.get("eps_2026"))), (2027, finite(record.get("eps_2027"))), (2028, finite(record.get("eps_2028")))) if eps is not None and eps > 0}
     forecasts.update(annual_eps_from_consensus(consensus))
+    year_end = dt.date(as_of.year, 12, 31)
+    next_february = dt.date(as_of.year + 1, 2, calendar.monthrange(as_of.year + 1, 2)[1])
     targets = {
         "current": as_of,
-        "year_end": dt.date(2026, 12, 31),
-        "next_year_start": dt.date(2027, 2, 28),
-        "twelve": as_of + dt.timedelta(days=365),
+        "year_end": year_end,
+        "next_year_start": next_february,
+        "twelve": add_calendar_months(as_of, 12),
     }
     calculated: dict[str, tuple[float, float]] = {}
     current, calculation_route = current_model_range(record, forecasts, as_of)
@@ -341,7 +376,7 @@ def rebuild_record(record: dict[str, Any], financial: dict[str, Any], quote: dic
             except ValueError:
                 calculated[label] = current
     # Preserve the explicit six-month view as a useful operational horizon.
-    six_month_date = as_of + dt.timedelta(days=182)
+    six_month_date = add_calendar_months(as_of, 6)
     six_months = months_between(as_of, six_month_date)
     if pe_capable:
         six_eps, six_pe = ntm_eps(six_month_date, forecasts), pe_at(record, six_months)
@@ -351,6 +386,8 @@ def rebuild_record(record: dict[str, Any], financial: dict[str, Any], quote: dic
             six = scenario_range(record, six_months)
         except ValueError:
             six = current
+    public_forward_status, public_forward_reason = forward_scenario_status(record, forecasts)
+    public_forward_range = fmt_range(*six) if public_forward_status != "unavailable" else None
     buy_low, buy_high = current[0] * 0.85, current[0]
     price = finite(quote.get("price")) or finite(record.get("price_as_of"))
     status, gate = classify(price, current[0], current[1], buy_low)
@@ -363,10 +400,16 @@ def rebuild_record(record: dict[str, Any], financial: dict[str, Any], quote: dic
         "price_date": quote_date(quote.get("timestamp") or quote.get("date"), as_of),
         "current_low": current[0], "current_high": current[1], "current": fmt_range(*current),
         "six_low": six[0], "six_high": six[1], "six": fmt_range(*six),
+        "forward_public_horizon_months": 6,
+        "forward_scenario_status": public_forward_status,
+        "forward_scenario": public_forward_range,
+        "forward_scenario_date": six_month_date.isoformat(),
+        "forward_scenario_note": public_forward_reason,
+        "twelve_public": False,
         "year_end_low": calculated["year_end"][0], "year_end_high": calculated["year_end"][1], "year_end": fmt_range(*calculated["year_end"]),
-        "year_end_date": "2026-12-31",
+        "year_end_date": targets["year_end"].isoformat(),
         "next_year_start_low": calculated["next_year_start"][0], "next_year_start_high": calculated["next_year_start"][1], "next_year_start": fmt_range(*calculated["next_year_start"]),
-        "next_year_start_date": "2027-02-28",
+        "next_year_start_date": targets["next_year_start"].isoformat(),
         "twelve_low": calculated["twelve"][0], "twelve_high": calculated["twelve"][1], "twelve": fmt_range(*calculated["twelve"]),
         "twelve_date": targets["twelve"].isoformat(),
         "buy_low": buy_low, "buy_high": buy_high, "buy_zone": fmt_range(buy_low, buy_high),

@@ -47,10 +47,19 @@ def main() -> None:
             fail(f"{code}: card differs from quote")
         if company.get("valuation_status") != value.get("status"):
             fail(f"{code}: card differs from valuation status")
+        if value.get("twelve_public") is not False:
+            fail(f"{code}: twelve-month target is still public")
+        if value.get("forward_public_horizon_months") != 6:
+            fail(f"{code}: public forward horizon is not six months")
+        forward_status = value.get("forward_scenario_status")
+        if forward_status == "unavailable" and value.get("forward_scenario") is not None:
+            fail(f"{code}: unavailable forward scenario exposes a number")
+        if forward_status in ("formal", "research") and not value.get("forward_scenario"):
+            fail(f"{code}: displayable six-month scenario is missing")
         if action.get("reference_price") != quote.get("price") or action.get("reference_price_date") != quote.get("date"):
             fail(f"{code}: strategy reference differs from quote")
         visible = json.dumps({"one_liner": company.get("one_liner"), "details": company.get("details"), "signal": company.get("signal")}, ensure_ascii=False)
-        if any(token in visible for token in ("V7.6当前合理区间", "估值日2026-08-07", "等待当前估值模型更新")):
+        if any(token in visible for token in ("V7.6当前合理区间", "估值日2026-08-07", "等待当前估值模型更新")) or re.search(r"(?:未来12个月|明年2月)\s*[0-9]", visible):
             fail(f"{code}: stale generated valuation copy remains")
         zone = (action.get("first_buy_zone_low"), action.get("first_buy_zone_high"))
         if zone == (0, 0):
@@ -86,7 +95,8 @@ def main() -> None:
         "工作日后台8个时点自动运行",
         "v793-market-grid",
         "data-live-market",
-        "当前 / 前瞻合理区间",
+        "当前研究区间 / 6个月情景",
+        "未来12个月目标已取消公开展示",
     )
     missing = [token for token in required if token not in html]
     if missing:

@@ -28,7 +28,8 @@ def main() -> None:
         "current", "year_end", "next_year_start", "twelve", "status",
         "valuation_gate", "version", "current_low", "current_high",
         "primary_model", "cross_check_model", "evidence_state",
-        "calculation_route", "confidence_display",
+        "calculation_route", "confidence_display", "forward_public_horizon_months",
+        "forward_scenario_status", "forward_scenario_date", "forward_scenario_note",
     )
     for code, row in values.items():
         missing = [key for key in required if not row.get(key)]
@@ -40,6 +41,21 @@ def main() -> None:
             errors.append(f"{code}: missing primary/cross model")
         if row.get("valuation_basis") not in ("正式模型复算", "低置信度数值研究区间"):
             errors.append(f"{code}: missing valuation basis")
+        if row.get("twelve_public") is not False:
+            errors.append(f"{code}: twelve-month target is still public")
+        forward_status = row.get("forward_scenario_status")
+        if forward_status not in ("formal", "research", "unavailable"):
+            errors.append(f"{code}: invalid forward scenario status")
+        if row.get("forward_public_horizon_months") != 6:
+            errors.append(f"{code}: public forward horizon is not six months")
+        if forward_status == "unavailable" and row.get("forward_scenario") is not None:
+            errors.append(f"{code}: unavailable forward scenario still exposes a number")
+        if forward_status in ("formal", "research") and not row.get("forward_scenario"):
+            errors.append(f"{code}: displayable forward scenario has no range")
+        if forward_status == "research" and (
+            row.get("revision_gate") != "通过" or row.get("realization_gate") != "通过"
+        ):
+            errors.append(f"{code}: research scenario bypasses forecast or realization gate")
         if not isinstance(row.get("current_low"), (int, float)) or not isinstance(row.get("current_high"), (int, float)):
             errors.append(f"{code}: non-numeric current range")
         elif row.get("current_low", 0) <= 0 or row.get("current_low", 0) >= row.get("current_high", 0):
@@ -67,8 +83,10 @@ def main() -> None:
         "application": 59,
         "numeric_ranges": sum(bool(r.get("current_low") and r.get("current_high")) for r in values.values()),
         "formal_closed": sum(bool(r.get("formal_closed")) for r in values.values()),
+        "public_six_month_scenarios": sum(r.get("forward_scenario_status") in ("formal", "research") for r in values.values()),
+        "public_twelve_month_targets": sum(r.get("twelve_public") is not False for r in values.values()),
         "legacy_keys": 0,
-        "calendar_targets": 4,
+        "public_horizon_months": 6,
         "valuation_trading_separated": True,
     }, ensure_ascii=False))
 

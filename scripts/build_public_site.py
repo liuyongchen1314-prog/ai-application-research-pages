@@ -28,6 +28,10 @@ def main() -> None:
         raise SystemExit("估值或策略未覆盖唯一公司池")
     if any(not isinstance(v.get("current_low"), (int, float)) or not isinstance(v.get("current_high"), (int, float)) for v in valuation.values()):
         raise SystemExit("存在非数值合理估值范围")
+    if any(v.get("twelve_public") is not False for v in valuation.values()):
+        raise SystemExit("仍有未来12个月目标被标记为公开")
+    if any(v.get("forward_public_horizon_months") != 6 for v in valuation.values()):
+        raise SystemExit("公开前瞻时间未统一为6个月")
 
     template = (FRONTEND / "V7_9_页面模板.html").read_text("utf-8")
     app = (FRONTEND / "V7_9_统一前端.js").read_text("utf-8")
