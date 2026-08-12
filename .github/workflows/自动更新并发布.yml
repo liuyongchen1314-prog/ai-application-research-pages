@@ -1,0 +1,121 @@
+name: 自动更新并发布研究网页
+
+on:
+  schedule:
+    - cron: '55 8 * * 1-5'   # 北京时间工作日16:55
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'config/**'
+      - 'scripts/**'
+      - '.github/workflows/自动更新并发布.yml'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 自动更新研究网页
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - name: 读取仓库
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: 准备运行环境
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: 更新142家公司行情与交易层
+        run: python scripts/更新研究系统.py
+
+      - name: 严格验收估值与中文页面
+        run: python scripts/验收发布版.py
+
+      - name: 桌面和手机真实浏览器验收
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME=$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)
+          test -n "$CHROME"
+          mkdir -p 验收证据
+          PAGE="file://$GITHUB_WORKSPACE/index.html"
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --window-size=1680,1100 --virtual-time-budget=3000 --dump-dom "$PAGE" > 验收证据/桌面页面.html
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --window-size=1680,1100 --virtual-time-budget=3000 --screenshot=验收证据/桌面截图.png "$PAGE"
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --window-size=390,844 --virtual-time-budget=3000 --dump-dom "$PAGE" > 验收证据/手机页面.html
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --window-size=390,844 --virtual-time-budget=3000 --screenshot=验收证据/手机截图.png "$PAGE"
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import re
+          class V(HTMLParser):
+              def __init__(self): super().__init__(); self.skip=0; self.parts=[]
+              def handle_starttag(self,t,a):
+                  if t in {'script','style'}: self.skip+=1
+              def handle_endtag(self,t):
+                  if t in {'script','style'} and self.skip:self.skip-=1
+              def handle_data(self,d):
+                  if not self.skip:self.parts.append(d)
+          for name in ('桌面页面','手机页面'):
+              dom=Path('验收证据/'+name+'.html').read_text(encoding='utf-8')
+              if 'data-ready="142"' not in dom or 'data-total="142"' not in dom:
+                  raise SystemExit(name+' 未真实渲染142家公司')
+              v=V();v.feed(dom);visible=' '.join(v.parts)
+              if '冻结' in visible: raise SystemExit(name+' 仍出现冻结')
+              bad=re.findall(r'[A-Za-z]{5,}',visible)
+              if bad: raise SystemExit(name+' 仍有长串英文: '+','.join(sorted(set(bad))[:10]))
+              if '合理估值范围' not in visible: raise SystemExit(name+' 缺少合理估值范围')
+          print('桌面1680×1100和手机390×844真实渲染通过；142家公司、中文页面、估值区间均通过')
+          PY
+
+      - name: 上传验收证据
+        uses: actions/upload-artifact@v4
+        with:
+          name: 网页真实验收证据
+          path: 验收证据/
+          retention-days: 30
+
+      - name: 保存通过验收的数据
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html data
+          if ! git diff --cached --quiet; then
+            DATE=$(python - <<'PY'
+          import json
+          print(json.load(open('data/最新研究数据.json',encoding='utf-8'))['数据日期'])
+          PY
+          )
+            git commit -m "更新研究数据 ${DATE}"
+            git push
+          fi
+
+      - name: 配置网页发布
+        uses: actions/configure-pages@v5
+
+      - name: 打包网页
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 发布网页
+        id: deployment
+        uses: actions/deploy-pages@v4
