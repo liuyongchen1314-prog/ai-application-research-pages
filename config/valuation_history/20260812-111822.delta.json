@@ -1,8 +1,36 @@
 {
-  "version": "V7.9",
-  "valuation_date": "2026-08-12",
-  "records": [
-    {
+  "schema": "v79-valuation-delta-1",
+  "meta": {
+    "version": "V7.9",
+    "generated_at": "2026-08-12T11:18:22.401238+00:00",
+    "companies": 142,
+    "single_source": true,
+    "public_targets": [
+      "current_research_range",
+      "six_month_value_scenario"
+    ],
+    "internal_audit_targets": [
+      "2026-12-31",
+      "2027-02-28",
+      "12_month"
+    ],
+    "public_six_month_scenarios": 24,
+    "public_twelve_month_targets": 0,
+    "queued_companies": [],
+    "numeric_research_ranges": 142,
+    "formal_closed": 0,
+    "evidence_distribution": {
+      "正式闭环": 0,
+      "部分闭环": 65,
+      "条件成立": 1,
+      "证据较弱": 76
+    },
+    "separation_rule": "估值对象不保存交易行动；操作策略由独立策略对象生成"
+  },
+  "previous_sha256": "90a8ce70b69b4bc0393899df43cd26af31d8b75a20257ac64ba5699fe21f40a3",
+  "current_sha256": "209f36715c2ed7f619c5f3cb977e73feaa7d36df4b4abfdb9c72f419eca31e24",
+  "changed": {
+    "300308.SZ": {
       "scope": "hardware",
       "code": "300308.SZ",
       "name": "中际旭创",
@@ -225,7 +253,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688008.SH": {
       "scope": "hardware",
       "code": "688008.SH",
       "name": "澜起科技",
@@ -455,7 +483,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002371.SZ": {
       "scope": "hardware",
       "code": "002371.SZ",
       "name": "北方华创",
@@ -685,7 +713,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "00522.HK": {
       "scope": "hardware",
       "code": "00522.HK",
       "name": "ASMPT",
@@ -840,7 +868,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688825.SH": {
       "scope": "hardware",
       "code": "688825.SH",
       "name": "长鑫科技",
@@ -996,7 +1024,7 @@
       "twelve_public": false,
       "model_kind": "price_to_book"
     },
-    {
+    "601138.SH": {
       "scope": "hardware",
       "code": "601138.SH",
       "name": "工业富联",
@@ -1219,7 +1247,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "300502.SZ": {
       "scope": "hardware",
       "code": "300502.SZ",
       "name": "新易盛",
@@ -1442,7 +1470,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002463.SZ": {
       "scope": "hardware",
       "code": "002463.SZ",
       "name": "沪电股份",
@@ -1665,7 +1693,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "601869.SH": {
       "scope": "hardware",
       "code": "601869.SH",
       "name": "长飞光纤",
@@ -1901,7 +1929,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "600183.SH": {
       "scope": "hardware",
       "code": "600183.SH",
       "name": "生益科技",
@@ -2137,7 +2165,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "300394.SZ": {
       "scope": "hardware",
       "code": "300394.SZ",
       "name": "天孚通信",
@@ -2360,7 +2388,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688041.SH": {
       "scope": "hardware",
       "code": "688041.SH",
       "name": "海光信息",
@@ -2527,7 +2555,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688256.SH": {
       "scope": "hardware",
       "code": "688256.SH",
       "name": "寒武纪",
@@ -2742,7 +2770,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002916.SZ": {
       "scope": "hardware",
       "code": "002916.SZ",
       "name": "深南电路",
@@ -2957,7 +2985,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688012.SH": {
       "scope": "hardware",
       "code": "688012.SH",
       "name": "中微公司",
@@ -3180,7 +3208,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "000977.SZ": {
       "scope": "hardware",
       "code": "000977.SZ",
       "name": "浪潮信息",
@@ -3403,7 +3431,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "000938.SZ": {
       "scope": "hardware",
       "code": "000938.SZ",
       "name": "紫光股份",
@@ -3569,7 +3597,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "301269.SZ": {
       "scope": "hardware",
       "code": "301269.SZ",
       "name": "华大九天",
@@ -3735,7 +3763,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "603019.SH": {
       "scope": "hardware",
       "code": "603019.SH",
       "name": "中科曙光",
@@ -3953,7 +3981,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688498.SH": {
       "scope": "hardware",
       "code": "688498.SH",
       "name": "源杰科技",
@@ -4183,7 +4211,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "603986.SH": {
       "scope": "hardware",
       "code": "603986.SH",
       "name": "兆易创新",
@@ -4411,7 +4439,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "000988.SZ": {
       "scope": "hardware",
       "code": "000988.SZ",
       "name": "华工科技",
@@ -4634,7 +4662,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002281.SZ": {
       "scope": "hardware",
       "code": "002281.SZ",
       "name": "光迅科技",
@@ -4856,7 +4884,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "600406.SH": {
       "scope": "hardware",
       "code": "600406.SH",
       "name": "国电南瑞",
@@ -5079,7 +5107,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002475.SZ": {
       "scope": "hardware",
       "code": "002475.SZ",
       "name": "立讯精密",
@@ -5294,7 +5322,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002837.SZ": {
       "scope": "hardware",
       "code": "002837.SZ",
       "name": "英维克",
@@ -5517,7 +5545,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "300476.SZ": {
       "scope": "hardware",
       "code": "300476.SZ",
       "name": "胜宏科技",
@@ -5740,7 +5768,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "09660.HK": {
       "scope": "hardware",
       "code": "09660.HK",
       "name": "地平线机器人",
@@ -5896,7 +5924,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "603893.SH": {
       "scope": "hardware",
       "code": "603893.SH",
       "name": "瑞芯微",
@@ -6119,7 +6147,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688521.SH": {
       "scope": "hardware",
       "code": "688521.SH",
       "name": "芯原股份",
@@ -6286,7 +6314,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "002409.SZ": {
       "scope": "hardware",
       "code": "002409.SZ",
       "name": "雅克科技",
@@ -6516,7 +6544,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688082.SH": {
       "scope": "hardware",
       "code": "688082.SH",
       "name": "盛美上海",
@@ -6739,7 +6767,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002028.SZ": {
       "scope": "hardware",
       "code": "002028.SZ",
       "name": "思源电气",
@@ -6962,7 +6990,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "300548.SZ": {
       "scope": "hardware",
       "code": "300548.SZ",
       "name": "长芯博创",
@@ -7165,7 +7193,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "600522.SH": {
       "scope": "hardware",
       "code": "600522.SH",
       "name": "中天科技",
@@ -7393,7 +7421,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688019.SH": {
       "scope": "hardware",
       "code": "688019.SH",
       "name": "安集科技",
@@ -7616,7 +7644,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688629.SH": {
       "scope": "hardware",
       "code": "688629.SH",
       "name": "华丰科技",
@@ -7831,7 +7859,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "001389.SZ": {
       "scope": "hardware",
       "code": "001389.SZ",
       "name": "广合科技",
@@ -8054,7 +8082,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "600487.SH": {
       "scope": "hardware",
       "code": "600487.SH",
       "name": "亨通光电",
@@ -8282,7 +8310,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002049.SZ": {
       "scope": "hardware",
       "code": "002049.SZ",
       "name": "紫光国微",
@@ -8497,7 +8525,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688072.SH": {
       "scope": "hardware",
       "code": "688072.SH",
       "name": "拓荆科技",
@@ -8727,7 +8755,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688120.SH": {
       "scope": "hardware",
       "code": "688120.SH",
       "name": "华海清科",
@@ -8950,7 +8978,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "603501.SH": {
       "scope": "hardware",
       "code": "603501.SH",
       "name": "豪威集团",
@@ -9173,7 +9201,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "603083.SH": {
       "scope": "hardware",
       "code": "603083.SH",
       "name": "剑桥科技",
@@ -9376,7 +9404,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002156.SZ": {
       "scope": "hardware",
       "code": "002156.SZ",
       "name": "通富微电",
@@ -9619,7 +9647,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "600584.SH": {
       "scope": "hardware",
       "code": "600584.SH",
       "name": "长电科技",
@@ -9862,7 +9890,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002179.SZ": {
       "scope": "hardware",
       "code": "002179.SZ",
       "name": "中航光电",
@@ -10065,7 +10093,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "06088.HK": {
       "scope": "hardware",
       "code": "06088.HK",
       "name": "鸿腾精密",
@@ -10268,7 +10296,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "000063.SZ": {
       "scope": "hardware",
       "code": "000063.SZ",
       "name": "中兴通讯",
@@ -10491,7 +10519,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688668.SH": {
       "scope": "hardware",
       "code": "688668.SH",
       "name": "鼎通科技",
@@ -10695,7 +10723,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002335.SZ": {
       "scope": "hardware",
       "code": "002335.SZ",
       "name": "科华数据",
@@ -10918,7 +10946,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688702.SH": {
       "scope": "hardware",
       "code": "688702.SH",
       "name": "盛科通信",
@@ -11081,7 +11109,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300570.SZ": {
       "scope": "hardware",
       "code": "300570.SZ",
       "name": "太辰光",
@@ -11304,7 +11332,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "300054.SZ": {
       "scope": "hardware",
       "code": "300054.SZ",
       "name": "鼎龙股份",
@@ -11534,7 +11562,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "000400.SZ": {
       "scope": "hardware",
       "code": "000400.SZ",
       "name": "许继电气",
@@ -11757,7 +11785,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002851.SZ": {
       "scope": "hardware",
       "code": "002851.SZ",
       "name": "麦格米特",
@@ -11987,7 +12015,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "00992.HK": {
       "scope": "hardware",
       "code": "00992.HK",
       "name": "联想集团",
@@ -12190,7 +12218,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688183.SH": {
       "scope": "hardware",
       "code": "688183.SH",
       "name": "生益电子",
@@ -12405,7 +12433,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688981.SH": {
       "scope": "hardware",
       "code": "688981.SH",
       "name": "中芯国际",
@@ -12572,7 +12600,7 @@
       "twelve_public": false,
       "model_kind": "price_to_book"
     },
-    {
+    "688313.SH": {
       "scope": "hardware",
       "code": "688313.SH",
       "name": "仕佳光子",
@@ -12795,7 +12823,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "300346.SZ": {
       "scope": "hardware",
       "code": "300346.SZ",
       "name": "南大光电",
@@ -13017,7 +13045,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "300620.SZ": {
       "scope": "hardware",
       "code": "300620.SZ",
       "name": "光库科技",
@@ -13227,7 +13255,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "300124.SZ": {
       "scope": "hardware",
       "code": "300124.SZ",
       "name": "汇川技术",
@@ -13450,7 +13478,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "688213.SH": {
       "scope": "hardware",
       "code": "688213.SH",
       "name": "思特威",
@@ -13673,7 +13701,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300913.SZ": {
       "scope": "hardware",
       "code": "300913.SZ",
       "name": "兆龙互连",
@@ -13876,7 +13904,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "000021.SZ": {
       "scope": "hardware",
       "code": "000021.SZ",
       "name": "深科技",
@@ -14092,7 +14120,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002130.SZ": {
       "scope": "hardware",
       "code": "002130.SZ",
       "name": "沃尔核材",
@@ -14307,7 +14335,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "300604.SZ": {
       "scope": "hardware",
       "code": "300604.SZ",
       "name": "长川科技",
@@ -14525,7 +14553,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688676.SH": {
       "scope": "hardware",
       "code": "688676.SH",
       "name": "金盘科技",
@@ -14748,7 +14776,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "300442.SZ": {
       "scope": "hardware",
       "code": "300442.SZ",
       "name": "润泽科技",
@@ -14916,7 +14944,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300693.SZ": {
       "scope": "hardware",
       "code": "300693.SZ",
       "name": "盛弘股份",
@@ -15139,7 +15167,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "301200.SZ": {
       "scope": "hardware",
       "code": "301200.SZ",
       "name": "大族数控",
@@ -15368,7 +15396,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688519.SH": {
       "scope": "hardware",
       "code": "688519.SH",
       "name": "南亚新材",
@@ -15598,7 +15626,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "300870.SZ": {
       "scope": "hardware",
       "code": "300870.SZ",
       "name": "欧陆通",
@@ -15821,7 +15849,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688001.SH": {
       "scope": "hardware",
       "code": "688001.SH",
       "name": "华兴源创",
@@ -16025,7 +16053,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688126.SH": {
       "scope": "hardware",
       "code": "688126.SH",
       "name": "沪硅产业",
@@ -16180,7 +16208,7 @@
       "twelve_public": false,
       "model_kind": "price_to_book"
     },
-    {
+    "301018.SZ": {
       "scope": "hardware",
       "code": "301018.SZ",
       "name": "申菱环境",
@@ -16403,7 +16431,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "301308.SZ": {
       "scope": "hardware",
       "code": "301308.SZ",
       "name": "江波龙",
@@ -16639,7 +16667,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "300857.SZ": {
       "scope": "hardware",
       "code": "300857.SZ",
       "name": "协创数据",
@@ -16867,7 +16895,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "688525.SH": {
       "scope": "hardware",
       "code": "688525.SH",
       "name": "佰维存储",
@@ -17103,7 +17131,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "300563.SZ": {
       "scope": "hardware",
       "code": "300563.SZ",
       "name": "神宇股份",
@@ -17306,7 +17334,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "300738.SZ": {
       "scope": "hardware",
       "code": "300738.SZ",
       "name": "奥飞数据",
@@ -17474,7 +17502,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "09698.HK": {
       "scope": "hardware",
       "code": "09698.HK",
       "name": "万国数据-SW",
@@ -17631,7 +17659,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "00700.HK": {
       "scope": "application",
       "code": "00700.HK",
       "name": "腾讯控股",
@@ -17789,7 +17817,7 @@
       "twelve_public": false,
       "model_kind": "sum_of_parts"
     },
-    {
+    "09988.HK": {
       "scope": "application",
       "code": "09988.HK",
       "name": "阿里巴巴-W",
@@ -17947,7 +17975,7 @@
       "twelve_public": false,
       "model_kind": "sum_of_parts"
     },
-    {
+    "09888.HK": {
       "scope": "application",
       "code": "09888.HK",
       "name": "百度集团-SW",
@@ -18105,7 +18133,7 @@
       "twelve_public": false,
       "model_kind": "sum_of_parts"
     },
-    {
+    "00020.HK": {
       "scope": "application",
       "code": "00020.HK",
       "name": "商汤-W",
@@ -18263,7 +18291,7 @@
       "twelve_public": false,
       "model_kind": "sum_of_parts"
     },
-    {
+    "600588.SH": {
       "scope": "application",
       "code": "600588.SH",
       "name": "用友网络",
@@ -18433,7 +18461,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300170.SZ": {
       "scope": "application",
       "code": "300170.SZ",
       "name": "汉得信息",
@@ -18603,7 +18631,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "603039.SH": {
       "scope": "application",
       "code": "603039.SH",
       "name": "泛微网络",
@@ -18773,7 +18801,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "301236.SZ": {
       "scope": "application",
       "code": "301236.SZ",
       "name": "软通动力",
@@ -18943,7 +18971,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "688111.SH": {
       "scope": "application",
       "code": "688111.SH",
       "name": "金山办公",
@@ -19111,7 +19139,7 @@
       "twelve_public": false,
       "model_kind": "free_cash_flow"
     },
-    {
+    "300634.SZ": {
       "scope": "application",
       "code": "300634.SZ",
       "name": "彩讯股份",
@@ -19279,7 +19307,7 @@
       "twelve_public": false,
       "model_kind": "free_cash_flow"
     },
-    {
+    "688095.SH": {
       "scope": "application",
       "code": "688095.SH",
       "name": "福昕软件",
@@ -19447,7 +19475,7 @@
       "twelve_public": false,
       "model_kind": "free_cash_flow"
     },
-    {
+    "688369.SH": {
       "scope": "application",
       "code": "688369.SH",
       "name": "致远互联",
@@ -19615,7 +19643,7 @@
       "twelve_public": false,
       "model_kind": "free_cash_flow"
     },
-    {
+    "300378.SZ": {
       "scope": "application",
       "code": "300378.SZ",
       "name": "鼎捷数智",
@@ -19784,7 +19812,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "688365.SH": {
       "scope": "application",
       "code": "688365.SH",
       "name": "光云科技",
@@ -19953,7 +19981,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "002153.SZ": {
       "scope": "application",
       "code": "002153.SZ",
       "name": "石基信息",
@@ -20111,7 +20139,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "603171.SH": {
       "scope": "application",
       "code": "603171.SH",
       "name": "税友股份",
@@ -20269,7 +20297,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300058.SZ": {
       "scope": "application",
       "code": "300058.SZ",
       "name": "蓝色光标",
@@ -20428,7 +20456,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "301171.SZ": {
       "scope": "application",
       "code": "301171.SZ",
       "name": "易点天下",
@@ -20598,7 +20626,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "600986.SH": {
       "scope": "application",
       "code": "600986.SH",
       "name": "浙文互联",
@@ -20757,7 +20785,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "002400.SZ": {
       "scope": "application",
       "code": "002400.SZ",
       "name": "省广集团",
@@ -20916,7 +20944,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300229.SZ": {
       "scope": "application",
       "code": "300229.SZ",
       "name": "拓尔思",
@@ -21073,7 +21101,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300766.SZ": {
       "scope": "application",
       "code": "300766.SZ",
       "name": "每日互动",
@@ -21230,7 +21258,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "688031.SH": {
       "scope": "application",
       "code": "688031.SH",
       "name": "星环科技-U",
@@ -21387,7 +21415,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "688228.SH": {
       "scope": "application",
       "code": "688228.SH",
       "name": "开普云",
@@ -21544,7 +21572,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300624.SZ": {
       "scope": "application",
       "code": "300624.SZ",
       "name": "万兴科技",
@@ -21702,7 +21730,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300364.SZ": {
       "scope": "application",
       "code": "300364.SZ",
       "name": "中文在线",
@@ -21860,7 +21888,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "000681.SZ": {
       "scope": "application",
       "code": "000681.SZ",
       "name": "视觉中国",
@@ -22018,7 +22046,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "301052.SZ": {
       "scope": "application",
       "code": "301052.SZ",
       "name": "果麦文化",
@@ -22176,7 +22204,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "002555.SZ": {
       "scope": "application",
       "code": "002555.SZ",
       "name": "三七互娱",
@@ -22365,7 +22393,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002517.SZ": {
       "scope": "application",
       "code": "002517.SZ",
       "name": "恺英网络",
@@ -22554,7 +22582,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002602.SZ": {
       "scope": "application",
       "code": "002602.SZ",
       "name": "世纪华通",
@@ -22743,7 +22771,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002624.SZ": {
       "scope": "application",
       "code": "002624.SZ",
       "name": "完美世界",
@@ -22932,7 +22960,7 @@
       "twelve_public": false,
       "model_kind": "earnings_multiple"
     },
-    {
+    "002230.SZ": {
       "scope": "application",
       "code": "002230.SZ",
       "name": "科大讯飞",
@@ -23100,7 +23128,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300010.SZ": {
       "scope": "application",
       "code": "300010.SZ",
       "name": "豆神教育",
@@ -23257,7 +23285,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300559.SZ": {
       "scope": "application",
       "code": "300559.SZ",
       "name": "佳发教育",
@@ -23414,7 +23442,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300359.SZ": {
       "scope": "application",
       "code": "300359.SZ",
       "name": "全通教育",
@@ -23571,7 +23599,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300253.SZ": {
       "scope": "application",
       "code": "300253.SZ",
       "name": "卫宁健康",
@@ -23740,7 +23768,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300451.SZ": {
       "scope": "application",
       "code": "300451.SZ",
       "name": "创业慧康",
@@ -23909,7 +23937,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "688246.SH": {
       "scope": "application",
       "code": "688246.SH",
       "name": "嘉和美康",
@@ -24067,7 +24095,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300078.SZ": {
       "scope": "application",
       "code": "300078.SZ",
       "name": "思创医惠",
@@ -24225,7 +24253,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "300033.SZ": {
       "scope": "application",
       "code": "300033.SZ",
       "name": "同花顺",
@@ -24413,7 +24441,7 @@
       "twelve_public": false,
       "model_kind": "sum_of_parts"
     },
-    {
+    "300059.SZ": {
       "scope": "application",
       "code": "300059.SZ",
       "name": "东方财富",
@@ -24601,7 +24629,7 @@
       "twelve_public": false,
       "model_kind": "sum_of_parts"
     },
-    {
+    "600570.SH": {
       "scope": "application",
       "code": "600570.SH",
       "name": "恒生电子",
@@ -24789,7 +24817,7 @@
       "twelve_public": false,
       "model_kind": "sum_of_parts"
     },
-    {
+    "601519.SH": {
       "scope": "application",
       "code": "601519.SH",
       "name": "大智慧",
@@ -24946,7 +24974,7 @@
       "twelve_public": false,
       "model_kind": "sum_of_parts"
     },
-    {
+    "300454.SZ": {
       "scope": "application",
       "code": "300454.SZ",
       "name": "深信服",
@@ -25114,7 +25142,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "688561.SH": {
       "scope": "application",
       "code": "688561.SH",
       "name": "奇安信-U",
@@ -25271,7 +25299,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "688023.SH": {
       "scope": "application",
       "code": "688023.SH",
       "name": "安恒信息",
@@ -25428,7 +25456,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "688225.SH": {
       "scope": "application",
       "code": "688225.SH",
       "name": "亚信安全",
@@ -25596,7 +25624,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "688777.SH": {
       "scope": "application",
       "code": "688777.SH",
       "name": "中控技术",
@@ -25765,7 +25793,7 @@
       "twelve_public": false,
       "model_kind": "free_cash_flow"
     },
-    {
+    "600845.SH": {
       "scope": "application",
       "code": "600845.SH",
       "name": "宝信软件",
@@ -25923,7 +25951,7 @@
       "twelve_public": false,
       "model_kind": "free_cash_flow"
     },
-    {
+    "603859.SH": {
       "scope": "application",
       "code": "603859.SH",
       "name": "能科科技",
@@ -26092,7 +26120,7 @@
       "twelve_public": false,
       "model_kind": "free_cash_flow"
     },
-    {
+    "300682.SZ": {
       "scope": "application",
       "code": "300682.SZ",
       "name": "朗新集团",
@@ -26261,7 +26289,7 @@
       "twelve_public": false,
       "model_kind": "free_cash_flow"
     },
-    {
+    "01357.HK": {
       "scope": "application",
       "code": "01357.HK",
       "name": "美图公司",
@@ -26418,7 +26446,7 @@
       "twelve_public": false,
       "model_kind": "sum_of_parts"
     },
-    {
+    "03690.HK": {
       "scope": "application",
       "code": "03690.HK",
       "name": "美团-W",
@@ -26575,7 +26603,7 @@
       "twelve_public": false,
       "model_kind": "sum_of_parts"
     },
-    {
+    "09961.HK": {
       "scope": "application",
       "code": "09961.HK",
       "name": "携程集团-S",
@@ -26732,7 +26760,7 @@
       "twelve_public": false,
       "model_kind": "sum_of_parts"
     },
-    {
+    "00780.HK": {
       "scope": "application",
       "code": "00780.HK",
       "name": "同程旅行",
@@ -26889,7 +26917,7 @@
       "twelve_public": false,
       "model_kind": "sum_of_parts"
     },
-    {
+    "688229.SH": {
       "scope": "application",
       "code": "688229.SH",
       "name": "博睿数据",
@@ -27047,7 +27075,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "605398.SH": {
       "scope": "application",
       "code": "605398.SH",
       "name": "新炬网络",
@@ -27205,7 +27233,7 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     },
-    {
+    "01675.HK": {
       "scope": "application",
       "code": "01675.HK",
       "name": "亚信科技",
@@ -27363,18 +27391,6 @@
       "twelve_public": false,
       "model_kind": "enterprise_value"
     }
-  ],
-  "rules": {
-    "version": "V7.9",
-    "total": 142,
-    "hardware": 83,
-    "application": 59,
-    "formal_closed": 0,
-    "numeric_research_ranges": 142,
-    "price_feedback": "review_only",
-    "institution_target_role": "cross_check_only",
-    "legacy_v76_price_anchor": "forbidden",
-    "valuation_and_trading_separated": true
   },
-  "schema": "v79-valuation-config-1"
+  "deleted": []
 }
