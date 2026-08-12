@@ -1,0 +1,115 @@
+{
+  "schema": "v75-history-delta-1",
+  "snapshot_date": "2026-08-12",
+  "globals": {
+    "errors": {
+      "us:CIBR": "RuntimeError('CIBR missing completed session 2026-08-11')",
+      "us:CLOU": "RuntimeError('CLOU missing completed session 2026-08-11')",
+      "fund:300308.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")"
+    },
+    "generated_at_cn": "2026-08-12T19:28:35.661493+08:00",
+    "refresh_summary": {
+      "version": "V7.9.3",
+      "last_success": {
+        "mode": "asia",
+        "status": "success",
+        "finished_at_utc": "2026-08-12T11:29:04.515604+00:00",
+        "finished_at_beijing": "2026-08-12T19:29:04.515604+08:00"
+      },
+      "recent_runs": [
+        {
+          "mode": "asia",
+          "status": "success",
+          "finished_at_utc": "2026-08-12T11:29:04.515604+00:00",
+          "finished_at_beijing": "2026-08-12T19:29:04.515604+08:00"
+        },
+        {
+          "mode": "all",
+          "status": "success",
+          "finished_at_utc": "2026-08-12T11:18:31.336289+00:00",
+          "finished_at_beijing": "2026-08-12T19:18:31.336289+08:00"
+        },
+        {
+          "mode": "all",
+          "status": "success",
+          "finished_at_utc": "2026-08-12T10:29:59.823567+00:00",
+          "finished_at_beijing": "2026-08-12T18:29:59.823567+08:00"
+        },
+        {
+          "mode": "all",
+          "status": "failure",
+          "finished_at_utc": "2026-08-12T10:24:31.841850+00:00",
+          "finished_at_beijing": "2026-08-12T18:24:31.841850+08:00"
+        },
+        {
+          "mode": "all",
+          "status": "success",
+          "finished_at_utc": "2026-08-12T10:20:37.063416+00:00",
+          "finished_at_beijing": "2026-08-12T18:20:37.063416+08:00"
+        },
+        {
+          "mode": "all",
+          "status": "failure",
+          "finished_at_utc": "2026-08-12T10:12:57.035365+00:00",
+          "finished_at_beijing": "2026-08-12T18:12:57.035365+08:00"
+        },
+        {
+          "mode": "final",
+          "status": "failure",
+          "finished_at_utc": "2026-08-12T10:02:15.389812+00:00",
+          "finished_at_beijing": "2026-08-12T18:02:15.389812+08:00"
+        },
+        {
+          "mode": "final",
+          "status": "failure",
+          "finished_at_utc": "2026-08-12T09:58:24.291579+00:00",
+          "finished_at_beijing": "2026-08-12T17:58:24.291579+08:00"
+        },
+        {
+          "mode": "final",
+          "status": "success",
+          "finished_at_utc": "2026-08-12T08:11:40.066668+00:00",
+          "finished_at_beijing": "2026-08-12T16:11:40.066668+08:00"
+        },
+        {
+          "mode": "all",
+          "status": "success",
+          "finished_at_utc": "2026-08-12T08:06:41.433030+00:00",
+          "finished_at_beijing": "2026-08-12T16:06:41.433030+08:00"
+        },
+        {
+          "mode": "all",
+          "status": "success",
+          "finished_at_utc": "2026-08-08T04:24:50.693042+00:00",
+          "finished_at_beijing": "2026-08-08T12:24:50.693042+08:00"
+        },
+        {
+          "mode": "all",
+          "status": "success",
+          "finished_at_utc": "2026-08-08T04:22:52.036114+00:00",
+          "finished_at_beijing": "2026-08-08T12:22:52.036114+08:00"
+        }
+      ],
+      "expected_daily_runs": 8
+    },
+    "strategy_meta": {
+      "schema": "v79-strategy-1",
+      "version": "V7.9.3",
+      "generated_at": "2026-08-12T11:28:59.632129+00:00",
+      "snapshot_date": "2026-08-12",
+      "action_counts": {
+        "等待突破": 34,
+        "减仓": 35,
+        "持有": 3,
+        "暂不参与": 1,
+        "回避/退出": 68,
+        "试仓": 1
+      },
+      "valuation_source": "valuation_current",
+      "separated_from_valuation": true
+    }
+  },
+  "maps": {},
+  "companies": {},
+  "histories": {}
+}
