@@ -3,7 +3,7 @@
   "data_schema": "v7-public-market-1",
   "release": "V7.9.1",
   "latest": "data/latest-v7.json",
-  "snapshot_sha256": "17421d746fae2ccd3077317f8090e7634dcb544a8a687f6f3defb82387c04900",
+  "snapshot_sha256": "25c92e26e85e71255088cd1f421eb5928c4144bd03233f4d680d5de5e0ec756d",
   "snapshot_date": "2026-08-12",
   "generated_at_cn": "2026-08-12T16:06:24.098064+08:00",
   "coverage": {
