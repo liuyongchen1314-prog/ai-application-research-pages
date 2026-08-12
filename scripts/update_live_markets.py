@@ -206,4 +206,50 @@ def main() -> None:
             try:
                 rows = tencent_items(group)
                 validate_same_session(rows, markets[group])
-                if valid_rows
+                if valid_rows(rows):
+                    markets[group] = rows
+            except Exception as exc:  # keep the completed-session fallback
+                errors[group] = repr(exc)
+        for group, definitions in YAHOO.items():
+            rows = []
+            for symbol, name in definitions:
+                try:
+                    rows.append(yahoo_item(symbol, name))
+                except Exception as exc:
+                    errors[f"{group}:{symbol}"] = repr(exc)
+            validate_same_session(rows, markets[group])
+            if len(rows) == len(definitions) and valid_rows(rows):
+                markets[group] = rows
+    missing = [group for group, rows in markets.items() if not valid_rows(rows)]
+    if missing:
+        raise SystemExit("四市场轻量面板缺失：" + ",".join(missing))
+    now = dt.datetime.now(dt.timezone.utc)
+    payload = {
+        "schema": "v793-live-markets-1",
+        "release": RELEASE,
+        "generated_at": now.isoformat(),
+        "generated_at_beijing": now.astimezone(ZoneInfo("Asia/Shanghai")).isoformat(),
+        "formal_snapshot_date": latest.get("snapshot_date"),
+        "separate_from_valuation": True,
+        "market_count": 4,
+        "markets": {
+            group: {
+                "status": "realtime" if any(row.get("realtime") for row in rows) else "completed_session_fallback",
+                "items": rows,
+            }
+            for group, rows in markets.items()
+        },
+        "errors": errors,
+    }
+    atomic_write(OUTPUT, json.dumps(payload, ensure_ascii=False, indent=2))
+    print(json.dumps({
+        "status": "PASS",
+        "release": RELEASE,
+        "market_count": 4,
+        "sources": {group: value["status"] for group, value in payload["markets"].items()},
+        "errors": len(errors),
+    }, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    main()
