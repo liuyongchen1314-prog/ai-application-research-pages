@@ -688,7 +688,7 @@
       "sector_strength": "弱",
       "sector_rank": 11.538461538461538,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 287.66,
         "ma20": 298.5605,
         "ma50": 311.755,
@@ -1080,7 +1080,7 @@
       "sector_strength": "弱",
       "sector_rank": 0.0,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 1429.0,
         "ma20": 1366.2459999999999,
         "ma50": 1526.5494,
@@ -1864,7 +1864,7 @@
       "sector_strength": "弱",
       "sector_rank": 19.230769230769234,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 250.36,
         "ma20": 245.32600000000002,
         "ma50": 257.8137,
@@ -1913,7 +1913,7 @@
       "sector_strength": "弱",
       "sector_rank": 26.923076923076923,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 148.18,
         "ma20": 146.52100000000002,
         "ma50": 156.7636,
@@ -2942,7 +2942,7 @@
       "sector_strength": "弱",
       "sector_rank": 15.384615384615385,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 111.9,
         "ma20": 104.0865,
         "ma50": 117.27004000000001,
@@ -3236,7 +3236,7 @@
       "sector_strength": "中",
       "sector_rank": 38.46153846153847,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 98.49,
         "ma20": 93.39349999999999,
         "ma50": 95.773,
@@ -3481,7 +3481,7 @@
       "sector_strength": "中",
       "sector_rank": 53.84615384615385,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 69.25,
         "ma20": 66.925,
         "ma50": 77.24600000000001,
@@ -3677,7 +3677,7 @@
       "sector_strength": "弱",
       "sector_rank": 15.384615384615385,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 297.27,
         "ma20": 251.079,
         "ma50": 301.4338,
@@ -3775,7 +3775,7 @@
       "sector_strength": "弱",
       "sector_rank": 19.230769230769234,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 50.36,
         "ma20": 49.4,
         "ma50": 62.7796,
@@ -3824,7 +3824,7 @@
       "sector_strength": "弱",
       "sector_rank": 19.230769230769234,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 26.26,
         "ma20": 25.5985,
         "ma50": 30.233600000000003,
@@ -4020,7 +4020,7 @@
       "sector_strength": "弱",
       "sector_rank": 7.6923076923076925,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 244.88,
         "ma20": 238.79850000000002,
         "ma50": 326.62028,
@@ -4069,7 +4069,7 @@
       "sector_strength": "弱",
       "sector_rank": 26.923076923076923,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 24.04,
         "ma20": 22.604,
         "ma50": 25.6454,
@@ -4755,7 +4755,7 @@
       "sector_strength": "强",
       "sector_rank": 88.46153846153845,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 21.28,
         "ma20": 19.185499999999998,
         "ma50": 19.8876,
@@ -4853,7 +4853,7 @@
       "sector_strength": "强",
       "sector_rank": 92.3076923076923,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 16.31,
         "ma20": 14.529499999999999,
         "ma50": 15.969000000000001,
@@ -5343,7 +5343,7 @@
       "sector_strength": "强",
       "sector_rank": 84.61538461538461,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 77.3,
         "ma20": 67.055,
         "ma50": 75.2238,
@@ -5539,7 +5539,7 @@
       "sector_strength": "强",
       "sector_rank": 80.76923076923077,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 24.76,
         "ma20": 23.019,
         "ma50": 23.6444,
@@ -5833,7 +5833,7 @@
       "sector_strength": "中",
       "sector_rank": 61.53846153846154,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 2.3,
         "ma20": 2.1399999999999997,
         "ma50": 2.2512,
@@ -5882,7 +5882,7 @@
       "sector_strength": "中",
       "sector_rank": 61.53846153846154,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 11.26,
         "ma20": 10.9915,
         "ma50": 10.820599999999999,
@@ -5931,7 +5931,7 @@
       "sector_strength": "中",
       "sector_rank": 61.53846153846154,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 4.53,
         "ma20": 4.008,
         "ma50": 3.8506,
@@ -6029,7 +6029,7 @@
       "sector_strength": "强",
       "sector_rank": 73.07692307692307,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 3.73,
         "ma20": 3.4835000000000003,
         "ma50": 3.447,
@@ -6127,7 +6127,7 @@
       "sector_strength": "强",
       "sector_rank": 73.07692307692307,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 3.21,
         "ma20": 2.9095,
         "ma50": 3.0038,
@@ -6470,7 +6470,7 @@
       "sector_strength": "中",
       "sector_rank": 57.692307692307686,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 40.2,
         "ma20": 37.8795,
         "ma50": 37.5576,
@@ -6519,7 +6519,7 @@
       "sector_strength": "中",
       "sector_rank": 57.692307692307686,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 13.11,
         "ma20": 12.4225,
         "ma50": 12.799000000000001,
@@ -6568,7 +6568,7 @@
       "sector_strength": "中",
       "sector_rank": 46.15384615384615,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 99.19,
         "ma20": 92.0795,
         "ma50": 101.71924000000001,
@@ -6960,7 +6960,7 @@
       "sector_strength": "弱",
       "sector_rank": 34.61538461538461,
       "technical": {
-        "history": 701,
+        "history": 700,
         "price": 72.25,
         "ma20": 65.549,
         "ma50": 75.4648,
@@ -7090,7 +7090,7 @@
       "strict_stop_due_to_evidence": true
     }
   },
-  "generated_at": "2026-08-12T11:28:59.632129+00:00",
+  "generated_at": "2026-08-12T12:02:38.680643+00:00",
   "action_counts": {
     "等待突破": 34,
     "减仓": 35,
