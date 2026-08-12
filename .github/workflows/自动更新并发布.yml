@@ -116,34 +116,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('scripts/更新研究系统.py')
-          s=p.read_text(encoding='utf-8')
-          old="""        d=str(day.get('date') or '')
-        if d!=snapshot: continue
-        rows=day.get('data') or []
-        if isinstance(rows,dict): rows=rows.get('data') or []
-        for line in rows:
-"""
-          new="""        d=str(day.get('date') or '')
-        dkey=''.join(ch for ch in d if ch.isdigit())
-        skey=''.join(ch for ch in snapshot if ch.isdigit())
-        if dkey!=skey: continue
-        rows=day.get('data') or []
-        if isinstance(rows,dict): rows=rows.get('data') or []
-        if isinstance(rows,str): rows=rows.replace('\\n','|').split('|')
-        for line in rows:
-"""
-          if old in s:
-              s=s.replace(old,new,1)
-              p.write_text(s,encoding='utf-8')
-              print('已写入腾讯五日分时格式兼容补丁')
-          elif "dkey=''.join(ch for ch in d if ch.isdigit())" in s:
-              print('腾讯五日分时格式兼容补丁已存在')
-          else:
-              raise SystemExit('找不到预期的分时解析代码，拒绝盲改')
-          PY
+          python -c "from pathlib import Path; p=Path('scripts/更新研究系统.py'); s=p.read_text(encoding='utf-8'); old=\"        d=str(day.get('date') or '')\\n        if d!=snapshot: continue\\n        rows=day.get('data') or []\\n        if isinstance(rows,dict): rows=rows.get('data') or []\\n        for line in rows:\\n\"; new=\"        d=str(day.get('date') or '')\\n        dkey=''.join(ch for ch in d if ch.isdigit())\\n        skey=''.join(ch for ch in snapshot if ch.isdigit())\\n        if dkey!=skey: continue\\n        rows=day.get('data') or []\\n        if isinstance(rows,dict): rows=rows.get('data') or []\\n        if isinstance(rows,str): rows=rows.replace('\\\\n','|').split('|')\\n        for line in rows:\\n\"; patched=(old in s); s=s.replace(old,new,1) if patched else s; assert patched or \"dkey=''.join(ch for ch in d if ch.isdigit())\" in s, '找不到预期的分时解析代码'; p.write_text(s,encoding='utf-8'); print('腾讯五日分时兼容补丁状态：'+('新写入' if patched else '已存在'))"
 
       - name: 更新142家公司行情与交易层
         run: python scripts/更新研究系统.py
@@ -158,11 +131,15 @@ jobs:
           CHROME=$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)
           test -n "$CHROME"
           mkdir -p 验收证据
-          PAGE="file://$GITHUB_WORKSPACE/index.html"
-          "$CHROME" --headless=new --no-sandbox --disable-gpu --window-size=1680,1100 --virtual-time-budget=3000 --dump-dom "$PAGE" > 验收证据/桌面页面.html
-          "$CHROME" --headless=new --no-sandbox --disable-gpu --window-size=1680,1100 --virtual-time-budget=3000 --screenshot=验收证据/桌面截图.png "$PAGE"
-          "$CHROME" --headless=new --no-sandbox --disable-gpu --window-size=390,844 --virtual-time-budget=3000 --dump-dom "$PAGE" > 验收证据/手机页面.html
-          "$CHROME" --headless=new --no-sandbox --disable-gpu --window-size=390,844 --virtual-time-budget=3000 --screenshot=验收证据/手机截图.png "$PAGE"
+          python -m http.server 8765 >/tmp/research-pages-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+          sleep 1
+          PAGE="http://127.0.0.1:8765/index.html"
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --window-size=1680,1100 --virtual-time-budget=5000 --dump-dom "$PAGE" > 验收证据/桌面页面.html
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --window-size=1680,1100 --virtual-time-budget=5000 --screenshot=验收证据/桌面截图.png "$PAGE"
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --window-size=390,844 --virtual-time-budget=5000 --dump-dom "$PAGE" > 验收证据/手机页面.html
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --window-size=390,844 --virtual-time-budget=5000 --screenshot=验收证据/手机截图.png "$PAGE"
           python - <<'PY'
           from html.parser import HTMLParser
           from pathlib import Path
