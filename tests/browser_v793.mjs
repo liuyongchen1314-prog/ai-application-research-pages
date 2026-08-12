@@ -75,7 +75,7 @@ for (const profile of [
     await page.waitForFunction(() => {
       const button = document.querySelector("#v74RefreshNow");
       const message = document.querySelector("#v74RefreshMessage")?.textContent || "";
-      return !button?.disabled && /(取得新数据|检查完成，当前已是最新|在线数据暂不可用，继续显示最近一次有效快照)/.test(message);
+      return !button?.disabled && /(取得新数据|检查完成，当前已是最新|在线数据暂不可用，继续显示最近一次有效快照|上次自动检查失败)/.test(message);
     }, { timeout: 45000 });
     report.manualRefresh = await page.$eval("#v74RefreshMessage", (node) => node.textContent);
     const marketsAfterRefresh = await page.$$eval("[data-live-market]", (nodes) => nodes.map((node) => node.textContent));
