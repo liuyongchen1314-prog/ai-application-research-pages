@@ -47,7 +47,7 @@ def main() -> None:
     temp = OUTPUT.with_suffix(".html.tmp")
     temp.write_text(html, "utf-8")
     temp.replace(OUTPUT)
-    print(json.dumps({"status": "PASS", "release": "V7.9.1", "html_sha256": hashlib.sha256(html.encode()).hexdigest(), "html_bytes": len(html.encode())}, ensure_ascii=False))
+    print(json.dumps({"status": "PASS", "release": "V7.9.3", "html_sha256": hashlib.sha256(html.encode()).hexdigest(), "html_bytes": len(html.encode())}, ensure_ascii=False))
 
 
 if __name__ == "__main__":

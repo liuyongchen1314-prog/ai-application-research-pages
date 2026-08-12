@@ -81,6 +81,22 @@ def main():
  if not P.exists():fail('latest-v7.json不存在')
  d=json.loads(P.read_text('utf-8'))
  if d.get('schema')!='v7-public-market-1':fail(f'正式数据协议不匹配: {d.get("schema")}')
+ if str(d.get('embedded_snapshot') or '')!=str(d.get('snapshot_date') or ''):fail('内置基线日期仍停在旧快照')
+ companies=[*((d.get('companies') or {}).get('hardware') or []),*((d.get('companies') or {}).get('application') or [])]
+ quotes=d.get('quotes') or {};valuations=d.get('valuation_current') or {};strategies=d.get('strategy_current') or {}
+ for company in companies:
+  code=company.get('code');quote=quotes.get(code) or {};valuation=valuations.get(code) or {};strategy=strategies.get(code) or {}
+  if not quote.get('date'):fail(f'{code} 报价缺少标准交易日字段')
+  if quote.get('session_complete') is not True:fail(f'{code} 报价不是正式收盘口径')
+  if company.get('price')!=quote.get('price'):fail(f'{code} 公司卡片价格与唯一报价不一致')
+  if company.get('price_date')!=quote.get('date'):fail(f'{code} 公司卡片日期与唯一报价不一致')
+  if company.get('valuation_status')!=valuation.get('status'):fail(f'{code} 公司卡片估值状态与唯一估值对象不一致')
+  if strategy and strategy.get('reference_price')!=quote.get('price'):fail(f'{code} 策略参考价与唯一报价不一致')
+  if 'V7.6当前合理区间' in str(company.get('one_liner') or ''):fail(f'{code} 一句话仍含V7.6旧估值')
+  if '等待当前估值模型更新' in json.dumps(company.get('signal') or {},ensure_ascii=False):fail(f'{code} 信号仍含旧等待提示')
+  if '估值日2026-08-07' in json.dumps(company.get('details') or [],ensure_ascii=False):fail(f'{code} 生产详情仍显示8月7日旧估值日')
+ fund=d.get('fund_flow_summary') or {};actual_fund=sum(str((x or {}).get('last_date') or '')==str(d.get('snapshot_date') or '') for x in (d.get('fund_flows') or {}).values())
+ if int(fund.get('coverage_current') or 0)!=actual_fund:fail('资金流当前覆盖把旧日期缓存计入当日')
  if a.mode in ('all','asia'):_repair_partial(d,cfg,'korea')
  if a.mode in ('all','us'):_repair_partial(d,cfg,'us')
  d=json.loads(P.read_text('utf-8'));cov=d.get('coverage') or {};fr=d.get('market_freshness') or {}
@@ -105,10 +121,4 @@ def main():
   us=(d.get('market_context') or {}).get('us') or {}
   if not us.get('items'):fail('美国当前数据为空；禁止用旧缓存冒充')
   expected=expected_completed_session('us')
-  if str((fr.get('us') or {}).get('date') or '')!=expected:fail(f'美国完整交易日不一致: 当前{(fr.get("us") or {}).get("date")}, 应为{expected}')
-  ny=dt.datetime.now(dt.timezone.utc).astimezone(ZoneInfo('America/New_York'));usd=str((fr.get('us') or {}).get('date') or '')
-  if ny.time()<dt.time(16,15) and usd>=ny.date().isoformat():fail(f'美国数据包含尚未收盘的当日盘中K线: {usd}')
- for g in ('us','korea'):
-  if (fr.get(g) or {}).get('fresh') and not ((d.get('market_context') or {}).get(g) or {}).get('items'):fail(f'{g}新鲜度与当前数据矛盾')
- print(json.dumps({'status':'PASS','mode':a.mode,'companies':total,'coverage':cov,'market_freshness':fr,'fund_flow_status':(d.get('fund_flow_summary') or {}).get('status','数据不足')},ensure_ascii=False))
-if __name__=='__main__':main()
+  if str(

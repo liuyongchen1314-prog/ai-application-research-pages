@@ -1,8 +1,12 @@
-name: V7.9.1 四阶段行情、财报、估值与策略更新
+name: V7.9.3 八时点行情、财报、估值与策略更新
 
 on:
   schedule:
     - cron: '50 22 * * 1-5' # 北京时间周二至周六06:50：美股上一完整交易日
+    - cron: '35 1 * * 1-5'  # 北京时间工作日09:35：早盘四市场即时行情
+    - cron: '40 3 * * 1-5'  # 北京时间工作日11:40：午间四市场即时行情
+    - cron: '10 5 * * 1-5'  # 北京时间工作日13:10：午后四市场即时行情
+    - cron: '20 7 * * 1-5'  # 北京时间工作日15:20：A股尾盘与港股盘中行情
     - cron: '35 8 * * 1-5'  # 北京时间工作日16:35：A股/港股/韩国收盘
     - cron: '10 10 * * 1-5' # 北京时间工作日18:10：财报/一致预期/估值
     - cron: '10 14 * * 1-5' # 北京时间工作日22:10：晚间公告补偿与审计
@@ -13,7 +17,7 @@ on:
         required: true
         default: all
         type: choice
-        options: [all, us, asia, fundamental, final]
+        options: [all, live, us, asia, fundamental, final]
   push:
     branches: [main]
     paths:
@@ -51,12 +55,15 @@ jobs:
           MANUAL='${{ inputs.mode }}'
           if [[ -n "$MANUAL" ]]; then MODE="$MANUAL"
           elif [[ "$S" == "50 22 * * 1-5" ]]; then MODE=us
+          elif [[ "$S" == "35 1 * * 1-5" || "$S" == "40 3 * * 1-5" || "$S" == "10 5 * * 1-5" || "$S" == "20 7 * * 1-5" ]]; then MODE=live
           elif [[ "$S" == "35 8 * * 1-5" ]]; then MODE=asia
           elif [[ "$S" == "10 10 * * 1-5" ]]; then MODE=fundamental
           else MODE=final
           fi
           echo "mode=$MODE" >> "$GITHUB_OUTPUT"
-          echo "V7.9.1 update mode: $MODE"
+          echo "V7.9.3 update mode: $MODE"
+      - name: 更新四市场轻量即时行情
+        run: python scripts/update_live_markets.py
       - name: 更新美股上一完整交易日
         if: contains(fromJSON('["all","us"]'), steps.scope.outputs.mode)
         run: python scripts/v7_guard.py market --mode us
@@ -91,7 +98,7 @@ jobs:
         if: contains(fromJSON('["all","us","asia"]'), steps.scope.outputs.mode)
         run: python scripts/v7_guard.py validate --mode ${{ steps.scope.outputs.mode == 'all' && 'all' || steps.scope.outputs.mode }}
       - name: 使用独立行动层重算操作策略
-        if: job.status == 'success'
+        if: job.status == 'success' && steps.scope.outputs.mode != 'live'
         run: |
           python scripts/rebuild_strategy.py
           python scripts/validate_strategy.py
@@ -101,12 +108,25 @@ jobs:
           REFRESH_MODE: ${{ steps.scope.outputs.mode }}
           JOB_STATUS: ${{ job.status }}
         run: python scripts/record_refresh.py
+      - name: 失败时只提交失败日志（不污染正式快照）
+        if: failure() && github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/public_v7/data/refresh-log.json
+          if ! git diff --cached --quiet; then
+            git commit -m "V7.9.3 记录失败刷新 ${{ steps.scope.outputs.mode }}"
+            git push
+          fi
       - name: 保存增量历史并生成轻量索引
         if: job.status == 'success'
         run: |
-          python scripts/record_history_delta.py
+          if [[ "${{ steps.scope.outputs.mode }}" != "live" ]]; then python scripts/record_history_delta.py; fi
           python scripts/publish_data_index.py
           python scripts/build_public_site.py
+          python scripts/regression_v793.py
       - name: 提交已通过验证的数据
         if: github.event_name != 'pull_request' && job.status == 'success'
         shell: bash
@@ -116,14 +136,14 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/public_v7 frontend config/consensus_snapshots config/valuation_history config/valuation_model.json
           if ! git diff --cached --quiet; then
-            git commit -m "V7.9.1 四阶段数据链更新 ${{ steps.scope.outputs.mode }}"
+            git commit -m "V7.9.3 八时点数据链更新 ${{ steps.scope.outputs.mode }}"
             git push
           fi
       - name: 上传恢复包
-        if: job.status == 'success'
+        if: job.status == 'success' && steps.scope.outputs.mode != 'live'
         uses: actions/upload-artifact@v4
         with:
-          name: AI研究系统-V7.9.1-数据与恢复包
+          name: AI研究系统-V7.9.3-数据与恢复包
           path: |
             docs/public_v7/
             config/valuation_model.json

@@ -27,7 +27,7 @@ def main() -> None:
     data["strategy_current"] = companies
     data["strategy_meta"] = {
         "schema": strategy["schema"],
-        "version": "V7.9.1",
+        "version": "V7.9.3",
         "generated_at": strategy["generated_at"],
         "snapshot_date": strategy["snapshot_date"],
         "action_counts": counts,

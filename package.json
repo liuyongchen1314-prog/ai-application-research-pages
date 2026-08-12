@@ -1,0 +1,12 @@
+{
+  "name": "ai-research-v793-browser-regression",
+  "private": true,
+  "scripts": {
+    "test:browser": "node tests/browser_v793.mjs"
+  },
+  "devDependencies": {
+    "@fontsource/noto-sans-sc": "5.3.0",
+    "@sparticuz/chromium": "138.0.2",
+    "puppeteer-core": "25.6.0"
+  }
+}

@@ -12,6 +12,11 @@ DATA_SCHEMA='v7-public-market-1'
 INDEX_SCHEMA='v7-public-index-3'
 INTRADAY_SCHEMA='v7-intraday-manifest-1'
 
+def normalize_quote_date(value):
+    raw=''.join(ch for ch in str(value or '') if ch.isdigit())
+    if len(raw)>=8:return f'{raw[:4]}-{raw[4:6]}-{raw[6:8]}'
+    return None
+
 def request(url,timeout=25,encoding='utf-8'):
     last=None
     for i in range(4):
@@ -74,7 +79,7 @@ def fetch_quotes(rows):
             lhs,raw=line.split('="',1);raw=raw.rsplit('"',1)[0];sym=lhs.replace('v_','').strip();a=raw.split('~');code=sym2code.get(sym)
             if not code or len(a)<6:continue
             try:
-                p=float(a[3]);pre=float(a[4]);out[code]={'name':a[1],'price':p,'prev_close':pre,'open':float(a[5]),'change_pct':p/pre-1 if pre else None,'source':'腾讯公开行情','timestamp':a[30] if len(a)>30 else ''}
+                p=float(a[3]);pre=float(a[4]);stamp=a[30] if len(a)>30 else '';out[code]={'name':a[1],'price':p,'prev_close':pre,'open':float(a[5]),'change_pct':p/pre-1 if pre else None,'source':'腾讯公开行情','timestamp':stamp,'date':normalize_quote_date(stamp),'session_complete':False}
             except Exception:pass
     return out
 
@@ -128,97 +133,4 @@ def scope_stats(rows,h,scope):
         if x['scope']!=scope:continue
         bars=(h.get(x['code']) or {}).get('daily') or []
         if len(bars)>=2:one.append(bars[-1][2]/bars[-2][2]-1)
-        if (v:=period_return(bars,5)) is not None:five.append(v)
-        if (v:=period_return(bars,20)) is not None:twenty.append(v)
-    return {'count':len(one),'median_1d':statistics.median(one) if one else None,'median_5d':statistics.median(five) if five else None,'median_20d':statistics.median(twenty) if twenty else None,'breadth':sum(v>0 for v in one)/len(one) if one else None}
-
-def load_latest():
-    p=DATA/'latest-v7.json'
-    if not p.exists():return {}
-    try:return json.loads(p.read_text('utf-8'))
-    except Exception:return {}
-
-def atomic_write_text(path,text):
-    path.parent.mkdir(parents=True,exist_ok=True)
-    fd,tmp=tempfile.mkstemp(prefix=path.name+'.',suffix='.tmp',dir=path.parent)
-    try:
-        with os.fdopen(fd,'w',encoding='utf-8') as f:
-            f.write(text);f.flush();os.fsync(f.fileno())
-        os.replace(tmp,path)
-    finally:
-        try:os.unlink(tmp)
-        except FileNotFoundError:pass
-
-def public_index(data):
-    return {'schema':INDEX_SCHEMA,'data_schema':DATA_SCHEMA,'release':'V7.9.1','latest':'data/latest-v7.json','snapshot_date':data.get('snapshot_date'),'generated_at_cn':data.get('generated_at_cn'),'coverage':data.get('coverage'),'intraday':data.get('intraday'),'market_freshness':data.get('market_freshness'),'privacy':'仅公开市场与基础信息'}
-
-def write(data):
-    DATA.mkdir(parents=True,exist_ok=True);INTRADAY.mkdir(parents=True,exist_ok=True)
-    save_snapshot(data)
-
-def update_us(cfg,data):
-    wanted=[x for x in cfg['external_market'] if x['group']=='us'];items=[];errors={}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
-        fs={pool.submit(yahoo,x):x for x in wanted}
-        for f,x in fs.items():
-            try:items.append(f.result())
-            except Exception as e:errors[x['ticker']]=repr(e)
-    fr=freshness(items,'us','^IXIC');data.setdefault('stale_cache',{})['us']=(data.get('market_context') or {}).get('us',{}).get('items',[]) if errors or not fr['fresh'] else []
-    data.setdefault('market_context',{})['us']={'items':items,'status':'正常' if fr['fresh'] else '数据不足'};data.setdefault('market_freshness',{})['us']=fr
-    if errors:data.setdefault('errors',{}).update({'us:'+k:v for k,v in errors.items()})
-
-def update_asia(cfg,data):
-    rows=cfg['companies'];hist={};errs={}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as pool:
-        fs={pool.submit(fetch_history,x):x for x in rows}
-        for f,x in fs.items():
-            try:k,v=f.result();hist[k]=v
-            except Exception as e:errs[x['code']]=repr(e)
-    if len(hist)!=len(rows):raise SystemExit(f'K线覆盖不完整 {len(hist)}/{len(rows)}')
-    quotes=fetch_quotes(rows)
-    if len(quotes)!=len(rows):raise SystemExit(f'报价覆盖不完整 {len(quotes)}/{len(rows)}')
-    benchmarks={}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:
-        fs={pool.submit(fetch_benchmark,k,v):(k,v) for k,v in BENCH.items()}
-        for f,(k,v) in fs.items():
-            try:kk,x=f.result();benchmarks[kk]=x
-            except Exception as e:errs['benchmark:'+k]=repr(e)
-    if len(benchmarks)<4:raise SystemExit('宽基基准覆盖不足 '+json.dumps(errs,ensure_ascii=False))
-    intraday_payloads={}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
-        fs={pool.submit(fetch_intraday,x):x for x in rows}
-        for f,x in fs.items():
-            try:k,v=f.result();intraday_payloads[k]=v
-            except Exception as e:errs['intraday:'+x['code']]=repr(e)
-    ok=len(intraday_payloads)
-    minimum=(len(rows)*95+99)//100
-    if ok<minimum:raise SystemExit(f'分时实体覆盖低于95% {ok}/{len(rows)}；拒绝发布')
-    expected_files=set()
-    for code,payload in intraday_payloads.items():
-        p=INTRADAY/(code.replace('.','_')+'.json');expected_files.add(p.name)
-        atomic_write_text(p,json.dumps(payload,ensure_ascii=False,separators=(',',':')))
-    for p in INTRADAY.glob('*.json'):
-        if p.name not in expected_files:p.unlink()
-    ext=[];ext_errors={};wanted=[x for x in cfg['external_market'] if x['group']=='korea']
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:
-        fs={pool.submit(yahoo,x):x for x in wanted}
-        for f,x in fs.items():
-            try:ext.append(f.result())
-            except Exception as e:ext_errors[x['ticker']]=repr(e)
-    kr=freshness(ext,'korea','^KS11');data.setdefault('stale_cache',{})['korea']=(data.get('market_context') or {}).get('korea',{}).get('items',[]) if ext_errors or not kr['fresh'] else []
-    snapshot=max(x['last_date'] for x in hist.values());a_codes=[x['code'] for x in rows if not x['code'].endswith('.HK')];hk_codes=[x['code'] for x in rows if x['code'].endswith('.HK')]
-    a_date=benchmarks.get('CSI300',{}).get('last_date');hk_date=benchmarks.get('HSI',{}).get('last_date');a_ok=sum(hist[x]['last_date']==a_date for x in a_codes);hk_ok=sum(hist[x]['last_date']==hk_date for x in hk_codes)
-    available=sorted(intraday_payloads)
-    data.update({'schema':DATA_SCHEMA,'snapshot_date':snapshot,'quotes':quotes,'histories':hist,'benchmarks':benchmarks,'sector_stats':sector_stats(rows,hist),'intraday':{'schema':INTRADAY_SCHEMA,'base':'data/intraday/','success':ok,'total':len(rows),'available_codes':available,'status':'complete' if ok==len(rows) else 'partial'}})
-    data.setdefault('market_context',{})['china']={'snapshot_date':a_date,'hardware':scope_stats(rows,hist,'hardware'),'application':scope_stats(rows,hist,'application')};data['market_context']['hk']={'snapshot_date':hk_date};data['market_context']['korea']={'items':ext,'status':'正常' if kr['fresh'] else '数据不足'}
-    data.setdefault('market_freshness',{}).update({'china':{'fresh':a_ok==len(a_codes),'date':a_date,'coverage':f'{a_ok}/{len(a_codes)}'},'hk':{'fresh':hk_ok==len(hk_codes),'date':hk_date,'coverage':f'{hk_ok}/{len(hk_codes)}'},'korea':kr})
-    retained={k:v for k,v in (data.get('errors') or {}).items() if not (k.startswith('intraday:') or k.startswith('korea:') or k.startswith('benchmark:') or k in {x['code'] for x in rows})}
-    retained.update(errs);retained.update({'korea:'+k:v for k,v in ext_errors.items()});data['errors']=retained;data['coverage']={'histories':len(hist),'quotes':len(quotes),'intraday':ok,'total':len(rows),'hardware':sum(x['scope']=='hardware' for x in rows),'application':sum(x['scope']=='application' for x in rows),'benchmarks':len(benchmarks)}
-
-def main():
-    ap=argparse.ArgumentParser();ap.add_argument('--mode',choices=['all','us','asia'],default='all');args=ap.parse_args();cfg=load_config();data=load_latest();data.setdefault('schema',DATA_SCHEMA);data.setdefault('market_context',{});data.setdefault('market_freshness',{});data.setdefault('errors',{})
-    if args.mode in ('all','asia'):update_asia(cfg,data)
-    if args.mode in ('all','us'):update_us(cfg,data)
-    data.setdefault('snapshot_date',data.get('embedded_snapshot'))
-    data['generated_at_cn']=dt.datetime.now(dt.timezone.utc).astimezone(ZoneInfo('Asia/Shanghai')).isoformat();write(data);print(json.dumps({'status':'PASS','mode':args.mode,'snapshot':data.get('snapshot_date'),'coverage':data.get('coverage'),'freshness':data.get('market_freshness')},ensure_ascii=False))
-if __name__=='__main__':main()
+        if (v:=period_return(bars,5

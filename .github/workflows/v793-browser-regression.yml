@@ -1,0 +1,39 @@
+name: V7.9.3 桌面与手机真实浏览器回归
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/v793-browser-regression.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+      - name: 安装固定浏览器环境
+        run: npm ci
+      - name: 重建公开网页
+        run: python scripts/build_public_site.py
+      - name: 桌面与手机真实浏览器回归
+        run: npm run test:browser
+      - name: 保存截图与报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: V7.9.3-浏览器回归
+          path: test-results/browser-v793/
+          if-no-files-found: error

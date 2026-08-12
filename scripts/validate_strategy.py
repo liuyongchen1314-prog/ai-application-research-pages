@@ -31,6 +31,10 @@ def main() -> None:
         valuation = valuations.get(code) or {}
         if row.get("valuation_confidence") != valuation.get("confidence_display"):
             errors.append(f"{code}: strategy copied a different confidence")
+        if row.get("reference_price") != valuation.get("price_as_of"):
+            errors.append(f"{code}: strategy reference price differs from valuation/quote")
+        if row.get("reference_price_date") != valuation.get("price_date"):
+            errors.append(f"{code}: strategy reference date differs from valuation/quote")
         if any(key in valuation for key in ("action", "action_level", "action_reason", "initial_position")):
             errors.append(f"{code}: valuation object contains trading fields")
     if counts["暂不参与"] > 5:

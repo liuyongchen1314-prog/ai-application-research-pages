@@ -9,7 +9,102 @@ import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 LATEST = ROOT / "docs" / "public_v7" / "data" / "latest-v7.json"
-RELEASE = "V7.9.1"
+RELEASE = "V7.9.3"
+
+
+def _finite(value: object) -> float | None:
+    try:
+        number = float(value)
+        return number if number == number and abs(number) != float("inf") else None
+    except (TypeError, ValueError):
+        return None
+
+
+def _classify(price: object, current: dict) -> tuple[str, str]:
+    p, low, high = _finite(price), _finite(current.get("current_low")), _finite(current.get("current_high"))
+    buy_low = _finite(current.get("buy_low"))
+    if p is None or low is None or high is None or low <= 0 or low >= high:
+        return "无法判断", "观察"
+    buy_low = buy_low if buy_low is not None else low * 0.85
+    if p < buy_low:
+        return "明显低估", "通过"
+    if p < low:
+        return "合理偏低", "通过"
+    if p <= high:
+        return "合理区间", "通过"
+    if p <= high * 1.15:
+        return "偏高观察", "观察"
+    return "明显偏高", "不通过"
+
+
+def _rewrite_generated_copy(company: dict, current: dict, action: dict) -> None:
+    """Remove stale generated V7.6 price/action prose without touching research facts."""
+    core = re.split(r"；最新价|；当前行动：|；当前操作为", str(company.get("one_liner") or ""), maxsplit=1)[0].rstrip("。；")
+    if core:
+        company["one_liner"] = (
+            f"{core}；最新价{company.get('price', '—')}，{RELEASE}当前合理区间{current.get('current', '待核验')}，"
+            f"估值状态为“{current.get('status', '待核验')}”；当前行动为“{action.get('action', '等待突破')}”。"
+        )
+    valuation_text = (
+        f"估值日{current.get('valuation_as_of') or current.get('price_date') or '待更新'}。"
+        f"当前合理区间{current.get('current') or '待核验'}；年底{current.get('year_end') or '待核验'}；"
+        f"明年2月{current.get('next_year_start') or '待核验'}；未来12个月{current.get('twelve') or '待核验'}。"
+        f"证据状态：{current.get('evidence_state') or '待复核'}；合理区间不随股价自动漂移。"
+    )
+    for detail in company.get("details") or []:
+        title = str(detail.get("title") or detail.get("chapter") or "")
+        if "估值与时间跨度" in title or "估值模型" in title:
+            if "body" in detail:
+                detail["body"] = valuation_text
+            else:
+                detail["content"] = valuation_text
+        if "出现哪些信号才考虑买入" in title and isinstance(detail.get("items"), list):
+            detail["items"] = [
+                f"当前行动：{action.get('action') or '等待突破'}。{action.get('reason') or '等待趋势、估值和风险条件共同确认'}；"
+                f"第一买入区：{_strategy_zone(action)}。"
+            ]
+            if "content" in detail:
+                detail["content"] = valuation_text
+    signal = company.get("signal") if isinstance(company.get("signal"), dict) else {}
+    for key in ("positive", "risk", "neutral", "failed"):
+        rows = signal.get(key)
+        if isinstance(rows, list):
+            signal[key] = [x for x in rows if "等待当前估值模型更新" not in str(x) and "V7.6当前合理区间" not in str(x)]
+
+
+def _strategy_zone(action: dict) -> str:
+    low, high = _finite(action.get("first_buy_zone_low")), _finite(action.get("first_buy_zone_high"))
+    if low is not None and high is not None:
+        return f"{low:.2f}–{high:.2f}"
+    label = action.get("action")
+    return {
+        "等待突破": "当前不买，等待突破",
+        "持有": "持仓管理，不新增",
+        "减仓": "减仓管理，不新增",
+        "回避/退出": "不设买入区",
+        "暂不参与": "不设买入区",
+    }.get(label, "尚未形成买点")
+
+
+def _normalize_fund_flow_summary(data: dict) -> None:
+    flows = data.get("fund_flows") or {}
+    snapshot = str(data.get("snapshot_date") or "")
+    dates = [str(row.get("last_date") or "") for row in flows.values() if isinstance(row, dict)]
+    current = sum(value == snapshot for value in dates)
+    latest = max((value for value in dates if value), default=None)
+    total = sum(1 for row in ((data.get("companies") or {}).get("hardware") or []) + ((data.get("companies") or {}).get("application") or []) if not str(row.get("code") or "").endswith(".HK"))
+    history5 = sum(len((row or {}).get("daily") or []) >= 5 for row in flows.values() if isinstance(row, dict))
+    data["fund_flow_summary"] = {
+        "coverage_current": current,
+        "coverage_total_cache": len(flows),
+        "history_5d": history5,
+        "total_a_share": total,
+        "status": "正常" if total and current >= int(total * .9) else "部分可用" if total and current >= int(total * .5) else "数据不足",
+        "current_session": snapshot,
+        "cache_latest_date": latest,
+        "source": "东方财富/腾讯公开订单规模资金流",
+        "note": "仅把与当前交易日一致的数据计入当前覆盖；旧日期只作为历史缓存。大单/小单不是投资者真实身份。",
+    }
 
 
 def atomic_write(path: pathlib.Path, text: str) -> None:
@@ -54,6 +149,7 @@ def synchronize_runtime_views(data: dict) -> None:
                 company["change"] = change
             quote_date = _date(quote.get("timestamp") or quote.get("date"))
             if quote_date:
+                quote["date"] = quote_date
                 company["price_date"] = quote_date
             current = valuation.get(code) or {}
             if current:
@@ -63,20 +159,14 @@ def synchronize_runtime_views(data: dict) -> None:
                 company["twelve"] = current.get("twelve_month") or current.get("twelve") or company.get("twelve")
                 current["price_as_of"] = company.get("price")
                 current["price_date"] = company.get("price_date")
+                status, gate = _classify(company.get("price"), current)
+                current["status"] = status
+                current["valuation_judgement"] = status
+                current["valuation_gate"] = gate
+                current["decision_gate"] = gate
+                company["valuation_status"] = status
             action = strategy.get(code) or {}
             if action:
                 company["action"] = action.get("action") or company.get("action")
-
-
-def save_snapshot(data: dict) -> None:
-    """Write the only runtime snapshot. Pretty, mirror and full-history copies are forbidden."""
-    synchronize_runtime_views(data)
-    data["version"] = RELEASE
-    data["frontend_release"] = RELEASE
-    data.setdefault("public_data", {})["unified_market_urls"] = [
-        "https://liuyongchen1314-prog.github.io/ai-application-research-pages/data/latest-v7.json",
-        "https://liuyongchen1314-prog.github.io/ai-application-research-pages/mirror/latest-v7.json",
-    ]
-    data["public_data"]["repository"] = "liuyongchen1314-prog/ai-application-research-pages"
-    data["public_data"]["schedule_cn"] = "美股06:50；A股/港股/韩国16:35；财报估值18:10；公告审计22:10"
-    atomic_write(LATEST, json.dumps(data, ensure_ascii=False, separators=(",", ":")))
+            if current and action:
+                _rewrite_g
