@@ -1,0 +1,1194 @@
+{
+  "schema": "v75-universe-1",
+  "version": "V7.6",
+  "companies": [
+    {
+      "scope": "hardware",
+      "code": "300308.SZ",
+      "name": "中际旭创",
+      "market": "创业板",
+      "sector": "AI网络 / 光互连 / CPO",
+      "symbol": "sz300308"
+    },
+    {
+      "scope": "hardware",
+      "code": "688008.SH",
+      "name": "澜起科技",
+      "market": "科创板",
+      "sector": "HBM / 存储 / 内存接口",
+      "symbol": "sh688008"
+    },
+    {
+      "scope": "hardware",
+      "code": "002371.SZ",
+      "name": "北方华创",
+      "market": "深股通",
+      "sector": "先进制程 / 设备 / 材料 / 封装",
+      "symbol": "sz002371"
+    },
+    {
+      "scope": "hardware",
+      "code": "00522.HK",
+      "name": "ASMPT",
+      "market": "港股",
+      "sector": "HBM / 存储 / 内存接口",
+      "symbol": "hk00522"
+    },
+    {
+      "scope": "hardware",
+      "code": "688825.SH",
+      "name": "长鑫科技",
+      "market": "科创板",
+      "sector": "HBM / 存储 / 内存接口",
+      "symbol": "sh688825"
+    },
+    {
+      "scope": "hardware",
+      "code": "601138.SH",
+      "name": "工业富联",
+      "market": "沪股通",
+      "sector": "AI服务器 / 算力基础设施",
+      "symbol": "sh601138"
+    },
+    {
+      "scope": "hardware",
+      "code": "300502.SZ",
+      "name": "新易盛",
+      "market": "创业板",
+      "sector": "AI网络 / 光互连 / CPO",
+      "symbol": "sz300502"
+    },
+    {
+      "scope": "hardware",
+      "code": "002463.SZ",
+      "name": "沪电股份",
+      "market": "深股通",
+      "sector": "AI服务器PCB / 覆铜板",
+      "symbol": "sz002463"
+    },
+    {
+      "scope": "hardware",
+      "code": "601869.SH",
+      "name": "长飞光纤",
+      "market": "沪市主板",
+      "sector": "AI网络 / 光互连 / CPO",
+      "symbol": "sh601869"
+    },
+    {
+      "scope": "hardware",
+      "code": "600183.SH",
+      "name": "生益科技",
+      "market": "沪股通",
+      "sector": "AI服务器PCB / 覆铜板",
+      "symbol": "sh600183"
+    },
+    {
+      "scope": "hardware",
+      "code": "300394.SZ",
+      "name": "天孚通信",
+      "market": "创业板",
+      "sector": "AI网络 / 光互连 / CPO",
+      "symbol": "sz300394"
+    },
+    {
+      "scope": "hardware",
+      "code": "688041.SH",
+      "name": "海光信息",
+      "market": "科创板",
+      "sector": "AI芯片 / ASIC / 端侧算力",
+      "symbol": "sh688041"
+    },
+    {
+      "scope": "hardware",
+      "code": "688256.SH",
+      "name": "寒武纪",
+      "market": "科创板",
+      "sector": "AI芯片 / ASIC / 端侧算力",
+      "symbol": "sh688256"
+    },
+    {
+      "scope": "hardware",
+      "code": "002916.SZ",
+      "name": "深南电路",
+      "market": "深股通",
+      "sector": "先进制程 / 设备 / 材料 / 封装",
+      "symbol": "sz002916"
+    },
+    {
+      "scope": "hardware",
+      "code": "688012.SH",
+      "name": "中微公司",
+      "market": "科创板",
+      "sector": "先进制程 / 设备 / 材料 / 封装",
+      "symbol": "sh688012"
+    },
+    {
+      "scope": "hardware",
+      "code": "000977.SZ",
+      "name": "浪潮信息",
+      "market": "深股通",
+      "sector": "AI服务器 / 算力基础设施",
+      "symbol": "sz000977"
+    },
+    {
+      "scope": "hardware",
+      "code": "000938.SZ",
+      "name": "紫光股份",
+      "market": "深股通",
+      "sector": "HBM / 存储 / 内存接口",
+      "symbol": "sz000938"
+    },
+    {
+      "scope": "hardware",
+      "code": "301269.SZ",
+      "name": "华大九天",
+      "market": "创业板",
+      "sector": "先进制程 / 设备 / 材料 / 封装",
+      "symbol": "sz301269"
+    },
+    {
+      "scope": "hardware",
+      "code": "603019.SH",
+      "name": "中科曙光",
+      "market": "沪股通",
+      "sector": "AI服务器 / 算力基础设施",
+      "symbol": "sh603019"
+    },
+    {
+      "scope": "hardware",
+      "code": "688498.SH",
+      "name": "源杰科技",
+      "market": "科创板",
+      "sector": "AI网络 / 光互连 / CPO",
+      "symbol": "sh688498"
+    },
+    {
+      "scope": "hardware",
+      "code": "603986.SH",
+      "name": "兆易创新",
+      "market": "沪股通",
+      "sector": "HBM / 存储 / 内存接口",
+      "symbol": "sh603986"
+    },
+    {
+      "scope": "hardware",
+      "code": "000988.SZ",
+      "name": "华工科技",
+      "market": "深股通",
+      "sector": "AI网络 / 光互连 / CPO",
+      "symbol": "sz000988"
+    },
+    {
+      "scope": "hardware",
+      "code": "002281.SZ",
+      "name": "光迅科技",
+      "market": "深股通",
+      "sector": "AI网络 / 光互连 / CPO",
+      "symbol": "sz002281"
+    },
+    {
+      "scope": "hardware",
+      "code": "600406.SH",
+      "name": "国电南瑞",
+      "market": "沪股通",
+      "sector": "液冷 / 电源 / AI电力系统",
+      "symbol": "sh600406"
+    },
+    {
+      "scope": "hardware",
+      "code": "002475.SZ",
+      "name": "立讯精密",
+      "market": "深股通",
+      "sector": "高速铜缆 / 连接器",
+      "symbol": "sz002475"
+    },
+    {
+      "scope": "hardware",
+      "code": "002837.SZ",
+      "name": "英维克",
+      "market": "深股通",
+      "sector": "AI服务器 / 算力基础设施",
+      "symbol": "sz002837"
+    },
+    {
+      "scope": "hardware",
+      "code": "300476.SZ",
+      "name": "胜宏科技",
+      "market": "创业板",
+      "sector": "AI服务器PCB / 覆铜板",
+      "symbol": "sz300476"
+    },
+    {
+      "scope": "hardware",
+      "code": "09660.HK",
+      "name": "地平线机器人",
+      "market": "港股",
+      "sector": "AI芯片 / ASIC / 端侧算力",
+      "symbol": "hk09660"
+    },
+    {
+      "scope": "hardware",
+      "code": "603893.SH",
+      "name": "瑞芯微",
+      "market": "沪股通",
+      "sector": "AI芯片 / ASIC / 端侧算力",
+      "symbol": "sh603893"
+    },
+    {
+      "scope": "hardware",
+      "code": "688521.SH",
+      "name": "芯原股份",
+      "market": "科创板",
+      "sector": "AI芯片 / ASIC / 端侧算力",
+      "symbol": "sh688521"
+    },
+    {
+      "scope": "hardware",
+      "code": "002409.SZ",
+      "name": "雅克科技",
+      "market": "深股通",
+      "sector": "HBM / 存储 / 内存接口",
+      "symbol": "sz002409"
+    },
+    {
+      "scope": "hardware",
+      "code": "688082.SH",
+      "name": "盛美上海",
+      "market": "科创板",
+      "sector": "先进制程 / 设备 / 材料 / 封装",
+      "symbol": "sh688082"
+    },
+    {
+      "scope": "hardware",
+      "code": "002028.SZ",
+      "name": "思源电气",
+      "market": "深股通",
+      "sector": "液冷 / 电源 / AI电力系统",
+      "symbol": "sz002028"
+    },
+    {
+      "scope": "hardware",
+      "code": "300548.SZ",
+      "name": "长芯博创",
+      "market": "创业板",
+      "sector": "AI网络 / 光互连 / CPO",
+      "symbol": "sz300548"
+    },
+    {
+      "scope": "hardware",
+      "code": "600522.SH",
+      "name": "中天科技",
+      "market": "沪市主板",
+      "sector": "AI网络 / 光互连 / CPO",
+      "symbol": "sh600522"
+    },
+    {
+      "scope": "hardware",
+      "code": "688019.SH",
+      "name": "安集科技",
+      "market": "科创板",
+      "sector": "先进制程 / 设备 / 材料 / 封装",
+      "symbol": "sh688019"
+    },
+    {
+      "scope": "hardware",
+      "code": "688629.SH",
+      "name": "华丰科技",
+      "market": "科创板",
+      "sector": "高速铜缆 / 连接器",
+      "symbol": "sh688629"
+    },
+    {
+      "scope": "hardware",
+      "code": "001389.SZ",
+      "name": "广合科技",
+      "market": "深市主板",
+      "sector": "AI服务器PCB / 覆铜板",
+      "symbol": "sz001389"
+    },
+    {
+      "scope": "hardware",
+      "code": "600487.SH",
+      "name": "亨通光电",
+      "market": "沪市主板",
+      "sector": "AI网络 / 光互连 / CPO",
+      "symbol": "sh600487"
+    },
+    {
+      "scope": "hardware",
+      "code": "002049.SZ",
+      "name": "紫光国微",
+      "market": "深股通",
+      "sector": "AI芯片 / ASIC / 端侧算力",
+      "symbol": "sz002049"
+    },
+    {
+      "scope": "hardware",
+      "code": "688072.SH",
+      "name": "拓荆科技",
+      "market": "科创板",
+      "sector": "先进制程 / 设备 / 材料 / 封装",
+      "symbol": "sh688072"
+    },
+    {
+      "scope": "hardware",
+      "code": "688120.SH",
+      "name": "华海清科",
+      "market": "科创板",
+      "sector": "先进制程 / 设备 / 材料 / 封装",
+      "symbol": "sh688120"
+    },
+    {
+      "scope": "hardware",
+      "code": "603501.SH",
+      "name": "豪威集团",
+      "market": "沪股通",
+      "sector": "物理AI核心硬件",
+      "symbol": "sh603501"
+    },
+    {
+      "scope": "hardware",
+      "code": "603083.SH",
+      "name": "剑桥科技",
+      "market": "沪股通",
+      "sector": "AI网络 / 光互连 / CPO",
+      "symbol": "sh603083"
+    },
+    {
+      "scope": "hardware",
+      "code": "002156.SZ",
+      "name": "通富微电",
+      "market": "深股通",
+      "sector": "AI芯片 / ASIC / 端侧算力",
+      "symbol": "sz002156"
+    },
+    {
+      "scope": "hardware",
+      "code": "600584.SH",
+      "name": "长电科技",
+      "market": "沪股通",
+      "sector": "先进制程 / 设备 / 材料 / 封装",
+      "symbol": "sh600584"
+    },
+    {
+      "scope": "hardware",
+      "code": "002179.SZ",
+      "name": "中航光电",
+      "market": "深股通",
+      "sector": "高速铜缆 / 连接器",
+      "symbol": "sz002179"
+    },
+    {
+      "scope": "hardware",
+      "code": "06088.HK",
+      "name": "鸿腾精密",
+      "market": "港股",
+      "sector": "高速铜缆 / 连接器",
+      "symbol": "hk06088"
+    },
+    {
+      "scope": "hardware",
+      "code": "000063.SZ",
+      "name": "中兴通讯",
+      "market": "深股通",
+      "sector": "AI服务器 / 算力基础设施",
+      "symbol": "sz000063"
+    },
+    {
+      "scope": "hardware",
+      "code": "688668.SH",
+      "name": "鼎通科技",
+      "market": "科创板",
+      "sector": "高速铜缆 / 连接器",
+      "symbol": "sh688668"
+    },
+    {
+      "scope": "hardware",
+      "code": "002335.SZ",
+      "name": "科华数据",
+      "market": "深市主板",
+      "sector": "AI服务器 / 算力基础设施",
+      "symbol": "sz002335"
+    },
+    {
+      "scope": "hardware",
+      "code": "688702.SH",
+      "name": "盛科通信",
+      "market": "科创板",
+      "sector": "AI网络 / 交换芯片 / 设备",
+      "symbol": "sh688702"
+    },
+    {
+      "scope": "hardware",
+      "code": "300570.SZ",
+      "name": "太辰光",
+      "market": "创业板",
+      "sector": "AI网络 / 光互连 / CPO",
+      "symbol": "sz300570"
+    },
+    {
+      "scope": "hardware",
+      "code": "300054.SZ",
+      "name": "鼎龙股份",
+      "market": "创业板",
+      "sector": "先进制程 / 设备 / 材料 / 封装",
+      "symbol": "sz300054"
+    },
+    {
+      "scope": "hardware",
+      "code": "000400.SZ",
+      "name": "许继电气",
+      "market": "深股通",
+      "sector": "液冷 / 电源 / AI电力系统",
+      "symbol": "sz000400"
+    },
+    {
+      "scope": "hardware",
+      "code": "002851.SZ",
+      "name": "麦格米特",
+      "market": "深股通",
+      "sector": "AI服务器 / 算力基础设施",
+      "symbol": "sz002851"
+    },
+    {
+      "scope": "hardware",
+      "code": "00992.HK",
+      "name": "联想集团",
+      "market": "港股",
+      "sector": "AI服务器 / 算力基础设施",
+      "symbol": "hk00992"
+    },
+    {
+      "scope": "hardware",
+      "code": "688183.SH",
+      "name": "生益电子",
+      "market": "科创板",
+      "sector": "AI服务器PCB / 覆铜板",
+      "symbol": "sh688183"
+    },
+    {
+      "scope": "hardware",
+      "code": "688981.SH",
+      "name": "中芯国际",
+      "market": "科创板",
+      "sector": "其他AI硬件基础设施",
+      "symbol": "sh688981"
+    },
+    {
+      "scope": "hardware",
+      "code": "688313.SH",
+      "name": "仕佳光子",
+      "market": "科创板",
+      "sector": "AI网络 / 光互连 / CPO",
+      "symbol": "sh688313"
+    },
+    {
+      "scope": "hardware",
+      "code": "300346.SZ",
+      "name": "南大光电",
+      "market": "创业板",
+      "sector": "先进制程 / 设备 / 材料 / 封装",
+      "symbol": "sz300346"
+    },
+    {
+      "scope": "hardware",
+      "code": "300620.SZ",
+      "name": "光库科技",
+      "market": "创业板",
+      "sector": "AI网络 / 光互连 / CPO",
+      "symbol": "sz300620"
+    },
+    {
+      "scope": "hardware",
+      "code": "300124.SZ",
+      "name": "汇川技术",
+      "market": "创业板",
+      "sector": "物理AI核心硬件",
+      "symbol": "sz300124"
+    },
+    {
+      "scope": "hardware",
+      "code": "688213.SH",
+      "name": "思特威",
+      "market": "科创板",
+      "sector": "物理AI核心硬件",
+      "symbol": "sh688213"
+    },
+    {
+      "scope": "hardware",
+      "code": "300913.SZ",
+      "name": "兆龙互连",
+      "market": "创业板",
+      "sector": "高速铜缆 / 连接器",
+      "symbol": "sz300913"
+    },
+    {
+      "scope": "hardware",
+      "code": "000021.SZ",
+      "name": "深科技",
+      "market": "深股通",
+      "sector": "HBM / 存储 / 内存接口",
+      "symbol": "sz000021"
+    },
+    {
+      "scope": "hardware",
+      "code": "002130.SZ",
+      "name": "沃尔核材",
+      "market": "深市主板",
+      "sector": "高速铜缆 / 连接器",
+      "symbol": "sz002130"
+    },
+    {
+      "scope": "hardware",
+      "code": "300604.SZ",
+      "name": "长川科技",
+      "market": "创业板",
+      "sector": "先进制程 / 设备 / 材料 / 封装",
+      "symbol": "sz300604"
+    },
+    {
+      "scope": "hardware",
+      "code": "688676.SH",
+      "name": "金盘科技",
+      "market": "科创板",
+      "sector": "液冷 / 电源 / AI电力系统",
+      "symbol": "sh688676"
+    },
+    {
+      "scope": "hardware",
+      "code": "300442.SZ",
+      "name": "润泽科技",
+      "market": "创业板",
+      "sector": "AI服务器 / 算力基础设施",
+      "symbol": "sz300442"
+    },
+    {
+      "scope": "hardware",
+      "code": "300693.SZ",
+      "name": "盛弘股份",
+      "market": "创业板",
+      "sector": "AI服务器 / 算力基础设施",
+      "symbol": "sz300693"
+    },
+    {
+      "scope": "hardware",
+      "code": "301200.SZ",
+      "name": "大族数控",
+      "market": "创业板",
+      "sector": "AI服务器PCB / 覆铜板",
+      "symbol": "sz301200"
+    },
+    {
+      "scope": "hardware",
+      "code": "688519.SH",
+      "name": "南亚新材",
+      "market": "科创板",
+      "sector": "AI服务器PCB / 覆铜板",
+      "symbol": "sh688519"
+    },
+    {
+      "scope": "hardware",
+      "code": "300870.SZ",
+      "name": "欧陆通",
+      "market": "创业板",
+      "sector": "AI服务器 / 算力基础设施",
+      "symbol": "sz300870"
+    },
+    {
+      "scope": "hardware",
+      "code": "688001.SH",
+      "name": "华兴源创",
+      "market": "科创板",
+      "sector": "先进制程 / 设备 / 材料 / 封装",
+      "symbol": "sh688001"
+    },
+    {
+      "scope": "hardware",
+      "code": "688126.SH",
+      "name": "沪硅产业",
+      "market": "科创板",
+      "sector": "先进制程 / 设备 / 材料 / 封装",
+      "symbol": "sh688126"
+    },
+    {
+      "scope": "hardware",
+      "code": "301018.SZ",
+      "name": "申菱环境",
+      "market": "创业板",
+      "sector": "AI服务器 / 算力基础设施",
+      "symbol": "sz301018"
+    },
+    {
+      "scope": "hardware",
+      "code": "301308.SZ",
+      "name": "江波龙",
+      "market": "创业板",
+      "sector": "HBM / 存储 / 内存接口",
+      "symbol": "sz301308"
+    },
+    {
+      "scope": "hardware",
+      "code": "300857.SZ",
+      "name": "协创数据",
+      "market": "创业板",
+      "sector": "HBM / 存储 / 内存接口",
+      "symbol": "sz300857"
+    },
+    {
+      "scope": "hardware",
+      "code": "688525.SH",
+      "name": "佰维存储",
+      "market": "科创板",
+      "sector": "HBM / 存储 / 内存接口",
+      "symbol": "sh688525"
+    },
+    {
+      "scope": "hardware",
+      "code": "300563.SZ",
+      "name": "神宇股份",
+      "market": "创业板",
+      "sector": "高速铜缆 / 连接器",
+      "symbol": "sz300563"
+    },
+    {
+      "scope": "application",
+      "code": "00700.HK",
+      "name": "腾讯控股",
+      "market": "港股",
+      "sector": "大模型与平台入口",
+      "symbol": "hk00700"
+    },
+    {
+      "scope": "application",
+      "code": "09988.HK",
+      "name": "阿里巴巴-W",
+      "market": "港股",
+      "sector": "大模型与平台入口",
+      "symbol": "hk09988"
+    },
+    {
+      "scope": "application",
+      "code": "09888.HK",
+      "name": "百度集团-SW",
+      "market": "港股",
+      "sector": "大模型与平台入口",
+      "symbol": "hk09888"
+    },
+    {
+      "scope": "application",
+      "code": "00020.HK",
+      "name": "商汤-W",
+      "market": "港股",
+      "sector": "大模型与平台入口",
+      "symbol": "hk00020"
+    },
+    {
+      "scope": "application",
+      "code": "600588.SH",
+      "name": "用友网络",
+      "market": "A股",
+      "sector": "AI Agent／企业智能体",
+      "symbol": "sh600588"
+    },
+    {
+      "scope": "application",
+      "code": "300170.SZ",
+      "name": "汉得信息",
+      "market": "A股",
+      "sector": "AI Agent／企业智能体",
+      "symbol": "sz300170"
+    },
+    {
+      "scope": "application",
+      "code": "603039.SH",
+      "name": "泛微网络",
+      "market": "A股",
+      "sector": "AI Agent／企业智能体",
+      "symbol": "sh603039"
+    },
+    {
+      "scope": "application",
+      "code": "301236.SZ",
+      "name": "软通动力",
+      "market": "A股",
+      "sector": "AI Agent／企业智能体",
+      "symbol": "sz301236"
+    },
+    {
+      "scope": "application",
+      "code": "688111.SH",
+      "name": "金山办公",
+      "market": "A股",
+      "sector": "AI办公与生产力工具",
+      "symbol": "sh688111"
+    },
+    {
+      "scope": "application",
+      "code": "300634.SZ",
+      "name": "彩讯股份",
+      "market": "A股",
+      "sector": "AI办公与生产力工具",
+      "symbol": "sz300634"
+    },
+    {
+      "scope": "application",
+      "code": "688095.SH",
+      "name": "福昕软件",
+      "market": "A股",
+      "sector": "AI办公与生产力工具",
+      "symbol": "sh688095"
+    },
+    {
+      "scope": "application",
+      "code": "688369.SH",
+      "name": "致远互联",
+      "market": "A股",
+      "sector": "AI办公与生产力工具",
+      "symbol": "sh688369"
+    },
+    {
+      "scope": "application",
+      "code": "300378.SZ",
+      "name": "鼎捷数智",
+      "market": "A股",
+      "sector": "企业软件／ERP／SaaS",
+      "symbol": "sz300378"
+    },
+    {
+      "scope": "application",
+      "code": "688365.SH",
+      "name": "光云科技",
+      "market": "A股",
+      "sector": "企业软件／ERP／SaaS",
+      "symbol": "sh688365"
+    },
+    {
+      "scope": "application",
+      "code": "002153.SZ",
+      "name": "石基信息",
+      "market": "A股",
+      "sector": "企业软件／ERP／SaaS",
+      "symbol": "sz002153"
+    },
+    {
+      "scope": "application",
+      "code": "603171.SH",
+      "name": "税友股份",
+      "market": "A股",
+      "sector": "企业软件／ERP／SaaS",
+      "symbol": "sh603171"
+    },
+    {
+      "scope": "application",
+      "code": "300058.SZ",
+      "name": "蓝色光标",
+      "market": "A股",
+      "sector": "AI营销与广告",
+      "symbol": "sz300058"
+    },
+    {
+      "scope": "application",
+      "code": "301171.SZ",
+      "name": "易点天下",
+      "market": "A股",
+      "sector": "AI营销与广告",
+      "symbol": "sz301171"
+    },
+    {
+      "scope": "application",
+      "code": "600986.SH",
+      "name": "浙文互联",
+      "market": "A股",
+      "sector": "AI营销与广告",
+      "symbol": "sh600986"
+    },
+    {
+      "scope": "application",
+      "code": "002400.SZ",
+      "name": "省广集团",
+      "market": "A股",
+      "sector": "AI营销与广告",
+      "symbol": "sz002400"
+    },
+    {
+      "scope": "application",
+      "code": "300229.SZ",
+      "name": "拓尔思",
+      "market": "A股",
+      "sector": "AI数据与知识服务",
+      "symbol": "sz300229"
+    },
+    {
+      "scope": "application",
+      "code": "300766.SZ",
+      "name": "每日互动",
+      "market": "A股",
+      "sector": "AI数据与知识服务",
+      "symbol": "sz300766"
+    },
+    {
+      "scope": "application",
+      "code": "688031.SH",
+      "name": "星环科技-U",
+      "market": "A股",
+      "sector": "AI数据与知识服务",
+      "symbol": "sh688031"
+    },
+    {
+      "scope": "application",
+      "code": "688228.SH",
+      "name": "开普云",
+      "market": "A股",
+      "sector": "AI数据与知识服务",
+      "symbol": "sh688228"
+    },
+    {
+      "scope": "application",
+      "code": "300624.SZ",
+      "name": "万兴科技",
+      "market": "A股",
+      "sector": "AI内容生成",
+      "symbol": "sz300624"
+    },
+    {
+      "scope": "application",
+      "code": "300364.SZ",
+      "name": "中文在线",
+      "market": "A股",
+      "sector": "AI内容生成",
+      "symbol": "sz300364"
+    },
+    {
+      "scope": "application",
+      "code": "000681.SZ",
+      "name": "视觉中国",
+      "market": "A股",
+      "sector": "AI内容生成",
+      "symbol": "sz000681"
+    },
+    {
+      "scope": "application",
+      "code": "301052.SZ",
+      "name": "果麦文化",
+      "market": "A股",
+      "sector": "AI内容生成",
+      "symbol": "sz301052"
+    },
+    {
+      "scope": "application",
+      "code": "002555.SZ",
+      "name": "三七互娱",
+      "market": "A股",
+      "sector": "AI游戏",
+      "symbol": "sz002555"
+    },
+    {
+      "scope": "application",
+      "code": "002517.SZ",
+      "name": "恺英网络",
+      "market": "A股",
+      "sector": "AI游戏",
+      "symbol": "sz002517"
+    },
+    {
+      "scope": "application",
+      "code": "002602.SZ",
+      "name": "世纪华通",
+      "market": "A股",
+      "sector": "AI游戏",
+      "symbol": "sz002602"
+    },
+    {
+      "scope": "application",
+      "code": "002624.SZ",
+      "name": "完美世界",
+      "market": "A股",
+      "sector": "AI游戏",
+      "symbol": "sz002624"
+    },
+    {
+      "scope": "application",
+      "code": "002230.SZ",
+      "name": "科大讯飞",
+      "market": "A股",
+      "sector": "AI教育",
+      "symbol": "sz002230"
+    },
+    {
+      "scope": "application",
+      "code": "300010.SZ",
+      "name": "豆神教育",
+      "market": "A股",
+      "sector": "AI教育",
+      "symbol": "sz300010"
+    },
+    {
+      "scope": "application",
+      "code": "300559.SZ",
+      "name": "佳发教育",
+      "market": "A股",
+      "sector": "AI教育",
+      "symbol": "sz300559"
+    },
+    {
+      "scope": "application",
+      "code": "300359.SZ",
+      "name": "全通教育",
+      "market": "A股",
+      "sector": "AI教育",
+      "symbol": "sz300359"
+    },
+    {
+      "scope": "application",
+      "code": "300253.SZ",
+      "name": "卫宁健康",
+      "market": "A股",
+      "sector": "AI医疗",
+      "symbol": "sz300253"
+    },
+    {
+      "scope": "application",
+      "code": "300451.SZ",
+      "name": "创业慧康",
+      "market": "A股",
+      "sector": "AI医疗",
+      "symbol": "sz300451"
+    },
+    {
+      "scope": "application",
+      "code": "688246.SH",
+      "name": "嘉和美康",
+      "market": "A股",
+      "sector": "AI医疗",
+      "symbol": "sh688246"
+    },
+    {
+      "scope": "application",
+      "code": "300078.SZ",
+      "name": "思创医惠",
+      "market": "A股",
+      "sector": "AI医疗",
+      "symbol": "sz300078"
+    },
+    {
+      "scope": "application",
+      "code": "300033.SZ",
+      "name": "同花顺",
+      "market": "A股",
+      "sector": "AI金融",
+      "symbol": "sz300033"
+    },
+    {
+      "scope": "application",
+      "code": "300059.SZ",
+      "name": "东方财富",
+      "market": "A股",
+      "sector": "AI金融",
+      "symbol": "sz300059"
+    },
+    {
+      "scope": "application",
+      "code": "600570.SH",
+      "name": "恒生电子",
+      "market": "A股",
+      "sector": "AI金融",
+      "symbol": "sh600570"
+    },
+    {
+      "scope": "application",
+      "code": "601519.SH",
+      "name": "大智慧",
+      "market": "A股",
+      "sector": "AI金融",
+      "symbol": "sh601519"
+    },
+    {
+      "scope": "application",
+      "code": "300454.SZ",
+      "name": "深信服",
+      "market": "A股",
+      "sector": "AI安全",
+      "symbol": "sz300454"
+    },
+    {
+      "scope": "application",
+      "code": "688561.SH",
+      "name": "奇安信-U",
+      "market": "A股",
+      "sector": "AI安全",
+      "symbol": "sh688561"
+    },
+    {
+      "scope": "application",
+      "code": "688023.SH",
+      "name": "安恒信息",
+      "market": "A股",
+      "sector": "AI安全",
+      "symbol": "sh688023"
+    },
+    {
+      "scope": "application",
+      "code": "688225.SH",
+      "name": "亚信安全",
+      "market": "A股",
+      "sector": "AI安全",
+      "symbol": "sh688225"
+    },
+    {
+      "scope": "application",
+      "code": "688777.SH",
+      "name": "中控技术",
+      "market": "A股",
+      "sector": "工业与垂直行业应用",
+      "symbol": "sh688777"
+    },
+    {
+      "scope": "application",
+      "code": "600845.SH",
+      "name": "宝信软件",
+      "market": "A股",
+      "sector": "工业与垂直行业应用",
+      "symbol": "sh600845"
+    },
+    {
+      "scope": "application",
+      "code": "603859.SH",
+      "name": "能科科技",
+      "market": "A股",
+      "sector": "工业与垂直行业应用",
+      "symbol": "sh603859"
+    },
+    {
+      "scope": "application",
+      "code": "300682.SZ",
+      "name": "朗新集团",
+      "market": "A股",
+      "sector": "工业与垂直行业应用",
+      "symbol": "sz300682"
+    },
+    {
+      "scope": "application",
+      "code": "01357.HK",
+      "name": "美图公司",
+      "market": "港股",
+      "sector": "消费端AI应用",
+      "symbol": "hk01357"
+    },
+    {
+      "scope": "application",
+      "code": "03690.HK",
+      "name": "美团-W",
+      "market": "港股",
+      "sector": "消费端AI应用",
+      "symbol": "hk03690"
+    },
+    {
+      "scope": "application",
+      "code": "09961.HK",
+      "name": "携程集团-S",
+      "market": "港股",
+      "sector": "消费端AI应用",
+      "symbol": "hk09961"
+    },
+    {
+      "scope": "application",
+      "code": "00780.HK",
+      "name": "同程旅行",
+      "market": "港股",
+      "sector": "消费端AI应用",
+      "symbol": "hk00780"
+    },
+    {
+      "scope": "application",
+      "code": "688229.SH",
+      "name": "博睿数据",
+      "market": "科创板",
+      "sector": "AI可观测性 / AIOps / 智能运维",
+      "symbol": "sh688229"
+    },
+    {
+      "scope": "application",
+      "code": "605398.SH",
+      "name": "新炬网络",
+      "market": "沪市主板",
+      "sector": "AI可观测性 / AIOps / 智能运维",
+      "symbol": "sh605398"
+    },
+    {
+      "scope": "application",
+      "code": "01675.HK",
+      "name": "亚信科技",
+      "market": "港股",
+      "sector": "AI可观测性 / AIOps / 智能运维",
+      "symbol": "hk01675"
+    },
+    {
+      "scope": "hardware",
+      "code": "300738.SZ",
+      "name": "奥飞数据",
+      "market": "创业板",
+      "sector": "智算中心运营 / IDC",
+      "symbol": "sz300738"
+    },
+    {
+      "scope": "hardware",
+      "code": "09698.HK",
+      "name": "万国数据-SW",
+      "market": "港股",
+      "sector": "智算中心运营 / IDC",
+      "symbol": "hk09698"
+    }
+  ],
+  "external_market": [
+    {
+      "ticker": "^IXIC",
+      "name": "纳斯达克",
+      "group": "us"
+    },
+    {
+      "ticker": "^SOX",
+      "name": "费城半导体",
+      "group": "us"
+    },
+    {
+      "ticker": "SMH",
+      "name": "AI芯片ETF",
+      "group": "us"
+    },
+    {
+      "ticker": "IGV",
+      "name": "软件ETF",
+      "group": "us"
+    },
+    {
+      "ticker": "CIBR",
+      "name": "网络安全ETF",
+      "group": "us"
+    },
+    {
+      "ticker": "CLOU",
+      "name": "云计算ETF",
+      "group": "us"
+    },
+    {
+      "ticker": "^KS11",
+      "name": "韩国KOSPI",
+      "group": "korea"
+    },
+    {
+      "ticker": "^KQ11",
+      "name": "韩国KOSDAQ",
+      "group": "korea"
+    },
+    {
+      "ticker": "000660.KS",
+      "name": "SK海力士",
+      "group": "korea"
+    },
+    {
+      "ticker": "005930.KS",
+      "name": "三星电子",
+      "group": "korea"
+    }
+  ]
+}

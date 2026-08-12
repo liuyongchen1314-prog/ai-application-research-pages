@@ -1,0 +1,154 @@
+name: V7.9.1 四阶段行情、财报、估值与策略更新
+
+on:
+  schedule:
+    - cron: '50 22 * * 1-5' # 北京时间周二至周六06:50：美股上一完整交易日
+    - cron: '35 8 * * 1-5'  # 北京时间工作日16:35：A股/港股/韩国收盘
+    - cron: '10 10 * * 1-5' # 北京时间工作日18:10：财报/一致预期/估值
+    - cron: '10 14 * * 1-5' # 北京时间工作日22:10：晚间公告补偿与审计
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 更新范围
+        required: true
+        default: all
+        type: choice
+        options: [all, us, asia, fundamental, final]
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - 'config/valuation_model.json'
+      - 'config/universe.json'
+      - 'frontend/**'
+      - '.github/workflows/v7-unified-refresh.yml'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: v79-unified-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.12'}
+      - name: 安装交易日历
+        run: python -m pip install --disable-pip-version-check exchange-calendars==4.13.2
+      - name: 判断本次更新范围
+        id: scope
+        shell: bash
+        run: |
+          S='${{ github.event.schedule }}'
+          MANUAL='${{ inputs.mode }}'
+          if [[ -n "$MANUAL" ]]; then MODE="$MANUAL"
+          elif [[ "$S" == "50 22 * * 1-5" ]]; then MODE=us
+          elif [[ "$S" == "35 8 * * 1-5" ]]; then MODE=asia
+          elif [[ "$S" == "10 10 * * 1-5" ]]; then MODE=fundamental
+          else MODE=final
+          fi
+          echo "mode=$MODE" >> "$GITHUB_OUTPUT"
+          echo "V7.9.1 update mode: $MODE"
+      - name: 更新美股上一完整交易日
+        if: contains(fromJSON('["all","us"]'), steps.scope.outputs.mode)
+        run: python scripts/v7_guard.py market --mode us
+      - name: 更新A股、港股、韩国与142家公司行情
+        if: contains(fromJSON('["all","asia"]'), steps.scope.outputs.mode)
+        run: python scripts/v7_guard.py market --mode asia
+      - name: 更新订单规模资金流
+        if: contains(fromJSON('["all","asia"]'), steps.scope.outputs.mode)
+        run: python scripts/v7_guard.py fund
+      - name: 更新正式披露索引
+        if: contains(fromJSON('["all","asia","fundamental","final"]'), steps.scope.outputs.mode)
+        run: python scripts/enrich_announcements_v7.py
+      - name: 事件驱动财务与一致预期检查
+        if: contains(fromJSON('["all","fundamental","final"]'), steps.scope.outputs.mode)
+        run: python scripts/refresh_fundamentals_v7.py
+      - name: 保存点时一致预期
+        if: contains(fromJSON('["all","fundamental","final"]'), steps.scope.outputs.mode)
+        run: python scripts/snapshot_consensus.py
+      - name: 对账公告、东方财富、同花顺与券商证据
+        if: contains(fromJSON('["all","fundamental","final"]'), steps.scope.outputs.mode)
+        run: python scripts/audit_evidence_v79.py
+      - name: 使用唯一模型重算四时点估值
+        if: contains(fromJSON('["all","fundamental","final"]'), steps.scope.outputs.mode)
+        run: python scripts/rebuild_valuation.py
+      - name: 验证142家公司估值一致性
+        if: contains(fromJSON('["all","fundamental","final"]'), steps.scope.outputs.mode)
+        run: python scripts/validate_valuation.py
+      - name: 监控突发风险
+        if: contains(fromJSON('["all","final"]'), steps.scope.outputs.mode)
+        run: python scripts/v7_guard.py risk
+      - name: 验证市场日期与覆盖
+        if: contains(fromJSON('["all","us","asia"]'), steps.scope.outputs.mode)
+        run: python scripts/v7_guard.py validate --mode ${{ steps.scope.outputs.mode == 'all' && 'all' || steps.scope.outputs.mode }}
+      - name: 使用独立行动层重算操作策略
+        if: job.status == 'success'
+        run: |
+          python scripts/rebuild_strategy.py
+          python scripts/validate_strategy.py
+      - name: 记录实际完成时间
+        if: always()
+        env:
+          REFRESH_MODE: ${{ steps.scope.outputs.mode }}
+          JOB_STATUS: ${{ job.status }}
+        run: python scripts/record_refresh.py
+      - name: 保存增量历史并生成轻量索引
+        if: job.status == 'success'
+        run: |
+          python scripts/record_history_delta.py
+          python scripts/publish_data_index.py
+          python scripts/build_public_site.py
+      - name: 提交已通过验证的数据
+        if: github.event_name != 'pull_request' && job.status == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/public_v7 frontend config/consensus_snapshots config/valuation_history config/valuation_model.json
+          if ! git diff --cached --quiet; then
+            git commit -m "V7.9.1 四阶段数据链更新 ${{ steps.scope.outputs.mode }}"
+            git push
+          fi
+      - name: 上传恢复包
+        if: job.status == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: AI研究系统-V7.9.1-数据与恢复包
+          path: |
+            docs/public_v7/
+            config/valuation_model.json
+            config/consensus_snapshots/
+            config/valuation_history/
+            scripts/
+            .github/workflows/v7-unified-refresh.yml
+          if-no-files-found: error
+      - name: 配置网页数据发布
+        if: github.event_name != 'pull_request' && job.status == 'success'
+        uses: actions/configure-pages@v5
+        with: {enablement: true}
+      - name: 上传网页数据
+        if: github.event_name != 'pull_request' && job.status == 'success'
+        uses: actions/upload-pages-artifact@v4
+        with: {path: docs/public_v7}
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: update
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 发布
+        id: deployment
+        uses: actions/deploy-pages@v4
