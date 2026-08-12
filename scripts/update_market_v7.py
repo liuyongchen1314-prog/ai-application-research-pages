@@ -88,7 +88,7 @@ def _market_clock(group):
     if group=='korea':return ZoneInfo('Asia/Seoul'),dt.time(15,40)
     return dt.timezone.utc,dt.time(23,59)
 
-def yahoo(item):
+def yahoo(item,target_date=None):
     t=urllib.parse.quote(item['ticker'],safe='');j=json.loads(request(f'https://query1.finance.yahoo.com/v8/finance/chart/{t}?range=15d&interval=1d&events=history',25));chart=((j.get('chart') or {}).get('result') or [None])[0]
     if not chart:raise RuntimeError((j.get('chart') or {}).get('error'))
     ts=chart.get('timestamp') or [];cl=((((chart.get('indicators') or {}).get('quote') or [{}])[0]).get('close') or [])
@@ -100,8 +100,28 @@ def yahoo(item):
         if item['group'] in ('us','korea') and now_local.time()<finalize and local_date>=now_local.date():continue
         pts.append((stamp,float(close),local_date))
     if len(pts)<2:raise RuntimeError('insufficient completed points')
-    a,b=pts[-2],pts[-1]
+    index=len(pts)-1
+    if target_date:
+        matches=[i for i,p in enumerate(pts) if p[2].isoformat()==str(target_date)]
+        if not matches:raise RuntimeError(f'{item["ticker"]} missing completed session {target_date}')
+        index=matches[-1]
+    if index<1:raise RuntimeError('insufficient completed points before target')
+    a,b=pts[index-1],pts[index]
     return {'ticker':item['ticker'],'name':item['name'],'group':item['group'],'date':b[2].isoformat(),'close':b[1],'change_pct':b[1]/a[1]-1,'source':'海外公开行情','session_complete':True}
+
+def aligned_yahoo_items(wanted,benchmark):
+    base=next((x for x in wanted if x['ticker']==benchmark),None)
+    if not base:return [],{benchmark:'benchmark config missing'}
+    try:first=yahoo(base)
+    except Exception as e:return [],{benchmark:repr(e)}
+    items=[first];errors={}
+    rest=[x for x in wanted if x['ticker']!=benchmark]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max(1,len(rest))) as pool:
+        fs={pool.submit(yahoo,x,first['date']):x for x in rest}
+        for f,x in fs.items():
+            try:items.append(f.result())
+            except Exception as e:errors[x['ticker']]=repr(e)
+    return items,errors
 
 def freshness(items,group,benchmark):
     rows=[x for x in items if x.get('group')==group];b=next((x for x in rows if x.get('ticker')==benchmark),None)
@@ -162,12 +182,7 @@ def write(data):
     save_snapshot(data)
 
 def update_us(cfg,data):
-    wanted=[x for x in cfg['external_market'] if x['group']=='us'];items=[];errors={}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
-        fs={pool.submit(yahoo,x):x for x in wanted}
-        for f,x in fs.items():
-            try:items.append(f.result())
-            except Exception as e:errors[x['ticker']]=repr(e)
+    wanted=[x for x in cfg['external_market'] if x['group']=='us'];items,errors=aligned_yahoo_items(wanted,'^IXIC')
     fr=freshness(items,'us','^IXIC');data.setdefault('stale_cache',{})['us']=(data.get('market_context') or {}).get('us',{}).get('items',[]) if errors or not fr['fresh'] else []
     data.setdefault('market_context',{})['us']={'items':items,'status':'正常' if fr['fresh'] else '数据不足'};data.setdefault('market_freshness',{})['us']=fr
     if errors:data.setdefault('errors',{}).update({'us:'+k:v for k,v in errors.items()})
@@ -204,12 +219,7 @@ def update_asia(cfg,data):
         atomic_write_text(p,json.dumps(payload,ensure_ascii=False,separators=(',',':')))
     for p in INTRADAY.glob('*.json'):
         if p.name not in expected_files:p.unlink()
-    ext=[];ext_errors={};wanted=[x for x in cfg['external_market'] if x['group']=='korea']
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:
-        fs={pool.submit(yahoo,x):x for x in wanted}
-        for f,x in fs.items():
-            try:ext.append(f.result())
-            except Exception as e:ext_errors[x['ticker']]=repr(e)
+    wanted=[x for x in cfg['external_market'] if x['group']=='korea'];ext,ext_errors=aligned_yahoo_items(wanted,'^KS11')
     kr=freshness(ext,'korea','^KS11');data.setdefault('stale_cache',{})['korea']=(data.get('market_context') or {}).get('korea',{}).get('items',[]) if ext_errors or not kr['fresh'] else []
     snapshot=max(x['last_date'] for x in hist.values());a_codes=[x['code'] for x in rows if not x['code'].endswith('.HK')];hk_codes=[x['code'] for x in rows if x['code'].endswith('.HK')]
     a_date=benchmarks.get('CSI300',{}).get('last_date');hk_date=benchmarks.get('HSI',{}).get('last_date');a_ok=sum(hist[x]['last_date']==a_date for x in a_codes);hk_ok=sum(hist[x]['last_date']==hk_date for x in hk_codes)

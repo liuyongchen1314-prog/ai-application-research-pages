@@ -38,7 +38,7 @@ def _request_json(url,timeout=25):
   except Exception as e:last=e;time.sleep(.5*(i+1))
  raise RuntimeError(repr(last))
 
-def _completed_yahoo(item):
+def _completed_yahoo(item,target_date=None):
  tz,finalize,_=_clock(item['group']);now=dt.datetime.now(dt.timezone.utc).astimezone(tz)
  ticker=urllib.parse.quote(item['ticker'],safe='')
  j=_request_json(f'https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?range=15d&interval=1d&events=history')
@@ -52,7 +52,13 @@ def _completed_yahoo(item):
   if now.time()<finalize and local_date>=now.date():continue
   pts.append((local_date,float(close)))
  if len(pts)<2:raise RuntimeError('完整交易日数据不足')
- a,b=pts[-2],pts[-1]
+ index=len(pts)-1
+ if target_date:
+  matches=[i for i,p in enumerate(pts) if p[0].isoformat()==str(target_date)]
+  if not matches:raise RuntimeError(f'{item["ticker"]}缺少完整交易日{target_date}')
+  index=matches[-1]
+ if index<1:raise RuntimeError('目标交易日前数据不足')
+ a,b=pts[index-1],pts[index]
  return {'ticker':item['ticker'],'name':item['name'],'group':item['group'],'date':b[0].isoformat(),'close':b[1],'change_pct':b[1]/a[1]-1,'source':'海外公开行情','session_complete':True}
 
 def _save(d):
@@ -60,11 +66,13 @@ def _save(d):
 
 def _repair_partial(d,cfg,group):
  tz,finalize,benchmark=_clock(group);now=dt.datetime.now(dt.timezone.utc).astimezone(tz);fr=(d.get('market_freshness') or {}).get(group) or {};date=str(fr.get('date') or '')
- if not (now.time()<finalize and date>=now.date().isoformat()):return False
+ if fr.get('fresh') and not (now.time()<finalize and date>=now.date().isoformat()):return False
  wanted=[x for x in cfg.get('external_market',[]) if x.get('group')==group]
- items=[]
- for x in wanted:items.append(_completed_yahoo(x))
- b=next((x for x in items if x.get('ticker')==benchmark),None)
+ base=next((x for x in wanted if x.get('ticker')==benchmark),None)
+ if not base:fail(f'{group}完整交易日基准配置缺失')
+ b=_completed_yahoo(base);items=[b]
+ for x in wanted:
+  if x is not base:items.append(_completed_yahoo(x,b['date']))
  if not b:fail(f'{group}完整交易日基准缺失')
  bad=[x.get('ticker') for x in items if x.get('date')!=b['date']]
  if bad:fail(f'{group}完整交易日成分日期不一致: {bad}')
