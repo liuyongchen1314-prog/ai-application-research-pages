@@ -53,11 +53,13 @@ jobs:
         run: |
           S='${{ github.event.schedule }}'
           MANUAL='${{ inputs.mode }}'
+          EVENT='${{ github.event_name }}'
           if [[ -n "$MANUAL" ]]; then MODE="$MANUAL"
           elif [[ "$S" == "50 22 * * 1-5" ]]; then MODE=us
           elif [[ "$S" == "35 1 * * 1-5" || "$S" == "40 3 * * 1-5" || "$S" == "10 5 * * 1-5" || "$S" == "20 7 * * 1-5" ]]; then MODE=live
           elif [[ "$S" == "35 8 * * 1-5" ]]; then MODE=asia
           elif [[ "$S" == "10 10 * * 1-5" ]]; then MODE=fundamental
+          elif [[ "$EVENT" == "push" ]]; then MODE=all
           else MODE=final
           fi
           echo "mode=$MODE" >> "$GITHUB_OUTPUT"
