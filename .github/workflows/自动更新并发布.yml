@@ -107,10 +107,42 @@ jobs:
               cfg_path.write_text(base64.b64encode(gzip.compress(payload,mtime=0)).decode('ascii'),encoding='ascii')
               repaired=True
 
-          # 无论走哪条路径，都做最终二次解压、字段和数量校验。
           final=json.loads(gzip.decompress(base64.b64decode(cfg_path.read_text(encoding='ascii').strip())).decode('utf-8'))
           validate(final['公司'])
           print('估值配置最终校验通过：142/142；自修复='+str(repaired))
+          PY
+
+      - name: 兼容腾讯五日分时返回格式
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('scripts/更新研究系统.py')
+          s=p.read_text(encoding='utf-8')
+          old="""        d=str(day.get('date') or '')
+        if d!=snapshot: continue
+        rows=day.get('data') or []
+        if isinstance(rows,dict): rows=rows.get('data') or []
+        for line in rows:
+"""
+          new="""        d=str(day.get('date') or '')
+        dkey=''.join(ch for ch in d if ch.isdigit())
+        skey=''.join(ch for ch in snapshot if ch.isdigit())
+        if dkey!=skey: continue
+        rows=day.get('data') or []
+        if isinstance(rows,dict): rows=rows.get('data') or []
+        if isinstance(rows,str): rows=rows.replace('\\n','|').split('|')
+        for line in rows:
+"""
+          if old in s:
+              s=s.replace(old,new,1)
+              p.write_text(s,encoding='utf-8')
+              print('已写入腾讯五日分时格式兼容补丁')
+          elif "dkey=''.join(ch for ch in d if ch.isdigit())" in s:
+              print('腾讯五日分时格式兼容补丁已存在')
+          else:
+              raise SystemExit('找不到预期的分时解析代码，拒绝盲改')
           PY
 
       - name: 更新142家公司行情与交易层
@@ -168,7 +200,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html data config/公司估值配置.b64
+          git add index.html data config/公司估值配置.b64 scripts/更新研究系统.py
           if ! git diff --cached --quiet; then
             DATE=$(python - <<'PY'
           import json
