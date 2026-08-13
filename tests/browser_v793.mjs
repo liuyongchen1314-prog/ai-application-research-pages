@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import chromium from "@sparticuz/chromium";
 import puppeteer from "puppeteer-core";
 
@@ -66,6 +66,7 @@ for (const profile of [
       schedulerActive: window.__V79_RUNTIME__.state().schedulerActive,
       authority: window.__V794_AUTHORITY__,
       liveMarkets: window.__V79_RUNTIME__.state().liveMarkets,
+      liveFingerprint: JSON.stringify(Object.values(window.__V79_RUNTIME__.state().liveMarkets?.markets || {}).map(m => [m.market, m.sampled_at, m.sample_date, m.last, m.source])),
       strategyDate: window.__V7_DATA__.snapshot_date,
     }));
     check(initial.title.includes("V7.9.4"), "title is not V7.9.4");
@@ -92,6 +93,11 @@ for (const profile of [
       return !button?.disabled && /(取得新数据|检查完成，当前已是最新|在线数据暂不可用，继续显示最近一次有效快照|上次自动检查失败)/.test(message);
     }, { timeout: 45000 });
     report.manualRefresh = await page.$eval("#v74RefreshMessage", (node) => node.textContent);
+    const refreshState = await page.evaluate(() => ({
+      fingerprint: JSON.stringify(Object.values(window.__V79_RUNTIME__.state().liveMarkets?.markets || {}).map(m => [m.market, m.sampled_at, m.sample_date, m.last, m.source])),
+      message: document.querySelector("#v74RefreshMessage")?.textContent || "",
+    }));
+    if (/取得新数据/.test(refreshState.message)) check(refreshState.fingerprint !== initial.liveFingerprint, "manual refresh claimed new data but market fingerprint did not change");
     const marketsAfterRefresh = await page.$$eval("[data-live-market]", (nodes) => nodes.map((node) => node.textContent));
     check(marketsAfterRefresh.length === 4 && marketsAfterRefresh.every((text) => text.includes("%")), "manual refresh fallback damaged four-market cards");
 
@@ -120,6 +126,24 @@ for (const profile of [
     check(!zeroZone, "strategy page still renders a 0-0 buy zone");
 
     await page.click('[data-scope="hardware"]');
+    await page.click('[data-tab="kline"]');
+    await page.waitForSelector("#v7KlineSortKey");
+    const klineSortOptions = await page.$$eval("#v7KlineSortKey option", nodes => nodes.map(n => n.value));
+    check(['canonical','action','trend','buy','rs'].every(x => klineSortOptions.includes(x)), `K-line sort options incomplete: ${klineSortOptions.join(',')}`);
+    await page.select("#v7KlineSortKey", "trend");
+    await page.waitForSelector("#klineList .company-item");
+    await page.click("#klineList .company-item");
+    await page.waitForFunction(() => {
+      const box=document.querySelector('#chartCanvas');
+      return (document.querySelector('#chartName')?.textContent || '') !== '选择公司' && box && box.getBoundingClientRect().height > 150;
+    }, { timeout: 20000 });
+    const klineAudit = await page.evaluate(() => ({
+      name: document.querySelector('#chartName')?.textContent || '',
+      sort: document.querySelector('#v7KlineSortKey')?.value,
+      height: document.querySelector('#chartCanvas')?.getBoundingClientRect().height || 0,
+    }));
+    check(klineAudit.sort === 'trend' && klineAudit.height > 150, 'K-line sorting/rendering interaction failed');
+
     await page.click('[data-tab="valuation"]');
     await page.waitForSelector("#panel-valuation table");
     const valuation = await page.evaluate(() => ({
@@ -159,6 +183,44 @@ for (const profile of [
     reports.push(report);
     await page.close();
   }
+}
+
+{
+  const page = await browser.newPage();
+  const pageErrors=[];
+  page.on("pageerror", error => pageErrors.push(error.message));
+  await page.setViewport({ width: 1280, height: 900, deviceScaleFactor: 1 });
+  await page.setRequestInterception(true);
+  page.on("request", request => {
+    const url=request.url();
+    if (/^https?:/.test(url)) request.abort("blockedbyclient");
+    else request.continue();
+  });
+  const report={profile:"local-file"};
+  try {
+    const localUrl=pathToFileURL(path.join(publicRoot,"index.html")).href;
+    await page.goto(localUrl,{waitUntil:"load",timeout:60000});
+    await page.waitForFunction(() => window.__V79_RUNTIME__?.release === "V7.9.4", {timeout:30000});
+    const local=await page.evaluate(() => ({
+      release: window.__V79_RUNTIME__?.release,
+      strategyCount: Object.keys(window.__V7_DATA__?.strategy_current || {}).length,
+      markets: document.querySelectorAll('[data-live-market]').length,
+      bodyWidth: document.body.scrollWidth,
+      viewportWidth: document.documentElement.clientWidth,
+      authority: window.__V794_AUTHORITY__?.frontendRole,
+    }));
+    check(local.release==='V7.9.4','local file is not V7.9.4');
+    check(local.strategyCount===142,'local file does not contain 142 strategy rows');
+    check(local.markets===4,'local file does not render four market cards');
+    check(local.authority==='display-and-sort-only','local file lost authority contract');
+    check(local.bodyWidth<=local.viewportWidth+2,'local file has body overflow');
+    check(pageErrors.length===0,`local file page errors: ${pageErrors.join(' | ')}`);
+    report.local=local; report.pageErrors=pageErrors; report.status='PASS';
+    await page.screenshot({path:path.join(resultsRoot,'local-file.png'),fullPage:true});
+  } catch(error) {
+    failed=true; report.status='FAIL'; report.error=error.stack||String(error);
+    await page.screenshot({path:path.join(resultsRoot,'local-file-failure.png'),fullPage:true}).catch(()=>{});
+  } finally { reports.push(report); await page.close(); }
 }
 
 await browser.close();
