@@ -18,7 +18,7 @@ def main() -> None:
     index = {
         "schema": "v7-public-index-3",
         "data_schema": "v7-public-market-1",
-        "release": "V7.9.3",
+        "release": "V7.9.4",
         "latest": "data/latest-v7.json",
         "live_markets": "data/live-markets.json",
         "live_markets_sha256": hashlib.sha256(LIVE.read_bytes()).hexdigest() if LIVE.exists() else None,
@@ -33,7 +33,7 @@ def main() -> None:
     temp = INDEX.with_suffix(".json.tmp")
     temp.write_text(json.dumps(index, ensure_ascii=False, indent=2), "utf-8")
     temp.replace(INDEX)
-    print(json.dumps({"status": "PASS", "release": "V7.9.3", "snapshot_sha256": index["snapshot_sha256"]}, ensure_ascii=False))
+    print(json.dumps({"status": "PASS", "release": "V7.9.4", "snapshot_sha256": index["snapshot_sha256"]}, ensure_ascii=False))
 
 
 if __name__ == "__main__":

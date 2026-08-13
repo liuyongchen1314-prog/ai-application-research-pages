@@ -55,7 +55,7 @@ for (const profile of [
     await page.goto(baseUrl + "/index.html", { waitUntil: "networkidle0", timeout: 60000 });
     await page.addStyleTag({ content: fontCss });
     await page.evaluate(() => document.fonts.ready);
-    await page.waitForFunction(() => window.__V79_RUNTIME__?.release === "V7.9.3", { timeout: 30000 });
+    await page.waitForFunction(() => window.__V79_RUNTIME__?.release === "V7.9.4", { timeout: 30000 });
     const initial = await page.evaluate(() => ({
       title: document.title,
       bodyWidth: document.body.scrollWidth,
@@ -64,12 +64,26 @@ for (const profile of [
       refreshText: document.querySelector("#v74RefreshNow")?.textContent,
       release: window.__V79_RUNTIME__.release,
       schedulerActive: window.__V79_RUNTIME__.state().schedulerActive,
+      authority: window.__V794_AUTHORITY__,
+      liveMarkets: window.__V79_RUNTIME__.state().liveMarkets,
+      strategyDate: window.__V7_DATA__.snapshot_date,
     }));
-    check(initial.title.includes("V7.9.3"), "title is not V7.9.3");
+    check(initial.title.includes("V7.9.4"), "title is not V7.9.4");
     check(initial.markets.length === 4 && initial.markets.every((text) => text.includes("%")), "four-market rise/fall cards are incomplete");
     check(initial.refreshText === "手动刷新全部数据", "manual refresh button has the wrong contract");
     check(initial.schedulerActive, "ten-minute browser scheduler is inactive");
+    check(initial.authority?.frontendRole === 'display-and-sort-only' && initial.authority?.legacyFrontendCalculatorsDisabled === true, 'frontend authority contract is missing');
+    check(initial.liveMarkets?.market_count === 4 && initial.liveMarkets?.separate_intraday_price_from_close_strategy === true, 'intraday/close-strategy separation missing');
     check(initial.bodyWidth <= initial.viewportWidth + 2, `body overflow ${initial.bodyWidth}/${initial.viewportWidth}`);
+    const marketAudit = await page.evaluate(() => [...document.querySelectorAll('[data-live-market]')].map((node) => ({
+      group: node.dataset.liveMarket, phase: node.dataset.marketPhase, freshness: node.dataset.marketFreshness, sampleDate: node.dataset.marketSampleDate, text: node.textContent || ''
+    })));
+    check(marketAudit.length === 4, 'market audit cards != 4');
+    for (const m of marketAudit) {
+      check(Boolean(m.phase) && Boolean(m.sampleDate), `${m.group} missing phase/sample date`);
+      check(/来源/.test(m.text) && /实际采样/.test(m.text) && /文件生成/.test(m.text) && /数据年龄/.test(m.text), `${m.group} freshness evidence not rendered`);
+      if (m.freshness === 'stale') check(/行情已过期/.test(m.text), `${m.group} stale data is shown as success`);
+    }
 
     await page.click("#v74RefreshNow");
     await page.waitForFunction(() => {
@@ -85,7 +99,10 @@ for (const profile of [
     await page.click('[data-tab="strategy"]');
     await page.waitForSelector(".strategy-company");
     const actions = await page.$$eval("[data-strategy-action]", (nodes) => [...new Set(nodes.map((node) => node.dataset.strategyAction).filter((value) => value && value !== "all"))]);
-    check(actions.length >= 6, "strategy action filters are incomplete");
+    const expectedActions=['重点参与','小仓试错','临近触发','突破后确认','缩量回踩观察','普通候选','等待趋势修复','不追/回避','已持仓继续持有','已持仓减仓或退出'];
+    check(expectedActions.every((x)=>actions.includes(x)), `strategy action filters incomplete: ${actions.join(',')}`);
+    const invalidHoldingActions=await page.evaluate(()=>Object.entries(window.__V7_DATA__.strategy_current||{}).filter(([code,s])=>String(s.action||'').startsWith('已持仓') && !window.__V7_DATA__.user_positions?.[code]));
+    check(invalidHoldingActions.length===0, `unheld stocks have holding actions: ${invalidHoldingActions.map(x=>x[0]).join(',')}`);
     for (const action of actions) {
       await page.evaluate((value) => document.querySelector(`[data-strategy-action="${CSS.escape(value)}"]`)?.click(), action);
       await new Promise((resolve) => setTimeout(resolve, 30));
@@ -93,6 +110,12 @@ for (const profile of [
       const expected = await page.evaluate((value) => window.__V7_DATA__.strategy_meta.action_counts[value] || 0, action);
       check(count === expected, `${action} filter shows ${count}, expected ${expected}`);
     }
+    const scoreAudit=await page.evaluate(()=>Object.values(window.__V7_DATA__.strategy_current||{}).map(s=>({a:s.action,t:s.trend_stage,ts:s.trend_quality_score,bs:s.buy_point_score,dc:s.data_completeness,blockers:s.blockers||[]})));
+    check(scoreAudit.length===142,'strategy rows != 142');
+    check(scoreAudit.every(x=>Number.isFinite(+x.ts)&&Number.isFinite(+x.bs)&&Number.isFinite(+x.dc)), 'trend/buy/completeness scores missing');
+    check(new Set(scoreAudit.map(x=>x.bs)).size>5, 'buy-point scores are still collapsed');
+    const sortContract=await page.evaluate(()=>window.__V7_DATA__.strategy_meta.sort_contract);
+    check(Array.isArray(sortContract)&&sortContract[0]==='action_priority'&&sortContract.at(-1)==='code(asc)','canonical sort contract missing');
     const zeroZone = await page.evaluate(() => /第一买入区\s*0(?:\.0+)?\s*[-–—]\s*0(?:\.0+)?/.test(document.querySelector("#panel-strategy")?.textContent || ""));
     check(!zeroZone, "strategy page still renders a 0-0 buy zone");
 
