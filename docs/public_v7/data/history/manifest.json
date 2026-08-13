@@ -11,7 +11,8 @@
     "2026-08-12-112905.delta.json",
     "2026-08-12-120244.delta.json",
     "2026-08-12-143521.delta.json",
-    "2026-08-12-173927.delta.json"
+    "2026-08-12-173927.delta.json",
+    "2026-08-13-052159.delta.json"
   ],
   "component_hashes": {
     "globals": {
@@ -22,11 +23,11 @@
       "feed_urls": "1bc5260a1ce2df0e9c4394f9ebad3d649d531afb20ddc86f166aef907b407550",
       "pipeline": "50cd7cbd597348dc18ef61752ca338f02b3d7ab2c7ecc8816884714ac45bf710",
       "valuation_audit": "5b62db2226b709d1f13d0c23c14f374f9855a687fa21f8ec3a90bc596cd564e9",
-      "market_context": "10c81ea030ecc958999726fcbad0fe2fc69a055a6b1640dc1f88377d3647418f",
+      "market_context": "65881abd1b94ae876b33bf738abb644f0f6e2f1186dd8056a757f8ac4e80b553",
       "announcements": "448a722f3fdd51128eae01d650fe268abf49abe87c7c71fbafbeb19bf82c188b",
       "announcement_summary": "0862fc36f8cabb3e86ada84cf884807e2c557187629f447029e2b689aba82924",
       "public_data": "eb1f51dc5448860db38857228d24b845593ef96e94d118121fd4555bb648c1dc",
-      "market_freshness": "35d9b7a83503a74e0ecbe4ba6d8ca8182bb33286f4f571522aff5cccfefdd752",
+      "market_freshness": "b651c031f4363154cab1d67d402bbc1b70ab0a94f142c9cfde31b15858ed34c6",
       "benchmarks": "fa288bb1c3df388ebf5fd72bb54f3d1d0c146cdcbd80251b932aedc3c6b7934a",
       "fund_flow_summary": "ca2abc47fd6e05670cb5c5d25a259e0499d9ce483e969d073790d6f11225fc61",
       "risk_events": "ef7df5f9f73f2585716158f7728983e36cb4fbe7d7032b22fc822525143c8bc3",
@@ -39,13 +40,13 @@
       "schema": "e844410e261e46aad568a7136548084a3d5d79cb015f8267dbe52547bcb4519a",
       "errors": "c7e7a3154fc97f29cd7fc07a50386eb11bbacfd3a3836b7eb380d4ff7c89d38d",
       "stale_cache": "045d4d0f6288eea415b0fc15cce68e0cb2b9357e5176baac41bcc0c78adb0684",
-      "generated_at_cn": "f656f05b62cd1cf6bcb9df0ec4ff51e8cfee0728f7fa1a5c0f818c016c43a0d7",
+      "generated_at_cn": "faf123b2709220e7e1ab92b6e00e9f146a3763b06d97d1fe4cc4e53a7606576d",
       "snapshot_date": "bdcb4b9a1dd2fde43bd3c03f636f9c53501b735921cc544ec9c5a97238007f71",
-      "refresh_summary": "6fe0ed8786966b757778d8fe05673ef8f882fc5cab224d86a95a1a8f567e2873",
+      "refresh_summary": "45bb24de7060e0a2f1786a6c517ac07b17b40e288130b7a3922ed20c3cf1ec15",
       "intraday": "03c975332256b724b8d8537bd7189b3d811b1c2168271da2b8fd2d9a32bd4a94",
       "frontend_release": "d8d9c4d3d4899fe42bf59c42b8fca74f7c21fb6a1b1161c1dbb17b5ea054ec12",
       "strategy_current": "615aabd7110bf61d74e0ce30b08f27de3b36175557530918d612f0a02586275a",
-      "strategy_meta": "330a24c71c2c0e91599d0f43c01ec0927bb318d7f83a4d8ddc22ace895a2990e",
+      "strategy_meta": "386d24e6817e60b2f8971d682a737961ebd8c57cea68f73d910c971d0d1d9d53",
       "valuation_evidence_audit": "57d2960f7fc91a6830eacb958ff599f1ab389babd7db113a354b3125dce1bdea",
       "sector_stats": "6414f66a2ef129c052c18a28e20945a2099c416f328c33c11168e33f90e108e2",
       "consensus_history": "a88ecdb1d00e1550639a8b475299dc7b358fccbcc11ee683179b2dc03903ed5e"
@@ -1460,6 +1461,6 @@
       }
     }
   },
-  "latest_snapshot_sha256": "ba68ea4010fd2516a9ba43d1c8ea6eb793bb253eb8cdd3153a31b14f1331876d",
+  "latest_snapshot_sha256": "8542bc60891406a841146c0643af8ab915976359240d3fbab9aac5e98f840139",
   "policy": "基线不复制两年K线；后续仅记录变化字段和K线追加行。历史回滚以压缩包版本为主，本目录用于跨日审计。"
 }
