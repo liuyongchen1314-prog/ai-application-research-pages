@@ -1,0 +1,36 @@
+name: Build clean V7.9.4 candidate branch
+
+on:
+  push:
+    branches: [fix/unified-engine-20260812]
+    paths:
+      - '.github/workflows/build-clean-v794.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with: {fetch-depth: 0}
+      - name: Build clean candidate on latest main
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPAIR=$(git rev-parse HEAD)
+          git fetch origin main
+          MAIN=$(git rev-parse origin/main)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B fix/v794-clean-final origin/main
+          mapfile -t FILES < <(git diff --name-only "$MAIN" "$REPAIR" -- README.md frontend scripts tests docs config/发布版本.txt | grep -v '^docs/public_v7/' || true)
+          if [ ${#FILES[@]} -eq 0 ]; then echo 'no source files selected' >&2; exit 1; fi
+          git checkout "$REPAIR" -- "${FILES[@]}"
+          git add -A README.md frontend scripts tests docs config/发布版本.txt || true
+          git diff --cached --check
+          git commit -m "V7.9.4 收口统一数据、估值、趋势、行动与展示链"
+          git push --force origin HEAD:fix/v794-clean-final
+          echo "main=$MAIN repair=$REPAIR clean=$(git rev-parse HEAD) files=${#FILES[@]}"
