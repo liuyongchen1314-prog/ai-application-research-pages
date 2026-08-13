@@ -103,7 +103,9 @@ for (const profile of [
 
     await page.click('[data-scope="full"]');
     await page.click('[data-tab="strategy"]');
-    await page.waitForSelector(".strategy-company");
+    await new Promise((resolve) => setTimeout(resolve, 750));
+    const strategyDiag = await page.evaluate(() => ({count: document.querySelectorAll('.strategy-company').length, text: document.querySelector('#strategyContent')?.textContent?.slice(0,600) || '', htmlLength: document.querySelector('#strategyContent')?.innerHTML?.length || 0}));
+    check(strategyDiag.count > 0, `strategy render failed: count=${strategyDiag.count} html=${strategyDiag.htmlLength} text=${strategyDiag.text} pageErrors=${pageErrors.join(' | ')}`);
     const actions = await page.$$eval("[data-strategy-action]", (nodes) => [...new Set(nodes.map((node) => node.dataset.strategyAction).filter((value) => value && value !== "all"))]);
     const expectedActions=['重点参与','小仓试错','临近触发','突破后确认','缩量回踩观察','普通候选','等待趋势修复','不追/回避','已持仓继续持有','已持仓减仓或退出'];
     check(expectedActions.every((x)=>actions.includes(x)), `strategy action filters incomplete: ${actions.join(',')}`);
