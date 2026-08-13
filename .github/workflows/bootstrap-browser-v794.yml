@@ -23,7 +23,7 @@ jobs:
           set -euo pipefail
           : > /tmp/browser_v793.mjs
           for f in .v794_browser/chunk*.b64; do base64 -d "$f" >> /tmp/browser_v793.mjs; done
-          test "$(git hash-object /tmp/browser_v793.mjs)" = "f94d15dcdb651a9911947d6ec200580899189779"
+          test "$(git hash-object /tmp/browser_v793.mjs)" = "f94dffe75d7eb974268e5492e96dd1202624d717"
           node --check /tmp/browser_v793.mjs
           cp /tmp/browser_v793.mjs tests/browser_v793.mjs
           git config user.name "github-actions[bot]"
