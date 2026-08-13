@@ -1,0 +1,32 @@
+name: Bootstrap V7.9.4 browser test
+
+on:
+  push:
+    branches: [fix/unified-engine-20260812]
+    paths:
+      - '.v794_browser/**'
+      - '.github/workflows/bootstrap-browser-v794.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Reconstruct enhanced browser regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .v794_browser/chunk*.b64 | base64 -d > /tmp/browser_v793.mjs
+          test "$(git hash-object /tmp/browser_v793.mjs)" = "f94d15dcdb651a9911947d6ec200580899189779"
+          node --check /tmp/browser_v793.mjs
+          cp /tmp/browser_v793.mjs tests/browser_v793.mjs
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/browser_v793.mjs
+          git commit -m "V7.9.4 强化真实浏览器验收"
+          git push origin HEAD:fix/unified-engine-20260812
