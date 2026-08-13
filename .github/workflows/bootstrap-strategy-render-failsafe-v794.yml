@@ -1,0 +1,72 @@
+name: Bootstrap V7.9.4 strategy display failsafe
+
+on:
+  push:
+    branches: [fix/unified-engine-20260812]
+    paths:
+      - '.github/workflows/bootstrap-strategy-render-failsafe-v794.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with: {fetch-depth: 0}
+      - name: Add display-only strategy renderer failsafe
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat >> frontend/V7_9_统一前端.js <<'JS'
+
+/* V7.9.4 display-only strategy renderer failsafe.
+   It never computes trend/action/score/CAN SLIM. It only renders the authoritative
+   strategy_current rows when the legacy renderer throws or produces an empty root. */
+const __v794LegacyRenderStrategy = renderStrategy;
+function __v794Esc(v){return String(v??'—').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+function __v794StrategyRows(){
+  const source=D.strategy_current||{};
+  return filtered().map(c=>({company:c,strategy:source[c.code]})).filter(x=>x.strategy);
+}
+function __v794RenderStrategyAuthoritative(root,selected='all'){
+  const actions=['all','重点参与','小仓试错','临近触发','突破后确认','缩量回踩观察','普通候选','等待趋势修复','不追/回避','已持仓继续持有','已持仓减仓或退出'];
+  const labels={all:'全部'};
+  const rows=__v794StrategyRows().filter(x=>selected==='all'||x.strategy.action===selected);
+  const filters=actions.map(a=>`<button type="button" class="chip ${a===selected?'active':''}" data-strategy-action="${__v794Esc(a)}">${__v794Esc(labels[a]||a)}</button>`).join('');
+  const cards=rows.map(({company:c,strategy:s})=>{
+    const blockers=Array.isArray(s.blockers)?s.blockers.join('；'):(s.blockers||'—');
+    const can=s.canslim?.verdict||s.canslim_verdict||s.canslim?.status||'—';
+    const trigger=s.trigger_text||s.trigger||s.entry_condition||s.buy_trigger||'—';
+    const stop=s.stop_text||s.stop||s.structure_stop||s.invalid_condition||'—';
+    return `<article class="strategy-company company-item" data-code="${__v794Esc(c.code)}" data-action="${__v794Esc(s.action)}">
+      <div class="company-head"><div><b>${__v794Esc(c.name||c.company||c.code)}</b><span class="code"> ${__v794Esc(c.code)}</span></div><span class="tag">${__v794Esc(s.action)}</span></div>
+      <div class="mini-grid">
+        <div><span>趋势阶段</span><b>${__v794Esc(s.trend_stage)}</b></div>
+        <div><span>趋势质量</span><b>${__v794Esc(s.trend_quality_score)}</b></div>
+        <div><span>当前买点</span><b>${__v794Esc(s.buy_point_score)}</b></div>
+        <div><span>数据完整度</span><b>${__v794Esc(s.data_completeness)}</b></div>
+        <div><span>RS 12/6/3月</span><b>${__v794Esc(s.rs_12m??s.rs12)} / ${__v794Esc(s.rs_6m??s.rs6)} / ${__v794Esc(s.rs_3m??s.rs3)}</b></div>
+        <div><span>CAN SLIM</span><b>${__v794Esc(can)}</b></div>
+      </div>
+      <p><b>触发：</b>${__v794Esc(trigger)}</p><p><b>止损/失效：</b>${__v794Esc(stop)}</p><p><b>阻断项：</b>${__v794Esc(blockers)}</p>
+    </article>`;
+  }).join('');
+  root.innerHTML=`<div class="strategy-filter-row">${filters}</div><div class="strategy-authority-note">行动、趋势、买点、CAN SLIM均直接来自后台唯一策略快照；盘中价格不在浏览器重算行动。</div><div class="strategy-company-list">${cards||'<div class="empty-state">当前筛选无公司</div>'}</div>`;
+  root.querySelectorAll('[data-strategy-action]').forEach(btn=>btn.addEventListener('click',()=>__v794RenderStrategyAuthoritative(root,btn.dataset.strategyAction||'all')));
+}
+renderStrategy=function(){
+  const root=document.getElementById('strategyContent'); if(!root)return;
+  let failed=false;
+  try{__v794LegacyRenderStrategy();}catch(error){failed=true;console.error('V7.9.4 legacy strategy renderer disabled after failure',error);}
+  if(failed||!root.querySelector('.strategy-company')) __v794RenderStrategyAuthoritative(root,'all');
+};
+JS
+          node --check frontend/V7_9_统一前端.js
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend/V7_9_统一前端.js
+          git commit -m "V7.9.4 策略页增加后台权威数据只读渲染兜底"
+          git push origin HEAD:fix/unified-engine-20260812
