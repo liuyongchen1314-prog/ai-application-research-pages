@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 import copy,datetime as dt,hashlib,json,pathlib,sys
-import pytest
 from collections import Counter
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
@@ -19,13 +18,11 @@ def h(x):return hashlib.sha256(json.dumps(x,ensure_ascii=False,sort_keys=True,se
 def companies(d):return [*((d.get('companies') or {}).get('hardware') or []),*((d.get('companies') or {}).get('application') or [])]
 def check(v,msg):
     if not v: raise AssertionError(msg)
-
-@pytest.fixture(scope='module')
-def data():
+def load_data():
     return json.load(open(LATEST,encoding='utf-8'))
 
-def test_fields_counts(data):
-    cs=companies(data); codes={x['code'] for x in cs}
+def test_fields_counts():
+    data=load_data(); cs=companies(data); codes={x['code'] for x in cs}
     check(len(cs)==142 and len(codes)==142,'142 unique')
     check(sum(x.get('scope')=='hardware' for x in cs)==83,'83 hardware')
     check(sum(x.get('scope')=='application' for x in cs)==59,'59 application')
@@ -48,8 +45,8 @@ def test_valuation_zero_drift_and_no_price_feedback():
         for k in fair: check(a[code].get(k)==c[code].get(k),f'{code} market price fed back into fair value {k}')
     check(all((x.get('institution_check') or {}).get('role') in (None,'仅交叉验证，不反推合理价') for x in a.values()),'institution target role')
 
-def test_trend_action_sort_scores(data):
-    held=set((data.get('user_positions') or {}).keys()); strat=data['strategy_current']
+def test_trend_action_sort_scores():
+    data=load_data(); held=set((data.get('user_positions') or {}).keys()); strat=data['strategy_current']
     for code,s in strat.items():
         check(s['action'] in ACTIONS,f'{code} action')
         check(s['trend_stage'] in STAGES,f'{code} stage')
@@ -71,7 +68,8 @@ def test_trend_action_sort_scores(data):
     check(all(k in roll for k in ('win_rate','average_return','max_drawdown','profit_loss_ratio')),'rolling metrics incomplete')
     check('not used to tune' in str(roll).lower() or '不' in str(roll),'validation must document no pass-count tuning')
 
-def test_canslim_evidence(data):
+def test_canslim_evidence():
+    data=load_data()
     for code,s in data['strategy_current'].items():
         cs=s.get('can_slim') or {}; items=cs.get('items') or []
         check([x.get('letter') for x in items]==list('CANSLIM'),f'{code} CANSLIM letters')
@@ -100,29 +98,28 @@ def test_market_clock():
     cn_after=dt.datetime(2026,8,13,9,0,tzinfo=UTC)
     check(expected_completed_session('china',cn_after)=='2026-08-13','China completed session')
 
-def test_market_json_and_coverage(data):
-    live=json.load(open(ROOT/'docs'/'public_v7'/'data'/'live-markets.json',encoding='utf-8'))
+def test_market_json_and_coverage():
+    data=load_data(); live=json.load(open(ROOT/'docs'/'public_v7'/'data'/'live-markets.json',encoding='utf-8'))
     check(live['schema']=='v794-live-markets-2' and live['market_count']==4,'live schema')
     for g in ('china','hk','us','korea'):
         m=live['markets'][g]
         for k in ('phase','exchange_timezone','exchange_local_time','beijing_time','source','quote_type','sample_date','file_generated_at','fresh','stale','freshness_reason'):check(k in m,f'{g} {k}')
         check(m['fresh'] != m['stale'],f'{g} fresh stale')
     check(len(data['quotes'])==142,'142 quote coverage')
-    # stale package rows are acceptable only when they are explicitly labelled stale.
     for g,m in live['markets'].items():
         exp=m.get('expected_completed_session'); sd=m.get('sample_date')
         if exp and sd!=exp and m.get('phase') in {'盘后','休市','盘前'}:check(m.get('stale') is True,f'{g} old session falsely fresh')
 
-def test_hardware_application_same_contract(data):
-    h=[c['code'] for c in companies(data) if c['scope']=='hardware']; a=[c['code'] for c in companies(data) if c['scope']=='application']
+def test_hardware_application_same_contract():
+    data=load_data(); h=[c['code'] for c in companies(data) if c['scope']=='hardware']; a=[c['code'] for c in companies(data) if c['scope']=='application']
     skey=set(data['strategy_current'][h[0]])
     check(all(set(data['strategy_current'][x])==skey for x in h+a),'hardware/application strategy fields differ')
     for code in h+a:
         s=data['strategy_current'][code]
         check(set((s.get('technical') or {}).keys())==set((data['strategy_current'][h[0]].get('technical') or {}).keys()),f'{code} technical contract differs')
 
-def test_factual_gaps_and_crosscheck(data):
-    fact=json.load(open(FACT,encoding='utf-8'))
+def test_factual_gaps_and_crosscheck():
+    data=load_data(); fact=json.load(open(FACT,encoding='utf-8'))
     check(fact['formal_closed']==0 and fact['hk_companies']==14,'factual closure facts')
     check(fact['summary']['港股币种']['unresolved']==14,'HK currency falsely closed')
     for code,v in data['valuation_current'].items():
@@ -141,16 +138,15 @@ def test_source_authority():
     check("5,15,25,35,45,55 13-21" in wf,'US 10m backend sampling missing')
 
 def main():
-    data=json.load(open(LATEST,encoding='utf-8'))
     tests=[
-      ('1_fields_counts',lambda:test_fields_counts(data)),
+      ('1_fields_counts',test_fields_counts),
       ('2_valuation_zero_drift',test_valuation_zero_drift_and_no_price_feedback),
-      ('3_trend_action_sort_scores',lambda:test_trend_action_sort_scores(data)),
-      ('4_canslim_evidence',lambda:test_canslim_evidence(data)),
+      ('3_trend_action_sort_scores',test_trend_action_sort_scores),
+      ('4_canslim_evidence',test_canslim_evidence),
       ('5_market_clock',test_market_clock),
-      ('6_market_json_quote_coverage',lambda:test_market_json_and_coverage(data)),
-      ('7_hardware_application_same_contract',lambda:test_hardware_application_same_contract(data)),
-      ('8_factual_gaps_crosscheck',lambda:test_factual_gaps_and_crosscheck(data)),
+      ('6_market_json_quote_coverage',test_market_json_and_coverage),
+      ('7_hardware_application_same_contract',test_hardware_application_same_contract),
+      ('8_factual_gaps_crosscheck',test_factual_gaps_and_crosscheck),
       ('9_source_authority',test_source_authority),
     ]
     out=[]
