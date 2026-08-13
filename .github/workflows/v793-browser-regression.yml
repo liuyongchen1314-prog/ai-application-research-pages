@@ -56,3 +56,4 @@ jobs:
           name: V7.9.4-浏览器回归
           path: test-results/browser-v793/
           if-no-files-found: warn
+# V7.9.4 acceptance contract: stale market data must never be reported as refresh success.
