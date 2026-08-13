@@ -1,7 +1,7 @@
-/* AI研究系统 V7.9 统一前端源码：以V7.6完整交互为母版，估值与操作策略使用独立数据层。 */
+/* AI研究系统 V7.9.4 统一前端：前端仅展示/排序；估值与策略字段禁止二次计算。 */
 
 const D=window.__V7_DATA__;
-const BUILD={version:'V7.9.3',builtAt:'2026-08-12T18:30:00+08:00'};
+const BUILD={version:'V7.9.4',builtAt:new Date().toISOString()};
 
 /* V7.9：保留V7.6完整能力，并由统一运行层提供唯一前端入口。 */
 let chooseMagicPeriod, dbGet, dbPut, deriveAttribution, drawCurrentChart, evaluateWeekLine, fetchFirst, gateState, loadCache, loadCompanyOnline, mergeLive, openDetailKline, refreshAllData, refreshPublicHardware, renderCurrent, renderDetail, renderIntraday, renderKline, renderMarketContext, renderSector, renderSepa, renderValuation, saveCache, selectChart, selectedWeekLine, updateStatus;
@@ -79,31 +79,36 @@ function renderCurrentBase(){['valuation','strategy','sector','sepa','kline','da
 
 function strategyFor(c){return D.strategy_current?.[typeof c==='string'?c:c?.code]||{}}
 function strategyNumber(v,digits=2){return v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))?Number(v).toLocaleString('zh-CN',{maximumFractionDigits:digits}):'—'}
-function strategyRange(s){if(s.first_buy_zone_low!==null&&s.first_buy_zone_low!==undefined&&s.first_buy_zone_high!==null&&s.first_buy_zone_high!==undefined&&Number.isFinite(Number(s.first_buy_zone_low))&&Number.isFinite(Number(s.first_buy_zone_high)))return `${strategyNumber(s.first_buy_zone_low)}–${strategyNumber(s.first_buy_zone_high)}`;return s.action==='等待突破'?'当前不买｜等待突破':s.action==='持有'?'持仓管理｜不新增':s.action==='减仓'?'减仓管理｜不新增':s.action==='回避/退出'||s.action==='暂不参与'?'回避｜不设买入区':'尚未形成买点'}
+function strategyRange(s){
+  if(s.first_buy_zone_low!==null&&s.first_buy_zone_low!==undefined&&s.first_buy_zone_high!==null&&s.first_buy_zone_high!==undefined&&Number.isFinite(Number(s.first_buy_zone_low))&&Number.isFinite(Number(s.first_buy_zone_high)))return `${strategyNumber(s.first_buy_zone_low)}–${strategyNumber(s.first_buy_zone_high)}`;
+  if(s.action==='已持仓继续持有')return '持仓管理｜不新增';
+  if(s.action==='已持仓减仓或退出')return '减仓/退出管理｜不新增';
+  if(s.action==='不追/回避')return '回避｜不设买入区';
+  return '触发条件未满足｜当前不买';
+}
 let strategyActionFilter='all';
 function strategyRows(){return filtered().map(c=>({c,s:strategyFor(c)})).filter(x=>x.s.action&&(strategyActionFilter==='all'||x.s.action===strategyActionFilter))}
 function renderStrategy(){
   const root=$('#strategyContent');if(!root)return;
-  const actions=['重点参与','试仓','等待突破','持有','减仓','回避/退出','暂不参与'];
+  const actions=['重点参与','小仓试错','临近触发','突破后确认','缩量回踩观察','普通候选','等待趋势修复','不追/回避','已持仓继续持有','已持仓减仓或退出'];
   const allRows=filtered().map(c=>({c,s:strategyFor(c)})).filter(x=>x.s.action),rows=strategyRows();
   const counts=Object.fromEntries(actions.map(a=>[a,allRows.filter(x=>x.s.action===a).length]));
   const markets=['A股','港股','美股','韩国'];
   const marketOf=c=>/\.SH$|\.SZ$|\.BJ$/.test(c.code)?'A股':/\.HK$/.test(c.code)?'港股':/\.KS$|\.KQ$/.test(c.code)?'韩国':'美股';
+  const cmp=(a,b)=>v794CanonicalCompare(a.c,b.c);
   const marketBlocks=markets.map(m=>{
     const marketRows=rows.filter(x=>marketOf(x.c)===m);if(!marketRows.length)return'';
     const sectors=uniq(marketRows.map(x=>x.c.sector)).sort((a,b)=>{
       const ar=marketRows.filter(x=>x.c.sector===a),br=marketRows.filter(x=>x.c.sector===b);
-      return Math.max(...br.map(x=>+x.s.sector_rank||0))-Math.max(...ar.map(x=>+x.s.sector_rank||0));
+      return Math.max(...br.map(x=>+x.s.sector_score||0))-Math.max(...ar.map(x=>+x.s.sector_score||0));
     });
-    return `<section class="strategy-market"><div class="strategy-market-title"><h2>${m}</h2><span>${marketRows.length}家公司</span></div>${sectors.map(sec=>{const secRows=marketRows.filter(x=>x.c.sector===sec).sort((a,b)=>actions.indexOf(a.s.action)-actions.indexOf(b.s.action));return `<div class="strategy-sector"><div class="strategy-sector-title"><h3>${esc(sec)}</h3><span>${secRows.length}家</span></div><div class="strategy-company-grid">${secRows.map(({c,s})=>`<article class="strategy-company action-${esc(s.action)}"><div class="strategy-company-head"><button class="company-link" data-strategy-detail="${esc(c.code)}">${esc(c.name)}</button><span class="strategy-action">${esc(s.action)}</span></div><div class="strategy-price"><b>${strategyNumber(c.price)}</b><span>${esc(c.code)}｜${esc(c.price_date||'—')}</span></div><div class="strategy-levels"><div><span>第一买入区</span><b>${strategyRange(s)}</b></div><div><span>突破位</span><b>${strategyNumber(s.breakout_level)}</b></div><div><span>首次仓位</span><b>${esc(s.initial_position||'—')}</b></div><div><span>止损位</span><b>${strategyNumber(s.stop_loss)}</b></div></div><p>${esc(s.reason||'等待证据更新')}</p><details><summary>加仓、减仓与失效条件</summary><dl><dt>加仓</dt><dd>${esc(s.add_condition||'—')}</dd><dt>减仓</dt><dd>${esc(s.reduce_condition||'—')}</dd><dt>失效</dt><dd>${esc(s.invalidation||'—')}</dd><dt>风险收益比</dt><dd>${Number.isFinite(+s.risk_reward_ratio)?(+s.risk_reward_ratio).toFixed(2):'当前不可计算'}</dd></dl></details></article>`).join('')}</div></div>`}).join('')}</section>`;
+    return `<section class="strategy-market"><div class="strategy-market-title"><h2>${m}</h2><span>${marketRows.length}家公司</span></div>${sectors.map(sec=>{const secRows=marketRows.filter(x=>x.c.sector===sec).sort(cmp);return `<div class="strategy-sector"><div class="strategy-sector-title"><h3>${esc(sec)}</h3><span>${secRows.length}家</span></div><div class="strategy-company-grid">${secRows.map(({c,s})=>`<article class="strategy-company action-${esc(s.action)}"><div class="strategy-company-head"><button class="company-link" data-strategy-detail="${esc(c.code)}">${esc(c.name)}</button><span class="strategy-action">${esc(s.action)}</span></div><div class="strategy-price"><b>${strategyNumber(c.price)}</b><span>${esc(c.code)}｜盘中价 ${esc(c.price_date||'—')}｜策略基准 ${esc(s.reference_price_date||s.snapshot_date||'—')}</span></div><div class="strategy-levels"><div><span>当前买点</span><b>${strategyNumber(s.buy_point_score,0)}分</b></div><div><span>趋势质量</span><b>${strategyNumber(s.trend_quality_score,0)}分｜${esc(s.trend_stage||'数据不足')}</b></div><div><span>第一买入区</span><b>${strategyRange(s)}</b></div><div><span>突破位</span><b>${strategyNumber(s.breakout_level)}</b></div><div><span>首次仓位</span><b>${esc(s.initial_position||'—')}</b></div><div><span>止损位</span><b>${strategyNumber(s.stop_loss)}</b></div></div><p>${esc(s.reason||'等待证据更新')}</p><p class="small muted">阻断：${esc((s.blockers||[]).join('；')||'无硬阻断')}｜数据完整度 ${strategyNumber(s.data_completeness,0)}｜12/6/3月RS ${strategyNumber(s.technical?.relative_strength_12m,0)}/${strategyNumber(s.technical?.relative_strength_6m,0)}/${strategyNumber(s.technical?.relative_strength_3m,0)}</p><details><summary>加仓、减仓与失效条件</summary><dl><dt>加仓</dt><dd>${esc(s.add_condition||'—')}</dd><dt>减仓</dt><dd>${esc(s.reduce_condition||'—')}</dd><dt>失效</dt><dd>${esc(s.invalidation||'—')}</dd><dt>风险收益比</dt><dd>${Number.isFinite(+s.risk_reward_ratio)?(+s.risk_reward_ratio).toFixed(2):'当前不可计算'}</dd></dl></details></article>`).join('')}</div></div>`}).join('')}</section>`;
   }).join('');
-  root.innerHTML=`<div class="card strategy-overview"><div><span class="v74-eyebrow">市场 → 板块 → 公司 → 买点</span><h2>独立操作策略</h2><p>估值只回答值多少钱；本页才把趋势、量价、板块强弱、仓位和止损组合成行动。没有买点时明确显示“不设买入区”，不再出现0–0。</p></div><div class="strategy-counts">${actions.map(a=>`<button class="strategy-count ${strategyActionFilter===a?'active':''}" data-strategy-action="${esc(a)}"><b>${counts[a]||0}</b>${a}</button>`).join('')}</div></div><div class="card strategy-filter"><b>行动筛选</b><button class="chip-btn ${strategyActionFilter==='all'?'active':''}" data-strategy-action="all">全部 ${allRows.length}</button>${actions.map(a=>`<button class="chip-btn ${strategyActionFilter===a?'active':''}" data-strategy-action="${esc(a)}">${esc(a)} ${counts[a]||0}</button>`).join('')}<span class="small muted">当前显示 ${rows.length} 家</span></div>${marketBlocks||'<div class="card empty">当前筛选下没有公司</div>'}`;
+  const order=(D.strategy_meta?.sort_contract||[]).join(' → ');
+  root.innerHTML=`<div class="card strategy-overview"><div><span class="v74-eyebrow">市场门禁 → 板块 → 公司 → 买点</span><h2>独立操作策略</h2><p>策略只使用后台唯一结果。盘中价格可先变化，但行动、趋势和止损仍明确标注其正式收盘基准日；未满足事先触发条件就不买。</p><p class="small muted">默认排序：${esc(order||'行动优先级 → 趋势阶段 → 趋势质量 → RS → 枢轴距离 → 形态质量 → 公司质量 → 代码')}</p></div><div class="strategy-counts">${actions.map(a=>`<button class="strategy-count ${strategyActionFilter===a?'active':''}" data-strategy-action="${esc(a)}"><b>${counts[a]||0}</b>${a}</button>`).join('')}</div></div><div class="card strategy-filter"><b>行动筛选</b><button class="chip-btn ${strategyActionFilter==='all'?'active':''}" data-strategy-action="all">全部 ${allRows.length}</button>${actions.map(a=>`<button class="chip-btn ${strategyActionFilter===a?'active':''}" data-strategy-action="${esc(a)}">${esc(a)} ${counts[a]||0}</button>`).join('')}<span class="small muted">当前显示 ${rows.length} 家</span></div>${marketBlocks||'<div class="card empty">当前筛选下没有公司</div>'}`;
   root.querySelectorAll('[data-strategy-action]').forEach(b=>b.onclick=()=>{strategyActionFilter=b.dataset.strategyAction;renderStrategy()});
   root.querySelectorAll('[data-strategy-detail]').forEach(b=>b.onclick=()=>openDetail(b.dataset.strategyDetail,rows.map(x=>x.c.code)));
 }
-
-
-
 function getCompany(code){return allCompanies().find(c=>c.code===code)}
 
 function selectChartBase(code){chartCode=code;$$('#klineList .company-item').forEach(b=>b.classList.toggle('active',b.dataset.code===code));drawCurrentChart();loadCompanyOnline(code,{silent:true}).then(()=>{if(chartCode===code)drawCurrentChart()})}
@@ -147,7 +152,7 @@ function moveDetail(n){if(!detailCodes.length)return;detailIndex=(detailIndex+n+
 function closeDetail(){$('#modal').classList.remove('open')}
 function currentDetail(){return getCompany(detailCodes[detailIndex])}
 function openDetailKlineBase(){const c=currentDetail();if(!c)return;closeDetail();scope=c.scope;tab='kline';$$('.scope-btn').forEach(b=>b.classList.toggle('active',b.dataset.scope===scope));populateSector();renderTabs();renderCurrent();selectChart(c.code)}
-function renderDetailBase(){const c=currentDetail();if(!c)return;$('#modalTitle').textContent=`${c.name}｜${c.code}`;const details=(c.details||[]).map(richDetail).join(''),audit=c.institution_audit||{},tech=calcCompanyTech(c),lf=c.live_financials||{},liveAnn=(lf.announcements||[]).slice(0,8),liveCard=liveAnn.length?`<div class="card source-list"><h3>云端每日正式披露与基础信息更新</h3><p class="small muted">生成时间：${esc(lf.generated_at||lf.update_time||'')}｜公开源仅做证据入口，仍需打开公告原文。</p>${liveAnn.map(x=>`<p><b>${esc(x.title||x.name||'公告')}</b><br><span class="small muted">${esc(x.date||x.notice_date||'')} ${esc(x.source||'')}</span></p>`).join('')}</div>`:'';$('#modalBody').innerHTML=`<div class="detail-hero"><h3>${esc(c.one_liner||c.subsector||'')}</h3><div class="grid"><div class="metric">最新价<b>${num(c.price)} <span class="${classFor(c.change)}">${pct(c.change)}</span></b><span>${esc(c.price_date)}${isStale(c.price_date)?'<span class="stale-pill">过期</span>':''}</span></div><div class="metric">公司质量<b>${num(c.quality)}</b><span>${esc(c.tier)}</span></div><div class="metric">SEPA阶段<b>${esc(c.sepa?.stage)}</b><span>${esc(c.action)}</span></div><div class="metric">产业链位置<b>${esc(c.sector)}</b><span>${esc(c.market)}｜${esc(c.currency)}</span></div></div></div><div class="card"><h3>估值概览</h3><div class="grid"><div class="metric">当前区间<b>${esc(c.current)}</b></div><div class="metric">6个月<b>${esc(c.six)}</b></div><div class="metric">12个月<b>${esc(c.twelve)}</b></div><div class="metric">价格状态<b>${esc(rangeStatus(c))}</b></div></div><p><b>模型：</b>${esc(c.valuation_model)}</p><p><b>置信度：</b>${esc(c.valuation_confidence)}｜${esc(c.valuation_status)}</p></div><div class="detail-grid"><div class="detail-section"><h4>护城河</h4><p>${esc(c.moat)}</p></div><div class="detail-section"><h4>最大风险</h4><p>${esc(c.risk)}</p></div><div class="detail-section"><h4>最强反证</h4><p>${esc(c.counter)}</p></div><div class="detail-section"><h4>财务事实与利润质量</h4><p>${esc(c.financial)}</p></div><div class="detail-section"><h4>技术与量价</h4><p>5日 ${pct(tech.r5)}｜20日 ${pct(tech.r20)}｜量比 ${tech.volRatio?tech.volRatio.toFixed(2)+'x':'—'}</p><p>MA20 ${num(tech.ma20)}｜MA50 ${num(tech.ma50)}｜MA150 ${num(tech.ma150)}｜MA200 ${num(tech.ma200)}</p></div><div class="detail-section"><h4>机构交叉审计</h4><p>${esc(typeof audit==='string'?audit:[audit.status,audit.model,audit.difference_reason].filter(Boolean).join('｜'))||'当前没有可显示的结构化机构审计。'}</p></div></div><div class="card"><h3>门禁、行动与失效</h3><p><b>积极：</b>${(c.sepa?.positive||[]).map(x=>`<span class="badge positive">${esc(x)}</span>`).join('')||'—'}</p><p><b>风险：</b>${(c.sepa?.risk||[]).map(x=>`<span class="badge risk">${esc(x)}</span>`).join('')||'—'}</p><p><b>未通过：</b>${(c.sepa?.failed||[]).map(x=>`<span class="badge neutral">${esc(x)}</span>`).join('')||'—'}</p><p><b>当前行动：</b>${esc(c.action)}</p></div>${liveCard}<div class="card"><h3>完整研究章节</h3><div class="detail-grid">${details}</div></div><div class="card source-list"><h3>来源与证据入口</h3>${sourceLinks(c)}<p class="small muted">事实、模型推算、反证和未知项应分开；无法核验的预测不自动补全。</p></div>`}
+function renderDetailBase(){const c=currentDetail();if(!c)return;$('#modalTitle').textContent=`${c.name}｜${c.code}`;const details=(c.details||[]).map(richDetail).join(''),audit=c.institution_audit||{},tech=calcCompanyTech(c),lf=c.live_financials||{},liveAnn=(lf.announcements||[]).slice(0,8),liveCard=liveAnn.length?`<div class="card source-list"><h3>云端每日正式披露与基础信息更新</h3><p class="small muted">生成时间：${esc(lf.generated_at||lf.update_time||'')}｜公开源仅做证据入口，仍需打开公告原文。</p>${liveAnn.map(x=>`<p><b>${esc(x.title||x.name||'公告')}</b><br><span class="small muted">${esc(x.date||x.notice_date||'')} ${esc(x.source||'')}</span></p>`).join('')}</div>`:'';$('#modalBody').innerHTML=`<div class="detail-hero"><h3>${esc(c.one_liner||c.subsector||'')}</h3><div class="grid"><div class="metric">最新价<b>${num(c.price)} <span class="${classFor(c.change)}">${pct(c.change)}</span></b><span>${esc(c.price_date)}${isStale(c.price_date)?'<span class="stale-pill">过期</span>':''}</span></div><div class="metric">公司质量<b>${num(c.quality)}</b><span>${esc(c.tier)}</span></div><div class="metric">趋势阶段<b>${esc(strategyFor(c).trend_stage||"数据不足")}</b><span>${esc(strategyFor(c).action||"等待趋势修复")}</span></div><div class="metric">产业链位置<b>${esc(c.sector)}</b><span>${esc(c.market)}｜${esc(c.currency)}</span></div></div></div><div class="card"><h3>估值概览</h3><div class="grid"><div class="metric">当前区间<b>${esc(c.current)}</b></div><div class="metric">6个月<b>${esc(c.six)}</b></div><div class="metric">12个月公开目标<b>不公开</b></div><div class="metric">价格状态<b>${esc(rangeStatus(c))}</b></div></div><p><b>模型：</b>${esc(c.valuation_model)}</p><p><b>置信度：</b>${esc(c.valuation_confidence)}｜${esc(c.valuation_status)}</p></div><div class="detail-grid"><div class="detail-section"><h4>护城河</h4><p>${esc(c.moat)}</p></div><div class="detail-section"><h4>最大风险</h4><p>${esc(c.risk)}</p></div><div class="detail-section"><h4>最强反证</h4><p>${esc(c.counter)}</p></div><div class="detail-section"><h4>财务事实与利润质量</h4><p>${esc(c.financial)}</p></div><div class="detail-section"><h4>技术与量价</h4><p>5日 ${pct(tech.r5)}｜20日 ${pct(tech.r20)}｜量比 ${tech.volRatio?tech.volRatio.toFixed(2)+'x':'—'}</p><p>MA20 ${num(tech.ma20)}｜MA50 ${num(tech.ma50)}｜MA150 ${num(tech.ma150)}｜MA200 ${num(tech.ma200)}</p></div><div class="detail-section"><h4>机构交叉审计</h4><p>${esc(typeof audit==='string'?audit:[audit.status,audit.model,audit.difference_reason].filter(Boolean).join('｜'))||'当前没有可显示的结构化机构审计。'}</p></div></div><div class="card"><h3>门禁、行动与失效</h3><p><b>积极：</b>${(c.sepa?.positive||[]).map(x=>`<span class="badge positive">${esc(x)}</span>`).join('')||'—'}</p><p><b>风险：</b>${(c.sepa?.risk||[]).map(x=>`<span class="badge risk">${esc(x)}</span>`).join('')||'—'}</p><p><b>未通过：</b>${(c.sepa?.failed||[]).map(x=>`<span class="badge neutral">${esc(x)}</span>`).join('')||'—'}</p><p><b>当前行动：</b>${esc(c.action)}</p></div>${liveCard}<div class="card"><h3>完整研究章节</h3><div class="detail-grid">${details}</div></div><div class="card source-list"><h3>来源与证据入口</h3>${sourceLinks(c)}<p class="small muted">事实、模型推算、反证和未知项应分开；无法核验的预测不自动补全。</p></div>`}
 function fillOperationCompany(){const c=getCompany($('#opCompany').value);if(!c)return;$('#opEntry').value=c.price??'';const h=history(c.code),low=h.length?Math.min(...h.slice(-10).map(r=>r[4])):'';$('#opStop').value=low?low.toFixed(2):'';evaluateOperation()}
 function renderOperations(){const rows=filtered(),old=$('#opCompany').value;$('#opCompany').innerHTML=rows.map(c=>`<option value="${c.code}">${esc(c.name)}｜${c.code}</option>`).join('');if(old&&rows.some(c=>c.code===old))$('#opCompany').value=old;fillOperationCompany()}
 
@@ -191,12 +196,13 @@ function compareDate(a,b){return String(a||'').localeCompare(String(b||''))}
 function batchQuoteJsonp(symbols,timeout=5000){return new Promise((resolve,reject)=>{const script=document.createElement('script'),timer=setTimeout(()=>{cleanup();reject(new Error('腾讯批量报价超时'))},timeout),cleanup=()=>{clearTimeout(timer);script.remove()};script.charset='gbk';script.src='https://qt.gtimg.cn/q='+symbols.join(',')+'&_='+Date.now();script.onload=()=>{const out={};for(const sym of symbols){const raw=window['v_'+sym];if(typeof raw!=='string')continue;const a=raw.split('~');if(a.length<6)continue;const p=Number(a[3]),pre=Number(a[4]);out[sym]={name:a[1],price:p,prev_close:pre,open:Number(a[5]),change_pct:pre?p/pre-1:null,timestamp:a[30]||'',source:'tencent-live'}}cleanup();resolve(out)};script.onerror=()=>{cleanup();reject(new Error('腾讯批量报价加载失败'))};document.head.appendChild(script)})}
 async function refreshBenchmarkDates(){try{const q=await batchQuoteJsonp(['sh000001','hkHSI'],5000),dates=Object.values(q).map(x=>normalizeFeedDate(x.timestamp)).filter(Boolean).sort();if(!dates.length)throw new Error('基准行情日期为空');liveMeta.expected_market_date=dates.at(-1);liveMeta.benchmark_dates={A股:normalizeFeedDate(q.sh000001?.timestamp),港股:normalizeFeedDate(q.hkHSI?.timestamp)};return liveMeta.benchmark_dates}catch(e){liveMeta.benchmark_error=String(e);return null}}
 async function refreshRealtimeQuotes({silent=false}={}){const rows=allCompanies(),groups=[];for(let i=0;i<rows.length;i+=45)groups.push(rows.slice(i,i+45));let updated=0;const errs=[];for(const g of groups){const syms=g.map(c=>D.histories[c.code]?.symbol).filter(Boolean);try{const q=await batchQuoteJsonp(syms);for(const c of g){const x=q[D.histories[c.code]?.symbol];if(!x)continue;c.price=x.price;c.change=x.change_pct;c.price_date=normalizeFeedDate(x.timestamp)||c.price_date;c.valuation_status=rangeStatus(c);updated++}}catch(e){errs.push(String(e))}}if(updated){D.sectors.hardware=calcSectorStats(D.companies.hardware);D.sectors.application=calcSectorStats(D.companies.application);liveMeta.realtime_count=updated;liveMeta.realtime_updated=new Date().toISOString();liveMeta.source=liveMeta.source.includes('GitHub')?liveMeta.source:`腾讯${totalCompanies()}家公司实时行情`;saveCurrentSummary();if(!silent){renderCurrent();updateStatus()}}return{updated,errors:errs}}
-function v793CompletedItem(symbol,name,record){const rows=record?.daily||[];if(rows.length<2)return null;const current=rows.at(-1),previous=rows.at(-2),price=+current[2],prior=+previous[2];return{symbol,name,price,previous_close:prior,change_pct:prior?price/prior-1:null,date:String(current[0]),as_of:String(current[0])+' 收盘',source:'正式收盘快照',realtime:false}}
-function v793FormalLiveFallback(){const b=D.benchmarks||{},context=D.market_context||{},pick=(group)=>(context[group]?.items||[]).slice(0,3).map(x=>({symbol:x.ticker,name:x.name||x.ticker,price:x.close,previous_close:null,change_pct:x.change_pct,date:x.date,as_of:String(x.date||'')+' 收盘',source:'正式收盘快照',realtime:false}));return{schema:'v793-live-markets-1',release:'V7.9.3',generated_at:D.generated_at_cn||D.generated_at||new Date().toISOString(),formal_snapshot_date:D.snapshot_date||D.embedded_snapshot,separate_from_valuation:true,market_count:4,markets:{china:{status:'completed_session_fallback',items:[v793CompletedItem('sh000300','沪深300',b.CSI300),v793CompletedItem('sz399006','创业板指',b.CHINEXT),v793CompletedItem('sh000688','科创50',b.STAR50)].filter(Boolean)},hk:{status:'completed_session_fallback',items:[v793CompletedItem('hkHSI','恒生指数',b.HSI),v793CompletedItem('hkHSTECH','恒生科技',b.HSTECH)].filter(Boolean)},us:{status:'completed_session_fallback',items:pick('us')},korea:{status:'completed_session_fallback',items:pick('korea')}}}}
-function v793ValidateLiveMarkets(payload){if(!payload||payload.schema!=='v793-live-markets-1'||+payload.market_count!==4)throw new Error('四市场即时行情协议不匹配');for(const group of ['china','hk','us','korea']){const items=payload.markets?.[group]?.items;if(!Array.isArray(items)||!items.length||items.some(x=>!Number.isFinite(+x.price)||!Number.isFinite(+x.change_pct)))throw new Error(`${group}即时行情不完整`)}if(payload.separate_from_valuation!==true)throw new Error('即时行情未声明与估值隔离');return payload}
-function v793MergeDirectMarkets(payload,quotes){for(const group of ['china','hk']){const items=payload.markets?.[group]?.items||[];let updated=0;items.forEach(item=>{const x=quotes[item.symbol];if(!x)return;Object.assign(item,{price:x.price,previous_close:x.prev_close,change_pct:x.change_pct,date:normalizeFeedDate(x.timestamp)||item.date,as_of:x.timestamp||item.as_of,source:'腾讯即时行情',realtime:true});updated++});if(updated)payload.markets[group].status='realtime'}return payload}
-async function refreshLiveMarkets(){let payload=null,endpointError='';try{const result=await fetchFirst(['data/live-markets.json','https://liuyongchen1314-prog.github.io/ai-application-research-pages/data/live-markets.json'],6500);payload=v793ValidateLiveMarkets(result.data)}catch(error){endpointError=String(error?.message||error);payload=v793FormalLiveFallback()}let directCount=0;try{const symbols=['sh000300','sz399006','sh000688','hkHSI','hkHSTECH'],quotes=await batchQuoteJsonp(symbols,5500);directCount=Object.keys(quotes).length;v793MergeDirectMarkets(payload,quotes)}catch(error){payload.browser_direct_error=String(error?.message||error)}payload.browser_refreshed_at=new Date().toISOString();if(endpointError)payload.endpoint_error=endpointError;D.live_markets=v793ValidateLiveMarkets(payload);liveMeta.live_market_updated=payload.browser_refreshed_at;return{success:true,marketCount:4,directCount,payload}}
-function v793MarketCards(){const payload=D.live_markets||v793FormalLiveFallback(),labels={china:'A股',hk:'港股',us:'美股',korea:'韩股'};return ['china','hk','us','korea'].map(group=>{const market=payload.markets?.[group]||{},items=(market.items||[]).slice(0,3),tone=market.status==='realtime'?'实时':'最近完整交易时段';return `<article class="v793-market-card" data-live-market="${group}"><div class="v793-market-head"><b>${labels[group]}</b><span>${tone}</span></div>${items.map(x=>`<div class="v793-market-row"><span>${esc(x.name||x.symbol)}</span><strong class="${classFor(x.change_pct)}">${pct(x.change_pct)}</strong><small>${num(x.price)}</small></div>`).join('')}<div class="v793-market-time">${esc(items[0]?.as_of||items[0]?.date||'等待刷新')}</div></article>`}).join('')}
+function v793CompletedItem(symbol,name,record){const rows=record?.daily||[];if(rows.length<2)return null;const current=rows.at(-1),previous=rows.at(-2),price=+current[2],prior=+previous[2];return{symbol,name,price,previous_close:prior,change_pct:prior?price/prior-1:null,date:String(current[0]),sample_at:null,as_of:String(current[0])+' 收盘',source:'正式收盘快照',quote_type:'正式收盘',realtime:false}}
+function v793FormalLiveFallback(){const b=D.benchmarks||{},context=D.market_context||{},mk=(items)=>({status:'completed_session_fallback',phase:'未知',exchange_timezone:'未知',exchange_local_time:null,beijing_time:new Date().toISOString(),source:'内置正式收盘快照',quote_type:'正式收盘',fresh:false,stale:true,freshness_reason:'仅有内置快照，联网后才能核验交易日与新鲜度',data_age_minutes:null,sample_at:null,sample_date:items[0]?.date||null,file_generated_at:D.generated_at_cn||D.generated_at||null,items}),pick=(group)=>(context[group]?.items||[]).slice(0,3).map(x=>({symbol:x.ticker,name:x.name||x.ticker,price:x.close,previous_close:null,change_pct:x.change_pct,date:x.date,sample_at:null,as_of:String(x.date||'')+' 收盘',source:'正式收盘快照',quote_type:'正式收盘',realtime:false}));const china=[v793CompletedItem('sh000300','沪深300',b.CSI300),v793CompletedItem('sz399006','创业板指',b.CHINEXT),v793CompletedItem('sh000688','科创50',b.STAR50)].filter(Boolean),hk=[v793CompletedItem('hkHSI','恒生指数',b.HSI),v793CompletedItem('hkHSTECH','恒生科技',b.HSTECH)].filter(Boolean),us=pick('us'),korea=pick('korea');return{schema:'v794-live-markets-2',release:'V7.9.4',generated_at:D.generated_at_cn||D.generated_at||new Date().toISOString(),formal_snapshot_date:D.snapshot_date||D.embedded_snapshot,separate_from_valuation:true,separate_intraday_price_from_close_strategy:true,market_count:4,markets:{china:mk(china),hk:mk(hk),us:mk(us),korea:mk(korea)}}}
+function v793ValidateLiveMarkets(payload){if(!payload||payload.schema!=='v794-live-markets-2'||payload.release!=='V7.9.4'||+payload.market_count!==4)throw new Error('四市场即时行情协议不匹配');for(const group of ['china','hk','us','korea']){const market=payload.markets?.[group],items=market?.items;if(!Array.isArray(items)||!items.length||items.some(x=>!Number.isFinite(+x.price)||!Number.isFinite(+x.change_pct)))throw new Error(`${group}即时行情不完整`);if(typeof market.stale!=='boolean'||typeof market.fresh!=='boolean'||!market.phase)throw new Error(`${group}缺少阶段/新鲜度字段`)}if(payload.separate_from_valuation!==true||payload.separate_intraday_price_from_close_strategy!==true)throw new Error('即时行情未声明与估值/收盘策略隔离');return payload}
+function v794TencentIso(raw){const x=String(raw||'').replace(/\D/g,'');if(x.length<14)return null;return `${x.slice(0,4)}-${x.slice(4,6)}-${x.slice(6,8)}T${x.slice(8,10)}:${x.slice(10,12)}:${x.slice(12,14)}+08:00`}
+function v793MergeDirectMarkets(payload,quotes){for(const group of ['china','hk']){const market=payload.markets?.[group]||{},items=market.items||[];let updated=0;items.forEach(item=>{const x=quotes[item.symbol];if(!x)return;const sampleAt=v794TencentIso(x.timestamp);Object.assign(item,{price:x.price,previous_close:x.prev_close,change_pct:x.change_pct,date:normalizeFeedDate(x.timestamp)||item.date,sample_at:sampleAt,as_of:sampleAt||x.timestamp||item.as_of,source:'腾讯即时行情',quote_type:'浏览器即时行情',realtime:true});updated++});if(updated){market.status='realtime';market.source='腾讯即时行情';market.quote_type='浏览器即时行情';market.sample_at=items.map(x=>x.sample_at).filter(Boolean).sort().at(-1)||market.sample_at;market.sample_date=items.map(x=>x.date).filter(Boolean).sort().at(-1)||market.sample_date;if(market.phase==='盘中'&&market.sample_at){const age=(Date.now()-new Date(market.sample_at).getTime())/60000;market.data_age_minutes=Math.max(0,age);market.fresh=age<=20;market.stale=!market.fresh;market.freshness_reason=market.fresh?'浏览器直连行情在20分钟新鲜度阈值内':'浏览器直连行情已超过20分钟';}}}return payload}
+async function refreshLiveMarkets(){let payload=null,endpointError='';try{const result=await fetchFirst(['data/live-markets.json','https://liuyongchen1314-prog.github.io/ai-application-research-pages/data/live-markets.json'],6500);payload=v793ValidateLiveMarkets(result.data)}catch(error){endpointError=String(error?.message||error);payload=v793FormalLiveFallback()}let directCount=0;try{const symbols=['sh000300','sz399006','sh000688','hkHSI','hkHSTECH'],quotes=await batchQuoteJsonp(symbols,5500);directCount=Object.keys(quotes).length;v793MergeDirectMarkets(payload,quotes)}catch(error){payload.browser_direct_error=String(error?.message||error)}payload.browser_refreshed_at=new Date().toISOString();if(endpointError)payload.endpoint_error=endpointError;D.live_markets=v793ValidateLiveMarkets(payload);liveMeta.live_market_updated=payload.browser_refreshed_at;const staleGroups=Object.entries(payload.markets||{}).filter(([,m])=>m.stale).map(([g])=>g);return{success:true,marketCount:4,directCount,staleGroups,payload}}
+function v793MarketCards(){const payload=D.live_markets||v793FormalLiveFallback(),labels={china:'A股',hk:'港股',us:'美股',korea:'韩股'};return ['china','hk','us','korea'].map(group=>{const market=payload.markets?.[group]||{},items=(market.items||[]).slice(0,3),stale=!!market.stale,tone=stale?'行情已过期':`${market.phase||'未知'} · ${market.status==='realtime'?'即时':'正式收盘'}`,age=Number.isFinite(+market.data_age_minutes)?`${(+market.data_age_minutes).toFixed(0)}分钟`:'—',sample=market.sample_at||market.sample_date||items[0]?.as_of||'—',file=market.file_generated_at_beijing||market.file_generated_at||payload.generated_at_beijing||payload.generated_at||'—';return `<article class="v793-market-card" data-live-market="${group}" data-market-freshness="${stale?'stale':'fresh'}" data-market-phase="${esc(market.phase||'未知')}" data-market-sample-date="${esc(market.sample_date||items[0]?.date||'')}"><div class="v793-market-head"><b>${labels[group]}</b><span>${esc(tone)}</span></div>${items.map(x=>`<div class="v793-market-row"><span>${esc(x.name||x.symbol)}</span><strong class="${classFor(x.change_pct)}">${pct(x.change_pct)}</strong><small>${num(x.price)}</small></div>`).join('')}<div class="v793-market-time"><b>${stale?'行情已过期':'新鲜度正常'}</b>｜来源 ${esc(market.source||items[0]?.source||'未知')}｜类型 ${esc(market.quote_type||items[0]?.quote_type||'未知')}<br>交易所当地 ${esc(String(market.exchange_local_time||'—').replace('T',' ').slice(0,19))}｜北京时间 ${esc(String(market.beijing_time||'—').replace('T',' ').slice(0,19))}<br>实际采样 ${esc(String(sample).replace('T',' ').slice(0,25))}｜文件生成 ${esc(String(file).replace('T',' ').slice(0,25))}｜数据年龄 ${age}<br>${esc(market.freshness_reason||'')}</div></article>`}).join('')}
 function jsonpVar(url,varName,timeout=8000){return new Promise((resolve,reject)=>{const script=document.createElement('script'),timer=setTimeout(()=>{cleanup();reject(new Error('JSONP超时'))},timeout),cleanup=()=>{clearTimeout(timer);script.remove();try{delete window[varName]}catch(e){}};script.src=url+(url.includes('?')?'&':'?')+'_var='+encodeURIComponent(varName)+'&_='+Date.now();script.onload=()=>{const v=window[varName];cleanup();v?resolve(v):reject(new Error('JSONP无数据'))};script.onerror=()=>{cleanup();reject(new Error('JSONP加载失败'))};document.head.appendChild(script)})}
 function parseDirectHistory(j,symbol){const n=(j.data||{})[symbol]||{},src=n.qfqday||n.day||[];return src.map(x=>[String(x[0]),+x[1],+x[2],+x[3],+x[4],+x[5]]).filter(x=>Number.isFinite(x[2]))}
 function parseDirectIntraday(j,symbol,kind){const node=((j.data||{})[symbol]||{}),root=node.data||{},out=[];if(kind==='minute'){const obj=Array.isArray(root)?{}:root,d=String(obj.date||'');(obj.data||[]).forEach(line=>{const p=String(line).split(' ');if(p.length>=3)out.push([d,p[0],+p[1],+p[2]])})}else{const days=Array.isArray(root)?root:(Array.isArray(root.data)?root.data:[]);days.forEach(day=>{const d=String(day.date||'');(day.data||[]).forEach(line=>{const p=String(line).split(' ');if(p.length>=3)out.push([d,p[0],+p[1],+p[2]])})})}return out}
@@ -219,7 +225,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
 (function () {
   "use strict";
   window.__V7_VALUATION__ = window.__V7_DATA__?.valuation_current || {};
-  window.__V7_META__ = { version: "V7.9.3", builtAt: BUILD.builtAt };
+  window.__V7_META__ = { version: "V7.9.4", builtAt: BUILD.builtAt };
   const V74_VALUATION_PENDING = "估值数据暂不可用";
   const V7_CACHE = {
     temp: new Map(),
@@ -315,7 +321,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
     });
   }
   v7TranslateTree(D);
-  D.version = "V7.9.3";
+  D.version = "V7.9.4";
   D.v7 = D.v7 || {};
   D.v7.valuation = window.__V7_VALUATION__;
   D.fund_flows = D.fund_flows || {};
@@ -418,7 +424,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
           .replace(/；当前操作为“[^”]*”。?$/, "")
           .replace(/；当前行动：[^。]*。?$/, "");
       c.action = liveAction;
-      if (oneLineCore) c.one_liner = `${oneLineCore}；最新价${num(c.price)}，V7.9.3当前合理区间${x.current || V74_VALUATION_PENDING}，估值状态为“${x.status}”；当前行动为“${liveAction}”。`;
+      if (oneLineCore) c.one_liner = `${oneLineCore}；最新价${num(c.price)}，V7.9.4当前合理区间${x.current || V74_VALUATION_PENDING}，估值状态为“${x.status}”；当前行动为“${liveAction}”。`;
       (c.details || []).forEach((d) => {
         const t = String(d.title || d.chapter || "");
         if (
@@ -938,107 +944,23 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
   }
 
   function v7FundamentalGate(c) {
-    const lf = c.live_financials || {},
-      rep = lf.latest_report || {},
-      con = lf.consensus || {},
-      v = window.__V7_VALUATION__?.[c.code] || {},
-      e = [];
-    if (Number.isFinite(+rep.revenue)) {
-      e.push("收入");
-    }
-    if (Number.isFinite(+rep.net_profit)) {
-      e.push("利润");
-    }
-    if (Number.isFinite(+rep.gross_margin)) {
-      e.push("毛利率");
-    }
-    if (Number.isFinite(+rep.ocf_per_share)) {
-      e.push("经营现金流");
-    }
-    if (
-      Number.isFinite(+con.eps2) ||
-      Number.isFinite(+con.eps3) ||
-      Number.isFinite(+v.eps_2027)
-    )
-      e.push("盈利预测");
-    if (!e.length)
-      return { name: "基本面", state: "unknown", detail: "数据不足" };
-    const rev = +rep.revenue_yoy,
-      np = +rep.net_profit_yoy,
-      ocf = +rep.ocf_per_share;
-    let state = e.length >= 3 ? "pass" : "unknown";
-    if (Number.isFinite(rev) && rev < -20 && Number.isFinite(np) && np < -30)
-      state = "fail";
-    if (Number.isFinite(np) && np < -50 && Number.isFinite(ocf) && ocf < 0)
-      state = "fail";
-    const fam = String(c.v7_model_family || "");
-    if (/idc/.test(fam) && !Number.isFinite(+rep.revenue)) state = "unknown";
-    if (
-      /saas|software|observability|agent|content|marketing/.test(fam) &&
-      !Number.isFinite(+rep.gross_margin) &&
-      !Number.isFinite(+con.eps2)
-    )
-      state = "unknown";
-    return { name: "基本面", state, detail: `结构化证据：${e.join("、")}` };
+    const s=strategyFor(c), items=s.can_slim?.items||[], ca=items.filter(x=>['C','A'].includes(x.letter));
+    if(!ca.length)return{name:'基本面',state:'unknown',detail:'后台CAN SLIM C/A数据不足'};
+    const map={pass:'pass',fail:'fail',partial:'unknown',unknown:'unknown',not_applicable:'unknown'}, state=ca.some(x=>x.state==='fail')?'fail':ca.every(x=>x.state==='pass')?'pass':'unknown';
+    return{name:'基本面',state:map[state]||state,detail:ca.map(x=>`${x.letter}:${x.evidence}`).join('｜')};
   }
   function v7TrendGate(c) {
-    const r = history(c.code),
-      t = calcCompanyTech(c),
-      s50 = v7Slope(r, 50),
-      s150 = v7Slope(r, 150),
-      s200 = v7Slope(r, 200);
-    if (!t.close || !t.ma50)
-      return { name: "趋势", state: "unknown", detail: "数据不足" };
-    const long = t.ma150 && t.ma200 ? t.ma150 >= t.ma200 : true,
-      price = t.close >= t.ma50 && (t.ma150 ? t.close >= t.ma150 : true),
-      slope =
-        (s50 == null || s50 > -0.01) &&
-        (s150 == null || s150 > -0.015) &&
-        (s200 == null || s200 > -0.015);
-    return {
-      name: "趋势",
-      state:
-        price && long && slope
-          ? "pass"
-          : t.close < t.ma50 && t.ma200 && t.close < t.ma200
-            ? "fail"
-            : "unknown",
-      detail: `收盘 ${num(t.close)}｜MA50 ${num(t.ma50)}｜MA150 ${num(t.ma150)}｜MA200 ${num(t.ma200)}`,
-    };
+    const s=strategyFor(c), stage=s.trend_stage||'数据不足', score=s.trend_quality_score;
+    return{name:'趋势',state:stage==='第二阶段确认'?'pass':stage==='第四阶段'?'fail':stage==='数据不足'?'unknown':'unknown',detail:`后台唯一阶段 ${stage}｜趋势质量 ${strategyNumber(score,0)}分`};
   }
   function v7VolumeGate(c) {
-    const t = calcCompanyTech(c),
-      v = t.volRatio,
-      r5 = t.r5;
-    if (v == null)
-      return { name: "量价", state: "unknown", detail: "数据不足" };
-    const breakout = r5 != null && r5 > 0.04 && v >= 1.15;
-    const pullback = r5 != null && r5 < 0 && r5 > -0.08 && v <= 0.9;
-    const bad = r5 != null && r5 < -0.08 && v >= 1.25;
-    return {
-      name: "量价",
-      state: breakout || pullback ? "pass" : bad ? "fail" : "unknown",
-      detail: breakout
-        ? "上涨放量"
-        : pullback
-          ? "回踩缩量"
-          : bad
-            ? "下跌放量"
-            : "量价尚未形成清晰优势",
-    };
+    const s=strategyFor(c), br=s.technical?.breakout?.state||'数据不足', vcp=s.technical?.vcp?.state||'数据不足', vr=s.technical?.volume_ratio;
+    const good=['当日突破','突破次日站稳','突破后2-5日站稳','突破后回踩确认'].includes(br)||['确认突破','形成中'].includes(vcp), bad=br==='突破失败跌回';
+    return{name:'量价',state:good?'pass':bad?'fail':'unknown',detail:`后台突破=${br}｜VCP=${vcp}｜量比=${strategyNumber(vr,2)}`};
   }
   function v7SectorGate(c) {
-    const s = v7SectorMetrics(c),
-      rs = v7SectorRs(c, 20);
-    if (s.count < 2)
-      return { name: "板块", state: "unknown", detail: "数据不足" };
-    const good = s.median5 > 0 && s.ma20 >= 0.5 && (rs == null || rs >= 0);
-    const bad = s.median5 < -0.05 && s.ma20 < 0.35 && (rs == null || rs < 0);
-    return {
-      name: "板块",
-      state: good ? "pass" : bad ? "fail" : "unknown",
-      detail: `5日中位 ${pct(s.median5)}｜站上MA20 ${(s.ma20 * 100).toFixed(0)}%｜相对大盘 ${rs == null ? "数据不足" : pct(rs)}`,
-    };
+    const s=strategyFor(c), strength=s.sector_strength||'未知', score=s.sector_score;
+    return{name:'板块',state:strength==='强'?'pass':strength==='弱'?'fail':'unknown',detail:`后台板块强弱=${strength}｜综合分=${strategyNumber(score,0)}`};
   }
   function v7ValGate(c) {
     const v = window.__V7_VALUATION__?.[c.code],
@@ -1081,221 +1003,22 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
     return [["us", "^IXIC"]];
   }
   function v7MarketGate(c) {
-    const m =
-        String(c.code).endsWith(".HK") || String(c.market).includes("港")
-          ? "hk"
-          : "china",
-      freshness = D.market_freshness?.[m],
-      usFresh = D.market_freshness?.us?.fresh,
-      krFresh = D.market_freshness?.korea?.fresh;
-    if (freshness?.fresh === false || usFresh === false || krFresh === false)
-      return { name: "市场", state: "unknown", detail: "关键市场数据过期" };
-    const br = v7BenchmarkRows(c);
-    if (br.length < 2)
-      return { name: "市场", state: "unknown", detail: "数据不足" };
-    const a = +br.at(-1)[2],
-      b = +br.at(-2)[2],
-      local = b ? a / b - 1 : null;
-    if (local == null)
-      return { name: "市场", state: "unknown", detail: "数据不足" };
-    const ovs = v7OverseasRefs(c)
-        .map(([g, t]) => v7MarketItem(g, t)?.change_pct)
-        .filter(Number.isFinite),
-      over = ovs.length ? avg(ovs) : null,
-      scopeRows = D.companies[c.scope] || [],
-      width = scopeRows.length
-        ? scopeRows.filter((x) => (x.change ?? 0) > 0).length / scopeRows.length
-        : null;
-    let state = "unknown";
-    if (local < -0.025) state = "fail";
-    else if (over != null && over < -0.05) state = "fail";
-    else if (
-      local >= -0.01 &&
-      (over == null || over > -0.03) &&
-      (width == null || width >= 0.3)
-    )
-      state = "pass";
-    return {
-      name: "市场",
-      state,
-      detail: `大盘 ${pct(local)}${over == null ? "" : `｜海外相关 ${pct(over)}`}${width == null ? "" : `｜AI宽度 ${pct(width)}`}`,
-    };
+    const m=strategyFor(c).market_gate||{};
+    return{name:'市场',state:m.hard_veto?'fail':m.state==='绿'?'pass':'unknown',detail:`后台市场灯=${m.state||'未知'}｜${esc(m.reason||'无说明')}｜${strategyNumber(m.score,0)}分`};
   }
   function v7GateState(c) {
-    return [
-      v7TrendGate(c),
-      v7VolumeGate(c),
-      v7FundamentalGate(c),
-      v7SectorGate(c),
-      v7ValGate(c),
-    ];
+    return [v7TrendGate(c),v7VolumeGate(c),v7FundamentalGate(c),v7SectorGate(c),v7ValGate(c)];
   }
-  gateState = function (c) {
-    const mg = v7MarketGate(c);
-    return [mg, ...v7GateState(c)];
-  };
-
+  gateState = function (c) { return [v7MarketGate(c), ...v7GateState(c)]; };
+  /* [LEGACY_DISABLED_V794] 原前端买点打分器已停用；分数/阻断/行动只读 strategy_core.py 输出。 */
   function _v7BuyPoint(c) {
-    const gates = v7GateState(c),
-      market = v7MarketGate(c),
-      hardFail =
-        gates.some(
-          (x) =>
-            x.state === "fail" && ["趋势", "基本面", "估值"].includes(x.name),
-        ) || market.state === "fail";
-    const r = history(c.code),
-      t = calcCompanyTech(c),
-      temp = v7Temperature(c),
-      fund = v7FundFlow(c),
-      av = v7Avwap(c),
-      prof = v7Profile(c),
-      chip = v7Chip(c),
-      rrg = v7Rrg(c),
-      vcp = detectVcp(r),
-      risk = v7Risk(c);
-    let trend = 0;
-    if (gates[0].state === "pass") trend += 12;
-    const rel = v7Relative(c, 20);
-    if (rel != null) trend += Math.max(0, Math.min(8, 4 + rel * 35));
-    let structure = 0;
-    if (vcp.state === "突破确认") structure = 20;
-    else if (vcp.state === "候选形态") structure = 16;
-    else if (vcp.state === "形成中") structure = 12;
-    else structure = 5;
-    let vp = 0;
-    if (gates[1].state === "pass") vp += 10;
-    else if (gates[1].state === "unknown") vp += 5;
-    if (fund.score != null) vp += Math.round((fund.score / 100) * 10);
-    const close = +r.at(-1)?.[2];
-    let supportEvidence = [];
-    const magic = chooseMagicPeriod(weekly(r), c.code);
-    if (
-      magic?.available &&
-      magic.line &&
-      Math.abs(close / magic.line - 1) < 0.08
-    )
-      supportEvidence.push("神奇支撑线");
-    if (av && Math.abs(close / av.value - 1) < 0.08)
-      supportEvidence.push("锚定均价");
-    if (prof && close >= prof.vaLow * 0.97 && close <= prof.vaHigh * 1.03)
-      supportEvidence.push("价格成交分布");
-    if (chip && Math.abs(close / chip.avg - 1) < 0.1)
-      supportEvidence.push("筹码成本");
-    const support = [0, 5, 9, 12, 15][Math.min(4, supportEvidence.length)];
-    let rot = 0;
-    const s = v7SectorMetrics(c);
-    rot += s.ma20 >= 0.6 ? 4 : s.ma20 >= 0.4 ? 2 : 0;
-    rot +=
-      rrg.state === "领先"
-        ? 6
-        : rrg.state === "改善"
-          ? 4
-          : rrg.state === "减弱"
-            ? 2
-            : 0;
-    let valrr = 0;
-    const vg = v7ValGate(c);
-    valrr += vg.state === "pass" ? 6 : vg.state === "unknown" ? 3 : 0;
-    let invalid = null;
-    if (t.ma50) invalid = t.ma50 * 0.97;
-    if (magic?.available && magic.line)
-      invalid =
-        invalid == null
-          ? magic.line * 0.97
-          : Math.min(invalid, magic.line * 0.97);
-    if (av?.value)
-      invalid =
-        invalid == null ? av.value * 0.97 : Math.min(invalid, av.value * 0.97);
-    if (invalid && invalid >= close) invalid = close * 0.94;
-    const currentRange = rangeNumbers(c.current),
-      target =
-        currentRange.length >= 2
-          ? Math.max(currentRange[1], close * 1.08)
-          : close * 1.12;
-    const riskAmt = invalid ? close - invalid : null,
-      reward = target - close,
-      rr = riskAmt > 0 ? reward / riskAmt : null;
-    if (rr != null) valrr += rr >= 2 ? 4 : rr >= 1.3 ? 2 : 0;
-    let tempPts = 0;
-    if (temp.score != null) {
-      if (temp.longBroken && temp.score < 40) tempPts = 0;
-      else if (temp.score >= 25 && temp.score <= 65) tempPts = 5;
-      else if (temp.score < 25) tempPts = 3;
-      else if (temp.score <= 80) tempPts = 2;
-    }
-    let score = Math.round(
-      Math.min(20, trend) +
-        Math.min(20, structure) +
-        Math.min(20, vp) +
-        support +
-        Math.min(10, rot) +
-        Math.min(10, valrr) +
-        Math.min(5, tempPts),
-    );
-    if (hardFail) score = Math.min(score, 49);
-    if (risk.level === "R2") score = Math.max(0, score - 5);
-    if (risk.level === "R3") score = Math.max(0, score - 12);
-    let type = "无明确买点";
-    if (hardFail) type = "暂不具备买入资格";
-    else if (temp.score >= 82) type = "追高区";
-    else if (
-      vcp.state === "突破确认" ||
-      (vcp.pivot && close > vcp.pivot * 0.985)
-    )
-      type = "突破候选";
-    else if (
-      supportEvidence.length >= 2 &&
-      temp.score != null &&
-      temp.score < 60
-    )
-      type = "回踩候选";
-    else if (
-      temp.score != null &&
-      temp.score < 25 &&
-      !temp.longBroken &&
-      vg.state !== "fail"
-    )
-      type = "超跌修复候选";
-    const zoneLo =
-        av?.value && prof?.vaLow
-          ? Math.max(Math.min(av.value, close), Math.min(prof.vaLow, close))
-          : (t.ma20 || close) * 0.99,
-      zoneHi = close * 1.015;
-    let action =
-      type === "暂不具备买入资格"
-        ? "先等资格门修复"
-        : type === "追高区"
-          ? "逻辑可跟踪，当前不追"
-          : type === "突破候选"
-            ? "等待有效突破或突破后首次缩量回踩"
-            : type === "回踩候选"
-              ? "观察关键成本区能否缩量守住"
-              : type === "超跌修复候选"
-                ? "等待趋势与相对强弱先出现修复"
-                : "继续观察，暂不强行交易";
-    if (risk.level === "R1") action += "；存在可信事件风险，降低优先级";
-    return {
-      score,
-      type,
-      gates,
-      market,
-      temp,
-      fund,
-      av,
-      prof,
-      chip,
-      rrg,
-      vcp,
-      risk,
-      supportEvidence,
-      invalid,
-      rr,
-      target,
-      zone: [zoneLo, zoneHi],
-      action,
-    };
+    const s=strategyFor(c),tech=s.technical||{},blockers=s.blockers||[],score=Number.isFinite(+s.buy_point_score)?+s.buy_point_score:0;
+    const zone=[s.first_buy_zone_low??null,s.first_buy_zone_high??null], market=v7MarketGate(c), gates=v7GateState(c);
+    const type=s.action||'等待趋势修复', rr=Number.isFinite(+s.risk_reward_ratio)?+s.risk_reward_ratio:null;
+    return {type,score,temp:v7Temperature(c),fund:v7FundFlow(c),av:v7Avwap(c),prof:v7Profile(c),chip:v7Chip(c),rrg:v7Rrg(c),risk:v7Risk(c),
+      vcp:{state:tech.vcp?.state||'数据不足',reason:`后台VCP：${tech.vcp?.state||'数据不足'}`,pivot:tech.pivot||null},gates,market,zone,invalid:s.stop_loss??null,rr,
+      supportEvidence:[],action:blockers.length?`阻断：${blockers.join('；')}`:(s.reason||'后台未列硬阻断'),backendAuthority:true};
   }
-
   function v7ClearCaches() {
     Object.values(V7_CACHE).forEach((x) => x.clear());
   }
@@ -1389,87 +1112,30 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
       ? '<span class="v7-temp muted">温度：数据不足</span>'
       : `<span class="v7-temp" data-help="temp">温度${t.score} · ${esc(t.label)}</span>`;
   }
-  function v7Action(c) {
-    const gs = v7GateState(c),
-      m = v7MarketGate(c),
-      fail = gs.filter((x) => x.state === "fail"),
-      pass = gs.filter((x) => x.state === "pass").length,
-      t = v7Temperature(c);
-    if (
-      fail.some((x) => ["趋势", "基本面", "估值"].includes(x.name)) ||
-      m.state === "fail"
-    )
-      return "暂不具备买入资格";
-    if (t.score != null && t.score >= 82) return "观察不追";
-    if (pass >= 4 && gs.find((x) => x.name === "量价")?.state === "pass")
-      return "等待突破确认";
-    if (pass >= 3 && t.score != null && t.score < 50) return "回踩观察";
-    if (pass >= 3) return "继续观察";
-    return "等待条件改善";
-  }
+  function v7Action(c) { return strategyFor(c).action || '等待趋势修复'; }
 
-  let v7SortKey = "quality",
-    v7SortDir = "desc";
+  function v794CanonicalCompare(A,B){
+    const a=strategyFor(A),b=strategyFor(B),n=(v,d=0)=>Number.isFinite(+v)?+v:d,abs=(v)=>Number.isFinite(+v)?Math.abs(+v):999;
+    const asc=[n(a.action_priority,99)-n(b.action_priority,99),n(a.trend_stage_priority,99)-n(b.trend_stage_priority,99),n(b.trend_quality_score)-n(a.trend_quality_score),n(b.technical?.relative_strength_12m)-n(a.technical?.relative_strength_12m),n(b.technical?.relative_strength_6m)-n(a.technical?.relative_strength_6m),n(b.technical?.relative_strength_3m)-n(a.technical?.relative_strength_3m),n(b.technical?.industry_relative_rank)-n(a.technical?.industry_relative_rank),abs(a.distance_to_pivot)-abs(b.distance_to_pivot),n(b.setup_quality_score)-n(a.setup_quality_score),n(b.sector_score)-n(a.sector_score),n(b.company_quality??B.quality)-n(a.company_quality??A.quality)];
+    return asc.find(x=>Math.abs(x)>1e-12)||String(A.code).localeCompare(String(B.code));
+  }
+  let v7SortKey = "canonical", v7SortDir = "desc";
   function v7SortRows(rows) {
-    const dir = v7SortDir === "asc" ? 1 : -1,
-      rank = {
-        回踩观察: 5,
-        等待突破确认: 4,
-        等待修复确认: 3,
-        继续观察: 2,
-        观察不追: 1,
-        暂不具备买入资格: 0,
-      };
-    return rows
-      .map((x, i) => ({ x, i }))
-      .sort((a, b) => {
-        const A = a.x,
-          B = b.x;
-        let av, bv;
-        if (v7SortKey === "quality") {
-          av = +A.quality || 0;
-          bv = +B.quality || 0;
-        } else if (v7SortKey === "stage") {
-          av = (A.sepa?.stage || "").includes("第二")
-            ? 3
-            : (A.sepa?.stage || "").includes("第一")
-              ? 2
-              : 1;
-          bv = (B.sepa?.stage || "").includes("第二")
-            ? 3
-            : (B.sepa?.stage || "").includes("第一")
-              ? 2
-              : 1;
-        } else if (v7SortKey === "action") {
-          av = rank[v7Action(A)] || 0;
-          bv = rank[v7Action(B)] || 0;
-        } else if (v7SortKey === "valuation") {
-          const f = (x) => {
-            const s = v7ValStatus(x);
-            return s.includes("明显低于")
-              ? 5
-              : s.includes("低于")
-                ? 4
-                : s.includes("合理区间")
-                  ? 3
-                  : s.includes("合理偏高")
-                    ? 2
-                    : 1;
-          };
-          av = f(A);
-          bv = f(B);
-        } else if (v7SortKey === "change") {
-          av = +A.change || 0;
-          bv = +B.change || 0;
-        } else {
-          av = calcCompanyTech(A).r5 ?? -9;
-          bv = calcCompanyTech(B).r5 ?? -9;
-        }
-        return av === bv ? a.i - b.i : (av - bv) * dir;
-      })
-      .map((z) => z.x);
+    if(v7SortKey==='canonical')return [...rows].sort(v794CanonicalCompare);
+    const dir=v7SortDir==='asc'?1:-1,n=(v,d=-Infinity)=>Number.isFinite(+v)?+v:d;
+    return rows.map((x,i)=>({x,i})).sort((a,b)=>{const A=a.x,B=b.x,sa=strategyFor(A),sb=strategyFor(B);let av,bv;
+      if(v7SortKey==='trend'){av=n(sa.trend_quality_score);bv=n(sb.trend_quality_score)}
+      else if(v7SortKey==='buy'){av=n(sa.buy_point_score);bv=n(sb.buy_point_score)}
+      else if(v7SortKey==='rs'){av=n(sa.technical?.relative_strength_12m);bv=n(sb.technical?.relative_strength_12m)}
+      else if(v7SortKey==='action'){av=-n(sa.action_priority,99);bv=-n(sb.action_priority,99)}
+      else if(v7SortKey==='stage'){av=-n(sa.trend_stage_priority,99);bv=-n(sb.trend_stage_priority,99)}
+      else if(v7SortKey==='quality'){av=n(A.quality);bv=n(B.quality)}
+      else if(v7SortKey==='valuation'){const f=x=>{const z=window.__V7_VALUATION__?.[x.code]?.status||'';return z==='明显低估'?5:z==='合理偏低'?4:z==='合理区间'?3:z.includes('偏高')?2:1};av=f(A);bv=f(B)}
+      else if(v7SortKey==='change'){av=n(A.change);bv=n(B.change)}
+      else {av=n(calcCompanyTech(A).r5);bv=n(calcCompanyTech(B).r5)}
+      const d=(av-bv)*dir;return Math.abs(d)>1e-12?d:a.i-b.i;
+    }).map(x=>x.x);
   }
-
   function v7SectorHtml(s, c0) {
     const rows = v7SectorRows(c0),
       leaders = [...rows]
@@ -1715,52 +1381,11 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
     return { ...x, mode: "manual", candidates: [] };
   };
 
+  /* [LEGACY_DISABLED_V794] 趋势灯只读后台趋势阶段/趋势质量。 */
   function v74TrendSignal(c) {
-    const rows = history(c.code),
-      tech = calcCompanyTech(c),
-      close = +rows.at(-1)?.[2],
-      s20 = v7Slope(rows, 20),
-      s50 = v7Slope(rows, 50),
-      s150 = v7Slope(rows, 150),
-      relative = v7Relative(c, 20),
-      volume = v7VolumeGate(c);
-    if (!close || !tech.ma20 || !tech.ma50)
-      return { score: null, label: "数据不足", tone: "unknown", note: "K线不足，暂不判断趋势" };
-    let score = 20;
-    if (close >= tech.ma20) score += 15;
-    if (close >= tech.ma50) score += 15;
-    if (!tech.ma150 || close >= tech.ma150) score += 10;
-    if (!tech.ma200 || close >= tech.ma200) score += 10;
-    if (s20 != null && s20 > 0) score += 8;
-    if (s50 != null && s50 > 0) score += 7;
-    if (s150 != null && s150 > 0) score += 5;
-    if (relative != null && relative > 0) score += 7;
-    if (volume.state === "pass") score += 3;
-    score = Math.max(0, Math.min(100, Math.round(score)));
-    let label = "结构破坏",
-      tone = "bad";
-    if (score >= 80) {
-      label = "强势上涨";
-      tone = "strong";
-    } else if (score >= 65) {
-      label = "上升修复";
-      tone = "good";
-    } else if (score >= 45) {
-      label = "震荡过渡";
-      tone = "neutral";
-    } else if (score >= 25) {
-      label = "下行趋势";
-      tone = "weak";
-    }
-    const note =
-      close >= tech.ma50
-        ? relative != null && relative > 0
-          ? "站在MA50上方，相对大盘转强"
-          : "站在MA50上方，但相对强弱尚未确认"
-        : tech.ma200 && close < tech.ma200
-          ? "跌破MA50与MA200，先等结构修复"
-          : "仍在MA50下方，当前只适合观察修复";
-    return { score, label, tone, note, relative, s20, s50 };
+    const s=strategyFor(c),score=Number.isFinite(+s.trend_quality_score)?+s.trend_quality_score:null,stage=s.trend_stage||'数据不足';
+    const tone=stage==='第二阶段确认'?'strong':stage==='第二阶段候选'?'good':stage==='第一阶段'?'neutral':stage==='第三阶段'?'weak':stage==='第四阶段'?'bad':'unknown';
+    return{score,label:stage,tone,note:`后台唯一趋势结果｜数据完整度 ${strategyNumber(s.data_completeness,0)}｜阻断 ${(s.blockers||[]).join('；')||'无硬阻断'}`,relative:s.technical?.relative_strength_12m??null,s20:null,s50:null};
   }
   function v74RenderTrendLight(c) {
     const title = document.querySelector("#panel-kline .chart-title");
@@ -2150,7 +1775,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
   };
 
   renderKline = function () {
-    const rows = filtered();
+    const rows = v7SortRows(filtered());
     $("#klineList").innerHTML = rows
       .map(
         (c) =>
@@ -2231,7 +1856,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
       return {};
     }
   }
-  const V76_RELEASE = "V7.9.3",
+  const V76_RELEASE = "V7.9.4",
     V76_DATA_SCHEMA = "v7-public-market-1",
     V76_CACHE_SCHEMA = "v7-browser-summary-2",
     V76_KLINE_SCHEMA = "v7-kline-cache-2",
@@ -2245,48 +1870,15 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
     } catch (e) {}
   }
   function v74RenderRefreshCard() {
-    const card = $("#v74RefreshCard");
-    if (!card) return;
-    const state = v74RefreshState(),
-      enabled = state.auto !== false,
-      last = state.lastSuccess || D.refresh_summary?.last_success?.finished_at_beijing,
-      next = enabled ? new Date(Date.now() + 10 * 60 * 1000) : null,
-      market = [
-        ["A股", "china"],
-        ["港股", "hk"],
-        ["韩国", "korea"],
-        ["美股", "us"],
-      ];
-    const formalDates=market.map(([name,key])=>`${name}${v74MarketDate(key)}`).join("｜"), backend=D.refresh_summary?.last_success?.finished_at_beijing;
-    card.innerHTML = `<div class="v74-refresh-main"><div><span class="v74-eyebrow">数据控制中心</span><h2>四市场即时行情＋正式研究快照</h2><p>工作日后台8个时点自动运行；页面开启后每10分钟检查。即时涨跌只用于观察，不覆盖正式收盘估值和策略价。</p></div><div class="v74-refresh-actions"><button id="v74RefreshNow" class="v74-refresh-now">手动刷新全部数据</button><label class="v74-auto"><input id="v74AutoRefresh" type="checkbox" ${enabled ? "checked" : ""}><span>自动检查</span></label></div></div><div class="v793-market-grid">${v793MarketCards()}</div><div class="v793-refresh-meta"><span>正式交易日｜${esc(formalDates)}</span><span>后台最近成功｜${backend?esc(String(backend).replace("T"," ").slice(0,19)):"尚无记录"}</span><span>本页最近检查｜${last?esc(String(last).replace("T"," ").slice(0,19)):"尚未检查"}</span><span>下次检查｜${next?next.toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit"}):"已关闭"}</span></div><div id="v74RefreshMessage" class="v74-refresh-message">${state.lastError ? `上次自动检查失败：${esc(state.lastError)}` : state.lastMessage ? esc(state.lastMessage) : D.valuation_meta?.single_source ? "142家公司正在使用同一版估值结果" : "当前为内置快照，建议立即刷新"}</div>`;
-    $("#v74RefreshNow").onclick = async () => {
-      const button = $("#v74RefreshNow"),
-        message = $("#v74RefreshMessage");
-      button.disabled = true;
-      button.textContent = "正在检查…";
-      try {
-        const result = await refreshAllData({ silent: true, reason: "manual" });
-        if (!result?.success) throw new Error("没有任何数据源成功");
-        const current=v74RefreshState();
-        current.lastMessage=`${result.changed ? "取得新数据" : "检查完成，当前已是最新"}｜行情截至 ${latestPriceDate()}｜估值 ${D.valuation_meta?.version || "V7.9"}`;
-        v74SaveRefreshState(current);
-        message.textContent=current.lastMessage;
-      } catch (error) {
-        const current=v74RefreshState();current.lastError=String(error?.message||error);current.lastErrorAt=new Date().toISOString();v74SaveRefreshState(current);
-        message.textContent = "在线数据暂不可用，继续显示最近一次有效快照";
-      } finally {
-        button.disabled = false;
-        button.textContent = "手动刷新全部数据";
-        v74RenderRefreshCard();
-      }
-    };
-    $("#v74AutoRefresh").onchange = (event) => {
-      const current = v74RefreshState();
-      current.auto = event.target.checked;
-      v74SaveRefreshState(current);
-      v74SetupAutoRefresh();
-      v74RenderRefreshCard();
-    };
+    const card = $("#v74RefreshCard"); if(!card)return;
+    const state=v74RefreshState(),enabled=state.auto!==false,last=state.lastSuccess||D.refresh_summary?.last_success?.finished_at_beijing,next=enabled?new Date(Date.now()+10*60*1000):null;
+    const market=[["A股","china"],["港股","hk"],["韩国","korea"],["美股","us"]],formalDates=market.map(([name,key])=>`${name}${v74MarketDate(key)}`).join("｜"),backend=D.refresh_summary?.last_success||{},plan=D.refresh_summary?.schedule_plan||[],live=D.live_markets||v793FormalLiveFallback();
+    const stale=Object.entries(live.markets||{}).filter(([,m])=>m.stale).map(([g])=>({china:'A股',hk:'港股',us:'美股',korea:'韩国'}[g]||g));
+    const planned=backend.scheduled_cron?`计划规则 ${backend.scheduled_cron}`:'手动/推送触发，无计划时点';
+    const actualStart=backend.actual_started_at_beijing||'—',actualFinish=backend.finished_at_beijing||'—';
+    card.innerHTML=`<div class="v74-refresh-main"><div><span class="v74-eyebrow">数据控制中心</span><h2>四市场即时行情＋正式研究快照</h2><p>页面打开立即检查，之后每10分钟检查；美股常规时段后台计划每10分钟采样。GitHub Actions计划规则与实际启动/完成时间分开显示，绝不把cron当成完成时间。盘中价格只用于观察，行动策略仍使用标明日期的正式收盘快照。</p></div><div class="v74-refresh-actions"><button id="v74RefreshNow" class="v74-refresh-now">手动刷新全部数据</button><label class="v74-auto"><input id="v74AutoRefresh" type="checkbox" ${enabled?'checked':''}><span>自动检查</span></label></div></div><div class="v793-market-grid">${v793MarketCards()}</div><div class="v793-refresh-meta"><span>正式交易日｜${esc(formalDates)}</span><span>后台计划｜${esc(planned)}</span><span>实际启动｜${esc(String(actualStart).replace('T',' ').slice(0,19))}</span><span>实际完成｜${esc(String(actualFinish).replace('T',' ').slice(0,19))}</span><span>本页最近检查｜${last?esc(String(last).replace('T',' ').slice(0,19)):'尚未检查'}</span><span>下次浏览器检查｜${next?next.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}):'已关闭'}</span></div><div id="v74RefreshMessage" class="v74-refresh-message">${stale.length?`行情已过期：${esc(stale.join('、'))}｜继续显示最近有效数据，但不标记刷新成功`:state.lastError?`上次自动检查失败：${esc(state.lastError)}`:state.lastMessage?esc(state.lastMessage):D.valuation_meta?.single_source?'142家公司正在使用同一版估值结果':'当前为内置快照，页面已启动立即检查'}</div>`;
+    $("#v74RefreshNow").onclick=async()=>{const button=$("#v74RefreshNow"),message=$("#v74RefreshMessage");button.disabled=true;button.textContent="正在检查…";try{const result=await refreshAllData({silent:true,reason:'manual'});if(!result?.success)throw new Error('没有任何数据源成功');const current=v74RefreshState();current.lastMessage=result.staleGroups?.length?`行情已过期：${result.staleGroups.join('、')}｜没有把过期行情标为刷新成功`:`${result.changed?'取得新行情':'检查完成，当前行情未变化'}｜行情截至 ${latestPriceDate()}｜估值 ${D.valuation_meta?.version||'V7.9.4'}`;v74SaveRefreshState(current);message.textContent=current.lastMessage}catch(error){const current=v74RefreshState();current.lastError=String(error?.message||error);current.lastErrorAt=new Date().toISOString();v74SaveRefreshState(current);message.textContent='在线数据暂不可用，继续显示最近一次有效快照'}finally{button.disabled=false;button.textContent='手动刷新全部数据';v74RenderRefreshCard()}};
+    $("#v74AutoRefresh").onchange=event=>{const current=v74RefreshState();current.auto=event.target.checked;v74SaveRefreshState(current);v74SetupAutoRefresh();v74RenderRefreshCard()};
   }
   let v74AutoTimer = null;
   function v76StopLegacyTimers() {
@@ -2336,59 +1928,12 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
   function v74CanSlimItem(letter, name, state, evidence, counter) {
     return { letter, name, state, evidence, counter };
   }
+  /* [LEGACY_DISABLED_V794] CAN SLIM 前端关键词/分析师代理实现已停用。 */
   function v74CanSlimAssessment(c) {
-    const v = window.__V7_VALUATION__?.[c.code] || {},
-      f = c.live_financials || D.company_financials?.[c.code] || {},
-      report = f.latest_report || {},
-      consensus = f.consensus || {},
-      tech = calcCompanyTech(c),
-      rows = history(c.code),
-      high52 = rows.length ? Math.max(...rows.slice(-250).map((x) => +x[3])) : null,
-      nearHigh = high52 ? +c.price / high52 >= 0.85 : false,
-      cyclical = /cycle|memory_fab|foundry|pb_ev|bank|utility/.test(String(v.model_family || "")),
-      profit = +(report.deduct_net_profit_yoy ?? report.net_profit_yoy),
-      revenue = +report.revenue_yoy,
-      eps26 = +(consensus.eps1 ?? v.eps_2026),
-      eps27 = +(consensus.eps2 ?? v.eps_2027),
-      annualGrowth = eps26 > 0 && eps27 > 0 ? eps27 / eps26 - 1 : null,
-      catalystText = [c.subsector, c.moat, c.one_liner, ...(c.details || []).map((x) => x.body || "")].join(" "),
-      hasCatalyst = /新品|新产品|新客户|新市场|1\.6T|HBM|CPO|智能体|AI|国产替代|份额提升/.test(catalystText),
-      volume = v7VolumeGate(c),
-      relative = v7Relative(c, 20),
-      sectorRelative = v7SectorRs(c, 20),
-      analysts = +(consensus.analyst_count ?? v.institution_check?.analyst_count ?? 0),
-      market = v7MarketGate(c),
-      stRisk = /(^|\b)ST/.test(String(c.name || ""));
-    const items = [];
-    items.push(
-      v74CanSlimItem(
-        "C",
-        "当期增长",
-        cyclical ? "not_applicable" : profit >= 25 && revenue >= 15 ? "pass" : profit > 0 && revenue > 0 ? "partial" : "fail",
-        cyclical ? "周期股改看中周期利润与库存" : `扣非/归母利润同比 ${Number.isFinite(profit) ? profit.toFixed(1) + "%" : "数据不足"}；收入同比 ${Number.isFinite(revenue) ? revenue.toFixed(1) + "%" : "数据不足"}`,
-        !Number.isFinite(profit) ? "缺少可核验扣非增速" : profit < 25 ? "增长强度不足" : "暂无硬反证",
-      ),
-    );
-    items.push(
-      v74CanSlimItem(
-        "A",
-        "年度增长",
-        cyclical ? "not_applicable" : annualGrowth != null && annualGrowth >= 0.25 ? "pass" : annualGrowth != null && annualGrowth >= 0.12 ? "partial" : "fail",
-        cyclical ? "周期股不机械套年度高增" : annualGrowth == null ? "年度一致预期不足" : `2027E EPS增速 ${pct(annualGrowth)}`,
-        annualGrowth == null ? "缺少点时预测" : annualGrowth < 0.25 ? "年度增速尚未达到强成长标准" : "暂无硬反证",
-      ),
-    );
-    items.push(v74CanSlimItem("N", "新变化", hasCatalyst && nearHigh ? "pass" : hasCatalyst ? "partial" : "fail", `${hasCatalyst ? "存在可追踪的新产品/新需求催化" : "未识别到可验证新催化"}；距52周高点 ${high52 ? pct(+c.price / high52 - 1) : "数据不足"}`, hasCatalyst ? (nearHigh ? "暂无硬反证" : "价格尚未确认催化") : "缺少可验证的新变化"));
-    items.push(v74CanSlimItem("S", "供需与量价", volume.state === "pass" && nearHigh ? "pass" : volume.state !== "fail" ? "partial" : "fail", `${volume.detail}；${nearHigh ? "接近年度高位" : "仍远离年度高位"}`, volume.state === "fail" ? "下跌放量" : "量价确认仍不充分"));
-    items.push(v74CanSlimItem("L", "领头羊", relative > 0 && sectorRelative > 0 ? "pass" : relative > 0 || sectorRelative > 0 ? "partial" : "fail", `相对大盘20日 ${relative == null ? "数据不足" : pct(relative)}；板块相对大盘 ${sectorRelative == null ? "数据不足" : pct(sectorRelative)}`, relative > 0 ? "板块强度仍需同步" : "个股尚未跑赢大盘"));
-    items.push(v74CanSlimItem("I", "机构认同", analysts >= 8 ? "pass" : analysts >= 3 ? "partial" : "fail", `公开一致预期覆盖 ${analysts || 0} 家`, analysts ? "机构数据存在发布时间滞后" : "缺少结构化机构覆盖"));
-    items.push(v74CanSlimItem("M", "市场方向", market.state === "pass" ? "pass" : market.state === "fail" ? "fail" : "partial", market.detail, market.state === "fail" ? "市场环境不支持主动进攻" : "市场方向仍需确认"));
-    if (stRisk) items.push(v74CanSlimItem("A股", "特别风险", "fail", "公司名称含ST风险标识", "退市、监管与流动性风险优先于成长筛选"));
-    const pass = items.filter((x) => x.state === "pass").length,
-      fail = items.filter((x) => x.state === "fail").length;
-    return { items, pass, fail, verdict: fail >= 3 ? "不通过" : pass >= 5 ? "通过" : "部分通过" };
+    const cs=strategyFor(c).can_slim;
+    if(cs&&Array.isArray(cs.items)&&cs.items.length===7)return strategyFor(c).can_slim;
+    return{verdict:'数据不足',items:['C','A','N','S','L','I','M'].map(letter=>v74CanSlimItem(letter,letter,'unknown','后台证据未生成','不得由前端补猜')),pass_count:0,fail_count:0,data_completeness:0};
   }
-  let v74SoftwareOnly = false;
   function v74CanSlimRows() {
     let rows =
       scope === "hardware"
@@ -2454,9 +1999,9 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
   }
 
   function v7InjectUi() {
-    document.title = "AI研究系统 V7.9.3";
+    document.title = "AI研究系统 V7.9.4";
     const h = document.querySelector("header .title");
-    if (h) h.textContent = "AI研究系统 V7.9.3";
+    if (h) h.textContent = "AI研究系统 V7.9.4";
     const sub = document.querySelector("header .subtitle");
     if (sub)
       sub.textContent = "产业链 · 独立估值 · 相对强弱 · 风险监控 · 买点判断";
@@ -2489,7 +2034,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
       const bar = document.createElement("div");
       bar.id = "v7SortBar";
       bar.className = "v7-sortbar";
-      bar.innerHTML = `<b>排序</b><select id="v7SortKey"><option value="quality">公司质量</option><option value="stage">趋势阶段</option><option value="action">行动优先级</option><option value="valuation">估值吸引力</option><option value="change">当日涨跌</option><option value="r5">5日强度</option></select><button id="v7SortDir" class="chip-btn">降序 ↓</button><span class="small muted">估值按板块商业模式独立计算</span>`;
+      bar.innerHTML = `<b>排序</b><select id="v7SortKey"><option value="canonical">系统默认顺序</option><option value="action">行动优先级</option><option value="stage">趋势阶段</option><option value="trend">趋势分</option><option value="buy">买点分</option><option value="rs">12个月RS</option><option value="quality">公司质量</option><option value="valuation">估值吸引力</option><option value="change">当日涨跌</option><option value="r5">5日强度</option></select><button id="v7SortDir" class="chip-btn">降序 ↓</button><span class="small muted">估值按板块商业模式独立计算</span>`;
       panel.prepend(bar);
       $("#v7SortKey").value = v7SortKey;
       $("#v7SortKey").onchange = (e) => {
@@ -2502,6 +2047,12 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
           v7SortDir === "desc" ? "降序 ↓" : "升序 ↑";
         renderValuation();
       };
+    }
+    const klinePanel = $("#panel-kline");
+    if (klinePanel && !$("#v7KlineSortBar")) {
+      const kb=document.createElement("div");kb.id="v7KlineSortBar";kb.className="v7-sortbar";
+      kb.innerHTML=`<b>K线排序</b><select id="v7KlineSortKey"><option value="canonical">系统默认顺序</option><option value="action">行动优先级</option><option value="trend">趋势分</option><option value="buy">买点分</option><option value="rs">12个月RS</option></select><span class="small muted">分数来自后台唯一策略引擎，前端不重算</span>`;
+      klinePanel.prepend(kb);$("#v7KlineSortKey").value=v7SortKey;$("#v7KlineSortKey").onchange=e=>{v7SortKey=e.target.value;if($("#v7SortKey"))$("#v7SortKey").value=v7SortKey;renderKline()};
     }
     const chartTitle = document.querySelector("#panel-kline .chart-title");
     if (chartTitle && !$("#v7ReturnDetail")) {
@@ -2827,13 +2378,14 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
         })
         .catch(() => {});
     } catch (e) {
-      console.warn("V7.9.3缓存不可用", e);
+      console.warn("V7.9.4缓存不可用", e);
     }
   };
   refreshAllData = async function (o = {}) {
     if (v76RefreshPromise) return v76RefreshPromise;
     v76RefreshPromise = (async () => {
-      const before={snapshot:D.snapshot_date||D.embedded_snapshot,generated:D.generated_at_cn||D.generated_at,prices:allCompanies().map(c=>`${c.code}:${c.price}:${c.price_date}`).join('|')};
+      const preservedCloseStrategy={current:D.strategy_current,meta:D.strategy_meta,positions:D.user_positions};
+      const before={snapshot:D.snapshot_date||D.embedded_snapshot,prices:allCompanies().map(c=>`${c.code}:${c.price}:${c.price_date}`).join('|'),live:JSON.stringify(Object.values((D.live_markets||{}).markets||{}).map(m=>[m.market,m.sampled_at,m.sample_date,m.last,m.source]))};
       const results = await Promise.allSettled([
         refreshPublicHardware({ silent: true }),
         refreshRealtimeQuotes({ silent: true }),
@@ -2847,6 +2399,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
         quoteCount = results[1].status === "fulfilled" ? +results[1].value?.updated || 0 : 0,
         companyOk = !!company?.history,
         liveOk = results[3].status === "fulfilled" && results[3].value?.marketCount === 4,
+        staleGroups = results[3].status === "fulfilled" ? (results[3].value?.staleGroups || []) : ["四市场状态未知"],
         success = (!!publicOk || quoteCount === totalCompanies()) && liveOk;
       if (!success) throw new Error(`完整刷新失败：正式快照${publicOk?'成功':'失败'}，公司实时行情${quoteCount}/${totalCompanies()}，四市场${liveOk?'4/4':'未完成'}；单家公司更新不计作全量成功`);
       v7ApplyValuation();
@@ -2863,10 +2416,16 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
       v74RenderRefreshCard();
       if (!o.silent)
         $("#feedStatus").textContent =
-          `刷新完成｜行情截至 ${latestPriceDate()}｜覆盖 ${priceDateCoverage(latestPriceDate())}/${totalCompanies()}｜程序 ${V76_RELEASE}`;
+          `${staleGroups.length?"行情已过期":"刷新完成"}｜行情截至 ${latestPriceDate()}｜覆盖 ${priceDateCoverage(latestPriceDate())}/${totalCompanies()}｜程序 ${V76_RELEASE}`;
+      if(!D.strategy_current||Object.keys(D.strategy_current).length!==142){
+        D.strategy_current=preservedCloseStrategy.current;
+        D.strategy_meta=preservedCloseStrategy.meta;
+        D.user_positions=preservedCloseStrategy.positions;
+      }
       const afterPrices=allCompanies().map(c=>`${c.code}:${c.price}:${c.price_date}`).join('|');
-      const changed=before.snapshot!==(D.snapshot_date||D.embedded_snapshot)||before.generated!==(D.generated_at_cn||D.generated_at)||before.prices!==afterPrices;
-      return { success: true, changed, publicOk: !!publicOk, quoteCount, companyOk, liveOk, marketCount:4, results };
+      const afterLive=JSON.stringify(Object.values((D.live_markets||{}).markets||{}).map(m=>[m.market,m.sampled_at,m.sample_date,m.last,m.source]));
+      const changed=before.snapshot!==(D.snapshot_date||D.embedded_snapshot)||before.prices!==afterPrices||before.live!==afterLive;
+      return { success: true, changed, publicOk: !!publicOk, quoteCount, companyOk, liveOk, marketCount:4, staleGroups, results };
     })();
     try {
       return await v76RefreshPromise;
@@ -2904,7 +2463,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
   
   
   function v73Action(c) {
-    return strategyFor(c).action || "等待突破";
+    return strategyFor(c).action || "等待趋势修复";
   }
   function v73Reason(c) {
     return strategyFor(c).reason || "等待趋势、估值和风险条件共同确认";
@@ -2914,11 +2473,11 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
       (c) =>
         (v73ActionFilter === "all" || v73Action(c) === v73ActionFilter) &&
         (v73StageFilter === "all" ||
-          String(c.sepa?.stage || "").includes(v73StageFilter)),
+          String(strategyFor(c).trend_stage || '')===v73StageFilter),
     );
   }
   function v73Filters(id) {
-    return `<div id="${id}" class="v73-filter"><b>筛选</b>${["all", "重点参与", "试仓", "等待突破", "持有", "减仓", "回避/退出", "暂不参与"].map((x) => `<button class="chip-btn ${v73ActionFilter === x ? "active" : ""}" data-v73-action="${x}">${x === "all" ? "全部" : x}</button>`).join("")}<span class="split"></span>${["all", "第一", "第二", "第三", "第四"].map((x) => `<button class="chip-btn ${v73StageFilter === x ? "active" : ""}" data-v73-stage="${x}">${x === "all" ? "全部阶段" : x + "阶段"}</button>`).join("")}</div>`;
+    return `<div id="${id}" class="v73-filter"><b>筛选</b>${["all","重点参与","小仓试错","临近触发","突破后确认","缩量回踩观察","普通候选","等待趋势修复","不追/回避","已持仓继续持有","已持仓减仓或退出"].map((x) => `<button class="chip-btn ${v73ActionFilter === x ? "active" : ""}" data-v73-action="${x}">${x === "all" ? "全部" : x}</button>`).join("")}<span class="split"></span>${["all","第二阶段确认","第二阶段候选","第一阶段","第三阶段","第四阶段","数据不足"].map((x) => `<button class="chip-btn ${v73StageFilter === x ? "active" : ""}" data-v73-stage="${x}">${x === "all" ? "全部阶段" : x}</button>`).join("")}</div>`;
   }
   function v73BindFilters(root) {
     root.querySelectorAll("[data-v73-action]").forEach(
@@ -2950,7 +2509,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
                 ...(D.companies.application || []),
               ],
       counts = Object.fromEntries(
-        ["重点参与", "试仓", "等待突破", "持有", "减仓", "回避/退出", "暂不参与"].map((k) => [
+        ["重点参与","小仓试错","临近触发","突破后确认","缩量回踩观察","普通候选","等待趋势修复","不追/回避","已持仓继续持有","已持仓减仓或退出"].map((k) => [
           k,
           scopeRows.filter((c) => v73Action(c) === k).length,
         ]),
@@ -2962,7 +2521,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
       ).length;
     const sum = $("#valuationSummary");
     if (sum)
-      sum.innerHTML = `<div class="metric"><span>合理或更低</span><b>${reasonable} / ${scopeRows.length}</b></div><div class="metric good"><span>重点参与 / 试仓</span><b>${counts["重点参与"]} / ${counts["试仓"]}</b></div><div class="metric"><span>等待突破 / 持有</span><b>${counts["等待突破"]} / ${counts["持有"]}</b></div><div class="metric warn"><span>减仓 / 回避退出</span><b>${counts["减仓"]} / ${counts["回避/退出"]}</b></div>`;
+      sum.innerHTML = `<div class="metric"><span>合理或更低</span><b>${reasonable} / ${scopeRows.length}</b></div><div class="metric good"><span>重点参与 / 小仓试错</span><b>${counts["重点参与"]} / ${counts["小仓试错"]}</b></div><div class="metric"><span>临近触发 / 突破确认</span><b>${counts["临近触发"]} / ${counts["突破后确认"]}</b></div><div class="metric warn"><span>等待修复 / 不追回避</span><b>${counts["等待趋势修复"]} / ${counts["不追/回避"]}</b></div>`;
     const body = $("#valuationBody");
     if (!body) return;
     const card = body.closest(".card");
@@ -2983,7 +2542,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
           a = v73Action(c),
           trend = v74TrendSignal(c);
         const s=strategyFor(c), f=v79ForwardScenario(v);
-        return `<tr><td><span class="company">${esc(c.name)}</span><div class="v74-live-price">${num(c.price)} <span class="${classFor(c.change)}">${pct(c.change)}</span></div><div class="code">${esc(c.code)}｜${esc(c.price_date || latestPriceDate())}</div></td><td>${esc(c.sector)}<div class="small muted">质量 ${num(c.quality)}｜${esc(c.tier||'—')}</div></td><td class="range"><b>当前 ${esc(v.current || V74_VALUATION_PENDING)}</b><div class="v74-calendar-price">${esc(f.label)} ${esc(f.range)}${f.available && f.date ? `｜截至 ${esc(f.date)}` : ""}</div></td><td><b>${esc(v.status || V74_VALUATION_PENDING)}</b><div class="small muted">${esc(v.confidence || "D")}级｜${esc(v.evidence_state || v.audit_status || "待复核")}</div></td><td>${esc(v.revision_gate || "数据不足")}<div class="small muted">财报 ${esc(v.realization_gate || "数据不足")}</div></td><td><span class="v74-mini-trend tone-${trend.tone}"><b>${esc(trend.label)}</b><em>${trend.score == null ? "—" : trend.score + "分"}</em></span><div class="small muted">${esc(c.sepa?.stage || "待判断")}</div></td><td><span class="v73-action a-${a}">${esc(a)}</span></td><td>${esc(s.reason || v73Reason(c))}</td><td><button class="detail-btn" data-detail="${esc(c.code)}">查看</button></td></tr>`;
+        return `<tr><td><span class="company">${esc(c.name)}</span><div class="v74-live-price">${num(c.price)} <span class="${classFor(c.change)}">${pct(c.change)}</span></div><div class="code">${esc(c.code)}｜${esc(c.price_date || latestPriceDate())}</div></td><td>${esc(c.sector)}<div class="small muted">质量 ${num(c.quality)}｜${esc(c.tier||'—')}</div></td><td class="range"><b>当前 ${esc(v.current || V74_VALUATION_PENDING)}</b><div class="v74-calendar-price">${esc(f.label)} ${esc(f.range)}${f.available && f.date ? `｜截至 ${esc(f.date)}` : ""}</div></td><td><b>${esc(v.status || V74_VALUATION_PENDING)}</b><div class="small muted">${esc(v.confidence || "D")}级｜${esc(v.evidence_state || v.audit_status || "待复核")}</div></td><td>${esc(v.revision_gate || "数据不足")}<div class="small muted">财报 ${esc(v.realization_gate || "数据不足")}</div></td><td><span class="v74-mini-trend tone-${trend.tone}"><b>${esc(trend.label)}</b><em>${trend.score == null ? "—" : trend.score + "分"}</em></span><div class="small muted">${esc(s.trend_stage || "数据不足")}</div></td><td><span class="v73-action a-${a}">${esc(a)}</span></td><td>${esc(s.reason || v73Reason(c))}</td><td><button class="detail-btn" data-detail="${esc(c.code)}">查看</button></td></tr>`;
       })
       .join("");
     body.querySelectorAll("[data-detail]").forEach(
@@ -3009,7 +2568,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
     $("#sepaBody").innerHTML = rows
       .map(
         (c) =>
-          `<tr><td><button class="detail-btn" data-code="${c.code}"><span class="company">${esc(c.name)}</span></button><div class="code">${c.code}</div></td><td><b>${esc(c.sepa?.stage)}</b></td><td>${(c.sepa?.positive || []).map((x) => `<span class="badge positive">${esc(x)}</span>`).join("") || "—"}</td><td>${(c.sepa?.risk || []).map((x) => `<span class="badge risk">${esc(x)}</span>`).join("") || "—"}</td><td>${(c.sepa?.failed || []).map((x) => `<div>• ${esc(x)}</div>`).join("")}</td><td><span class="v73-action a-${v73Action(c)}">${v73Action(c)}</span><div class="small muted">${esc(v73Reason(c))}</div></td></tr>`,
+          `<tr><td><button class="detail-btn" data-code="${c.code}"><span class="company">${esc(c.name)}</span></button><div class="code">${c.code}</div></td><td><b>${esc(strategyFor(c).trend_stage||"数据不足")}</b><div class="small muted">趋势质量 ${strategyNumber(strategyFor(c).trend_quality_score,0)}分</div></td><td>${(c.sepa?.positive || []).map((x) => `<span class="badge positive">${esc(x)}</span>`).join("") || "—"}</td><td>${(c.sepa?.risk || []).map((x) => `<span class="badge risk">${esc(x)}</span>`).join("") || "—"}</td><td>${(c.sepa?.failed || []).map((x) => `<div>• ${esc(x)}</div>`).join("")}</td><td><span class="v73-action a-${v73Action(c)}">${v73Action(c)}</span><div class="small muted">${esc(v73Reason(c))}</div></td></tr>`,
       )
       .join("");
     $$("#sepaBody .detail-btn").forEach(
@@ -3022,9 +2581,9 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
     );
   };
   function v73Header() {
-    document.title = "AI研究系统 V7.9.3";
+    document.title = "AI研究系统 V7.9.4";
     const h = document.querySelector("header .title");
-    if (h) h.textContent = "AI研究系统 V7.9.3";
+    if (h) h.textContent = "AI研究系统 V7.9.4";
     const s = $("#v7SortBar .small.muted");
     if (s) s.textContent = "142家公司均有数值估值范围；证据不足时扩大区间并明确降级";
     document.querySelectorAll("#v72Methods").forEach((n) => n.remove());
@@ -3058,7 +2617,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
       strategy=strategyFor(c),
       formal=!!v.formal_closed,
       forward=v79ForwardScenario(v);
-    card.innerHTML = `<div class="v74-detail-heading"><h3>估值证据与独立行动</h3><span>估值模型 V7.9.3</span></div><div class="v7-detail-model-grid"><div><span>当前研究区间</span><b>${esc(v.current || V74_VALUATION_PENDING)}</b></div><div><span>安全边际区</span><b>${esc(v.buy_zone || "—")}</b></div><div><span>${esc(forward.label)}</span><b>${esc(forward.range)}</b></div><div><span>证据状态</span><b>${esc(v.evidence_state||v.audit_status||"待复核")}</b></div></div><div class="v74-detail-pills"><span>置信度 ${esc(v.confidence || "—")}</span><span>${formal?"正式闭环":"研究区间"}</span><span>行情日 ${esc(v.price_date||c.price_date||"—")}</span></div><p><b>估值位置：</b>${esc(v.status || V74_VALUATION_PENDING)}｜<b>独立行动：</b>${esc(strategy.action||"等待突破")}｜<b>趋势：</b>${esc(trend.label)} ${trend.score == null ? "" : trend.score + "分"}</p><p><b>行动原因：</b>${esc(strategy.reason||"等待趋势、量价和风险条件共同确认")}</p><p><b>六个月情景说明：</b>${esc(forward.note)}${forward.available && forward.date ? `｜截至 ${esc(forward.date)}` : ""}。这是盈利与估值假设下的合理价值测算，不是未来股价预测；未来12个月目标已取消公开展示。</p><p><b>主模型：</b>${esc(v.primary_model || "—")}｜<b>交叉验证：</b>${esc(v.cross_check_model || "—")}｜<b>依据：</b>${esc(v.valuation_basis || v.model_note || "—")}</p><p><b>关键数据：</b>2026年预测EPS ${compactNumber(eps26)}｜2027年预测EPS ${compactNumber(eps27)}｜最新扣非/归母利润同比 ${compactNumber(profitYoy, 1)}%｜覆盖机构 ${Number.isFinite(+analystCount) ? Math.round(+analystCount) : "—"}家</p><p><b>机构交叉：</b>${institution ? `${esc(institution.range)}｜${institution.overlap ? "与模型有重叠" : "与模型差异较大，需复核"}` : "暂无结构化目标带"}。机构只作交叉验证，不反推合理价。</p><p class="small muted">行情变化只更新估值位置；只有财报、盈利预期、股本、公司行动或业务结构等估值输入改变，才重算合理价值。完整模型和版本变化记录在后台审计文件中。</p>`;
+    card.innerHTML = `<div class="v74-detail-heading"><h3>估值证据与独立行动</h3><span>估值模型 V7.9.4</span></div><div class="v7-detail-model-grid"><div><span>当前研究区间</span><b>${esc(v.current || V74_VALUATION_PENDING)}</b></div><div><span>安全边际区</span><b>${esc(v.buy_zone || "—")}</b></div><div><span>${esc(forward.label)}</span><b>${esc(forward.range)}</b></div><div><span>证据状态</span><b>${esc(v.evidence_state||v.audit_status||"待复核")}</b></div></div><div class="v74-detail-pills"><span>置信度 ${esc(v.confidence || "—")}</span><span>${formal?"正式闭环":"研究区间"}</span><span>行情日 ${esc(v.price_date||c.price_date||"—")}</span></div><p><b>估值位置：</b>${esc(v.status || V74_VALUATION_PENDING)}｜<b>独立行动：</b>${esc(strategy.action||"等待趋势修复")}｜<b>趋势：</b>${esc(trend.label)} ${trend.score == null ? "" : trend.score + "分"}</p><p><b>行动原因：</b>${esc(strategy.reason||"等待趋势、量价和风险条件共同确认")}</p><p><b>六个月情景说明：</b>${esc(forward.note)}${forward.available && forward.date ? `｜截至 ${esc(forward.date)}` : ""}。这是盈利与估值假设下的合理价值测算，不是未来股价预测；未来12个月目标已取消公开展示。</p><p><b>主模型：</b>${esc(v.primary_model || "—")}｜<b>交叉验证：</b>${esc(v.cross_check_model || "—")}｜<b>依据：</b>${esc(v.valuation_basis || v.model_note || "—")}</p><p><b>关键数据：</b>2026年预测EPS ${compactNumber(eps26)}｜2027年预测EPS ${compactNumber(eps27)}｜最新扣非/归母利润同比 ${compactNumber(profitYoy, 1)}%｜覆盖机构 ${Number.isFinite(+analystCount) ? Math.round(+analystCount) : "—"}家</p><p><b>机构交叉：</b>${institution ? `${esc(institution.range)}｜${institution.overlap ? "与模型有重叠" : "与模型差异较大，需复核"}` : "暂无结构化目标带"}。机构只作交叉验证，不反推合理价。</p><p class="small muted">行情变化只更新估值位置；只有财报、盈利预期、股本、公司行动或业务结构等估值输入改变，才重算合理价值。完整模型和版本变化记录在后台审计文件中。</p>`;
     body.prepend(card);
   };
 
@@ -3114,6 +2673,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
     v74RenderRefreshCard();
     if (tab === "valuation") renderValuation();
     if (tab === "kline" && chartCode) drawCurrentChart();
+    window.__V794_AUTHORITY__={valuation:'scripts/valuation_core.py',strategy:'scripts/strategy_core.py',marketClock:'scripts/market_clock.py',publish:'scripts/build_public_site.py',frontendRole:'display-and-sort-only',legacyFrontendCalculatorsDisabled:true};
     window.__V79_RUNTIME__ = {
       release: V76_RELEASE,
       dataSchema: V76_DATA_SCHEMA,
