@@ -1,0 +1,80 @@
+name: V7.9.4 Repair QA With Report
+
+on:
+  push:
+    branches: [fix/unified-engine-20260812]
+    paths:
+      - '.github/workflows/qa-v794-report.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Run full branch QA and persist exact result
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p qa test-results/browser-v793
+          : > qa/v794-qa.log
+          python -m pip install --disable-pip-version-check exchange-calendars==4.13.2 pytest >> qa/v794-qa.log 2>&1 || true
+          npm ci >> qa/v794-qa.log 2>&1 || true
+          RC=0
+          runcheck() {
+            echo "===== $* =====" >> qa/v794-qa.log
+            "$@" >> qa/v794-qa.log 2>&1
+            r=$?
+            echo "RC=$r" >> qa/v794-qa.log
+            if [ $r -ne 0 ]; then RC=$r; fi
+          }
+          runcheck python scripts/rebuild_strategy.py
+          runcheck python scripts/audit_factual_closure_v794.py
+          runcheck python scripts/update_live_markets.py --offline
+          runcheck python scripts/publish_data_index.py
+          runcheck python scripts/build_public_site.py
+          runcheck python scripts/regression_v793.py
+          runcheck python tests/test_v794.py
+          runcheck npm run test:browser
+          python - <<'PY'
+          from pathlib import Path
+          import json, os, datetime
+          report=Path('test-results/browser-v793/report.json')
+          payload={
+            'generated_at_utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            'head_sha': os.environ.get('GITHUB_SHA'),
+            'run_id': os.environ.get('GITHUB_RUN_ID'),
+            'browser_report': json.loads(report.read_text()) if report.exists() else None,
+            'log_tail': Path('qa/v794-qa.log').read_text(errors='replace')[-18000:],
+          }
+          Path('qa/v794-status.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2),encoding='utf-8')
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add qa/v794-status.json qa/v794-qa.log
+          git commit -m "qa: persist V7.9.4 branch regression result" || true
+          git push origin HEAD:fix/unified-engine-20260812 || true
+          exit $RC
+      - name: Upload QA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v794-repair-qa-report
+          path: |
+            qa/v794-status.json
+            qa/v794-qa.log
+            test-results/browser-v793/
+          if-no-files-found: warn
