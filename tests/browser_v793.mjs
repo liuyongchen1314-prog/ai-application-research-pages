@@ -90,14 +90,14 @@ for (const profile of [
     await page.waitForFunction(() => {
       const button = document.querySelector("#v74RefreshNow");
       const message = document.querySelector("#v74RefreshMessage")?.textContent || "";
-      return !button?.disabled && /(取得新数据|检查完成，当前已是最新|行情已过期|在线数据暂不可用，继续显示最近一次有效快照|上次自动检查失败)/.test(message);
+      return !button?.disabled && /(取得新行情|检查完成，当前行情未变化|行情已过期|在线数据暂不可用，继续显示最近一次有效快照|上次自动检查失败)/.test(message);
     }, { timeout: 45000 });
     report.manualRefresh = await page.$eval("#v74RefreshMessage", (node) => node.textContent);
     const refreshState = await page.evaluate(() => ({
       fingerprint: JSON.stringify(Object.values(window.__V79_RUNTIME__.state().liveMarkets?.markets || {}).map(m => [m.market, m.sampled_at, m.sample_date, m.last, m.source])),
       message: document.querySelector("#v74RefreshMessage")?.textContent || "",
     }));
-    if (/取得新数据/.test(refreshState.message)) check(refreshState.fingerprint !== initial.liveFingerprint, "manual refresh claimed new data but market fingerprint did not change");
+    if (/取得新行情/.test(refreshState.message)) check(refreshState.fingerprint !== initial.liveFingerprint, "manual refresh claimed new market data but market fingerprint did not change");
     const marketsAfterRefresh = await page.$$eval("[data-live-market]", (nodes) => nodes.map((node) => node.textContent));
     check(marketsAfterRefresh.length === 4 && marketsAfterRefresh.every((text) => text.includes("%")), "manual refresh fallback damaged four-market cards");
 
