@@ -1,0 +1,47 @@
+name: V7.9.4 Hard QA Gate
+
+on:
+  push:
+    branches: [fix/unified-engine-20260812]
+    paths:
+      - '.github/workflows/qa-v794-hard-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v6
+        with: {python-version: '3.12'}
+      - uses: actions/setup-node@v5
+        with: {node-version: '24', cache: npm}
+      - name: Install fixed dependencies
+        run: |
+          python -m pip install --disable-pip-version-check exchange-calendars==4.13.2 pytest
+          npm ci
+      - name: Canonical rebuild and rule regression
+        run: |
+          python scripts/rebuild_strategy.py
+          python scripts/audit_factual_closure_v794.py
+          python scripts/update_live_markets.py --offline
+          python scripts/publish_data_index.py
+          python scripts/build_public_site.py
+          python scripts/regression_v793.py
+          python tests/test_v794.py
+      - name: Desktop mobile local-file browser gate
+        run: npm run test:browser
+      - name: Write immutable browser READY sentinel
+        run: |
+          mkdir -p qa
+          printf '%s\n' "V7.9.4 browser/rule gate PASS" "tested_sha=$GITHUB_SHA" "run_id=$GITHUB_RUN_ID" > qa/READY_BROWSER_V794.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add qa/READY_BROWSER_V794.txt
+          git commit -m "qa: V7.9.4 browser and rule gate PASS"
+          git push origin HEAD:fix/unified-engine-20260812
