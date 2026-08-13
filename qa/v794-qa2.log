@@ -1,0 +1,149 @@
+Collecting exchange-calendars==4.13.2
+  Downloading exchange_calendars-4.13.2-py3-none-any.whl.metadata (26 kB)
+Collecting pytest
+  Downloading pytest-9.1.1-py3-none-any.whl.metadata (7.6 kB)
+Collecting numpy>=1.26.4 (from exchange-calendars==4.13.2)
+  Downloading numpy-2.5.2-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+Collecting pandas>=1.5.0 (from exchange-calendars==4.13.2)
+  Downloading pandas-3.0.5-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+Collecting pyluach>=2.3.0 (from exchange-calendars==4.13.2)
+  Downloading pyluach-2.3.0-py3-none-any.whl.metadata (4.3 kB)
+Collecting toolz>=1.0.0 (from exchange-calendars==4.13.2)
+  Downloading toolz-1.1.0-py3-none-any.whl.metadata (5.1 kB)
+Collecting tzdata>=2025.2 (from exchange-calendars==4.13.2)
+  Downloading tzdata-2026.3-py2.py3-none-any.whl.metadata (1.4 kB)
+Collecting korean_lunar_calendar>=0.3.1 (from exchange-calendars==4.13.2)
+  Downloading korean_lunar_calendar-0.4.0-py3-none-any.whl.metadata (6.6 kB)
+Collecting iniconfig>=1.0.1 (from pytest)
+  Downloading iniconfig-2.3.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting packaging>=22 (from pytest)
+  Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Collecting pluggy<2,>=1.5 (from pytest)
+  Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+Collecting pygments>=2.7.2 (from pytest)
+  Downloading pygments-2.20.0-py3-none-any.whl.metadata (2.5 kB)
+Collecting python-dateutil>=2.8.2 (from pandas>=1.5.0->exchange-calendars==4.13.2)
+  Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+Collecting six>=1.5 (from python-dateutil>=2.8.2->pandas>=1.5.0->exchange-calendars==4.13.2)
+  Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+Downloading exchange_calendars-4.13.2-py3-none-any.whl (213 kB)
+Downloading pytest-9.1.1-py3-none-any.whl (386 kB)
+Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+Downloading korean_lunar_calendar-0.4.0-py3-none-any.whl (11 kB)
+Downloading numpy-2.5.2-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.7/16.7 MB 348.2 MB/s  0:00:00
+Downloading packaging-26.3-py3-none-any.whl (129 kB)
+Downloading pandas-3.0.5-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (11.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.0/11.0 MB 108.4 MB/s  0:00:00
+Downloading pygments-2.20.0-py3-none-any.whl (1.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 196.5 MB/s  0:00:00
+Downloading pyluach-2.3.0-py3-none-any.whl (25 kB)
+Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+Downloading toolz-1.1.0-py3-none-any.whl (58 kB)
+Downloading tzdata-2026.3-py2.py3-none-any.whl (348 kB)
+Installing collected packages: tzdata, toolz, six, pyluach, pygments, pluggy, packaging, numpy, korean_lunar_calendar, iniconfig, python-dateutil, pytest, pandas, exchange-calendars
+
+Successfully installed exchange-calendars-4.13.2 iniconfig-2.3.0 korean_lunar_calendar-0.4.0 numpy-2.5.2 packaging-26.3 pandas-3.0.5 pluggy-1.6.0 pygments-2.20.0 pyluach-2.3.0 pytest-9.1.1 python-dateutil-2.9.0.post0 six-1.17.0 toolz-1.1.0 tzdata-2026.3
+
+added 45 packages, and audited 46 packages in 3s
+
+10 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+===== python scripts/rebuild_strategy.py =====
+{"status": "PASS", "companies": 142, "actions": {"普通候选": 18, "不追/回避": 102, "缩量回踩观察": 1, "等待趋势修复": 21}}
+RC=0
+===== python scripts/audit_factual_closure_v794.py =====
+{"status": "PASS", "formal_closed": 0, "hk": 14, "summary": {"港股币种": {"passed": 0, "applicable": 14, "unresolved": 14}, "法定财报": {"passed": 16, "applicable": 142, "unresolved": 126}, "净现金净债务": {"passed": 0, "applicable": 142, "unresolved": 142}, "少数股东权益": {"passed": 0, "applicable": 142, "unresolved": 142}, "完全摊薄股本": {"passed": 0, "applicable": 142, "unresolved": 142}, "ADR转换": {"passed": 0, "applicable": 0, "unresolved": 0}, "EV到每股价值桥": {"passed": 97, "applicable": 142, "unresolved": 45}, "拆股除权增发": {"passed": 0, "applicable": 142, "unresolved": 142}, "扣非净利润": {"passed": 0, "applicable": 142, "unresolved": 142}, "机构预测日期年度": {"passed": 100, "applicable": 142, "unresolved": 42}}}
+RC=0
+===== python scripts/update_live_markets.py --offline =====
+{"status": "PASS", "release": "V7.9.4", "market_count": 4, "stale_open_markets": [], "sources": {"china": "completed_session_fallback", "hk": "completed_session_fallback", "us": "completed_session_fallback", "korea": "completed_session_fallback"}, "errors": 0}
+RC=0
+===== python scripts/publish_data_index.py =====
+{"status": "PASS", "release": "V7.9.4", "snapshot_sha256": "fa6f28b224814513c2211334649151ee65eb4745f9120f8df508e6089c45a8fb"}
+RC=0
+===== python scripts/build_public_site.py =====
+{"status": "PASS", "release": "V7.9.4", "html_sha256": "f7ef3ae53cb5ed08dd7fa67c061dc996d04a2e02aec85eff69dafe4fc57a0b96", "html_bytes": 10899381}
+RC=0
+===== python scripts/regression_v793.py =====
+{"status": "PASS", "release": "V7.9.4", "companies": 142, "hardware": 83, "application": 59, "six_month_research": 24, "six_month_unavailable": 118, "public_12m": 0, "formal_closed": 0, "actions": {"普通候选": 18, "不追/回避": 102, "缩量回踩观察": 1, "等待趋势修复": 21}, "live_markets": 4}
+RC=0
+===== python tests/test_v794.py =====
+{
+  "status": "PASS",
+  "tests": [
+    {
+      "test": "1_fields_counts",
+      "status": "PASS"
+    },
+    {
+      "test": "2_valuation_zero_drift",
+      "status": "PASS"
+    },
+    {
+      "test": "3_trend_action_sort_scores",
+      "status": "PASS"
+    },
+    {
+      "test": "4_canslim_evidence",
+      "status": "PASS"
+    },
+    {
+      "test": "5_market_clock",
+      "status": "PASS"
+    },
+    {
+      "test": "6_market_json_quote_coverage",
+      "status": "PASS"
+    },
+    {
+      "test": "7_hardware_application_same_contract",
+      "status": "PASS"
+    },
+    {
+      "test": "8_factual_gaps_crosscheck",
+      "status": "PASS"
+    },
+    {
+      "test": "9_source_authority",
+      "status": "PASS"
+    }
+  ]
+}
+RC=0
+===== npm run test:browser =====
+
+> test:browser
+> node tests/browser_v793.mjs
+
+[
+  {
+    "profile": "desktop",
+    "manualRefresh": "行情已过期：A股、港股、韩国｜继续显示最近有效数据，但不标记刷新成功",
+    "status": "FAIL",
+    "error": "Error: strategy render failed: count=0 html=0 text= pageErrors=v794CanonicalCompare is not defined\ncmp (http://127.0.0.1:38323/index.html:344:20)\nArray.sort (<anonymous>)\nhttp://127.0.0.1:38323/index.html:351:209\n    at check (file:///home/runner/work/ai-application-research-pages/ai-application-research-pages/tests/browser_v793.mjs:36:21)\n    at file:///home/runner/work/ai-application-research-pages/ai-application-research-pages/tests/browser_v793.mjs:110:5"
+  },
+  {
+    "profile": "mobile",
+    "manualRefresh": "行情已过期：A股、港股、韩国｜继续显示最近有效数据，但不标记刷新成功",
+    "status": "FAIL",
+    "error": "Error: strategy render failed: count=0 html=0 text= pageErrors=v794CanonicalCompare is not defined\ncmp (http://127.0.0.1:38323/index.html:344:20)\nArray.sort (<anonymous>)\nhttp://127.0.0.1:38323/index.html:351:209\n    at check (file:///home/runner/work/ai-application-research-pages/ai-application-research-pages/tests/browser_v793.mjs:36:21)\n    at file:///home/runner/work/ai-application-research-pages/ai-application-research-pages/tests/browser_v793.mjs:110:5"
+  },
+  {
+    "profile": "local-file",
+    "local": {
+      "release": "V7.9.4",
+      "strategyCount": 142,
+      "markets": 4,
+      "bodyWidth": 1280,
+      "viewportWidth": 1280,
+      "authority": "display-and-sort-only"
+    },
+    "pageErrors": [],
+    "status": "PASS"
+  }
+]
+RC=1
