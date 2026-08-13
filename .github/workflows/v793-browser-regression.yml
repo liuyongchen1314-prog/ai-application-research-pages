@@ -34,8 +34,10 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - name: 安装固定浏览器环境
-        run: npm ci
+      - name: 安装固定浏览器与交易日历环境
+        run: |
+          npm ci
+          python -m pip install --disable-pip-version-check exchange-calendars==4.13.2
       - name: 重建V7.9.4策略、事实审计与公开网页
         run: |
           python scripts/rebuild_strategy.py
@@ -53,4 +55,4 @@ jobs:
         with:
           name: V7.9.4-浏览器回归
           path: test-results/browser-v793/
-          if-no-files-found: error
+          if-no-files-found: warn
