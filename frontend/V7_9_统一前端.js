@@ -1877,7 +1877,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
     const planned=backend.scheduled_cron?`计划规则 ${backend.scheduled_cron}`:'手动/推送触发，无计划时点';
     const actualStart=backend.actual_started_at_beijing||'—',actualFinish=backend.finished_at_beijing||'—';
     card.innerHTML=`<div class="v74-refresh-main"><div><span class="v74-eyebrow">数据控制中心</span><h2>四市场即时行情＋正式研究快照</h2><p>页面打开立即检查，之后每10分钟检查；美股常规时段后台计划每10分钟采样。GitHub Actions计划规则与实际启动/完成时间分开显示，绝不把cron当成完成时间。盘中价格只用于观察，行动策略仍使用标明日期的正式收盘快照。</p></div><div class="v74-refresh-actions"><button id="v74RefreshNow" class="v74-refresh-now">手动刷新全部数据</button><label class="v74-auto"><input id="v74AutoRefresh" type="checkbox" ${enabled?'checked':''}><span>自动检查</span></label></div></div><div class="v793-market-grid">${v793MarketCards()}</div><div class="v793-refresh-meta"><span>正式交易日｜${esc(formalDates)}</span><span>后台计划｜${esc(planned)}</span><span>实际启动｜${esc(String(actualStart).replace('T',' ').slice(0,19))}</span><span>实际完成｜${esc(String(actualFinish).replace('T',' ').slice(0,19))}</span><span>本页最近检查｜${last?esc(String(last).replace('T',' ').slice(0,19)):'尚未检查'}</span><span>下次浏览器检查｜${next?next.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}):'已关闭'}</span></div><div id="v74RefreshMessage" class="v74-refresh-message">${stale.length?`行情已过期：${esc(stale.join('、'))}｜继续显示最近有效数据，但不标记刷新成功`:state.lastError?`上次自动检查失败：${esc(state.lastError)}`:state.lastMessage?esc(state.lastMessage):D.valuation_meta?.single_source?'142家公司正在使用同一版估值结果':'当前为内置快照，页面已启动立即检查'}</div>`;
-    $("#v74RefreshNow").onclick=async()=>{const button=$("#v74RefreshNow"),message=$("#v74RefreshMessage");button.disabled=true;button.textContent="正在检查…";try{const result=await refreshAllData({silent:true,reason:'manual'});if(!result?.success)throw new Error('没有任何数据源成功');const current=v74RefreshState();current.lastMessage=result.staleGroups?.length?`行情已过期：${result.staleGroups.join('、')}｜没有把过期行情标为刷新成功`:`${result.changed?'取得新数据':'检查完成，当前已是最新'}｜行情截至 ${latestPriceDate()}｜估值 ${D.valuation_meta?.version||'V7.9.4'}`;v74SaveRefreshState(current);message.textContent=current.lastMessage}catch(error){const current=v74RefreshState();current.lastError=String(error?.message||error);current.lastErrorAt=new Date().toISOString();v74SaveRefreshState(current);message.textContent='在线数据暂不可用，继续显示最近一次有效快照'}finally{button.disabled=false;button.textContent='手动刷新全部数据';v74RenderRefreshCard()}};
+    $("#v74RefreshNow").onclick=async()=>{const button=$("#v74RefreshNow"),message=$("#v74RefreshMessage");button.disabled=true;button.textContent="正在检查…";try{const result=await refreshAllData({silent:true,reason:'manual'});if(!result?.success)throw new Error('没有任何数据源成功');const current=v74RefreshState();current.lastMessage=result.staleGroups?.length?`行情已过期：${result.staleGroups.join('、')}｜没有把过期行情标为刷新成功`:`${result.changed?'取得新行情':'检查完成，当前行情未变化'}｜行情截至 ${latestPriceDate()}｜估值 ${D.valuation_meta?.version||'V7.9.4'}`;v74SaveRefreshState(current);message.textContent=current.lastMessage}catch(error){const current=v74RefreshState();current.lastError=String(error?.message||error);current.lastErrorAt=new Date().toISOString();v74SaveRefreshState(current);message.textContent='在线数据暂不可用，继续显示最近一次有效快照'}finally{button.disabled=false;button.textContent='手动刷新全部数据';v74RenderRefreshCard()}};
     $("#v74AutoRefresh").onchange=event=>{const current=v74RefreshState();current.auto=event.target.checked;v74SaveRefreshState(current);v74SetupAutoRefresh();v74RenderRefreshCard()};
   }
   let v74AutoTimer = null;
@@ -2384,7 +2384,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
   refreshAllData = async function (o = {}) {
     if (v76RefreshPromise) return v76RefreshPromise;
     v76RefreshPromise = (async () => {
-      const before={snapshot:D.snapshot_date||D.embedded_snapshot,generated:D.generated_at_cn||D.generated_at,prices:allCompanies().map(c=>`${c.code}:${c.price}:${c.price_date}`).join('|')};
+      const before={snapshot:D.snapshot_date||D.embedded_snapshot,prices:allCompanies().map(c=>`${c.code}:${c.price}:${c.price_date}`).join('|'),live:JSON.stringify(Object.values((D.live_markets||{}).markets||{}).map(m=>[m.market,m.sampled_at,m.sample_date,m.last,m.source]))};
       const results = await Promise.allSettled([
         refreshPublicHardware({ silent: true }),
         refreshRealtimeQuotes({ silent: true }),
@@ -2417,7 +2417,8 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
         $("#feedStatus").textContent =
           `${staleGroups.length?"行情已过期":"刷新完成"}｜行情截至 ${latestPriceDate()}｜覆盖 ${priceDateCoverage(latestPriceDate())}/${totalCompanies()}｜程序 ${V76_RELEASE}`;
       const afterPrices=allCompanies().map(c=>`${c.code}:${c.price}:${c.price_date}`).join('|');
-      const changed=before.snapshot!==(D.snapshot_date||D.embedded_snapshot)||before.generated!==(D.generated_at_cn||D.generated_at)||before.prices!==afterPrices;
+      const afterLive=JSON.stringify(Object.values((D.live_markets||{}).markets||{}).map(m=>[m.market,m.sampled_at,m.sample_date,m.last,m.source]));
+      const changed=before.snapshot!==(D.snapshot_date||D.embedded_snapshot)||before.prices!==afterPrices||before.live!==afterLive;
       return { success: true, changed, publicOk: !!publicOk, quoteCount, companyOk, liveOk, marketCount:4, staleGroups, results };
     })();
     try {
