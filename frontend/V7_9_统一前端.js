@@ -2384,6 +2384,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
   refreshAllData = async function (o = {}) {
     if (v76RefreshPromise) return v76RefreshPromise;
     v76RefreshPromise = (async () => {
+      const preservedCloseStrategy={current:D.strategy_current,meta:D.strategy_meta,positions:D.user_positions};
       const before={snapshot:D.snapshot_date||D.embedded_snapshot,prices:allCompanies().map(c=>`${c.code}:${c.price}:${c.price_date}`).join('|'),live:JSON.stringify(Object.values((D.live_markets||{}).markets||{}).map(m=>[m.market,m.sampled_at,m.sample_date,m.last,m.source]))};
       const results = await Promise.allSettled([
         refreshPublicHardware({ silent: true }),
@@ -2416,6 +2417,11 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
       if (!o.silent)
         $("#feedStatus").textContent =
           `${staleGroups.length?"行情已过期":"刷新完成"}｜行情截至 ${latestPriceDate()}｜覆盖 ${priceDateCoverage(latestPriceDate())}/${totalCompanies()}｜程序 ${V76_RELEASE}`;
+      if(!D.strategy_current||Object.keys(D.strategy_current).length!==142){
+        D.strategy_current=preservedCloseStrategy.current;
+        D.strategy_meta=preservedCloseStrategy.meta;
+        D.user_positions=preservedCloseStrategy.positions;
+      }
       const afterPrices=allCompanies().map(c=>`${c.code}:${c.price}:${c.price_date}`).join('|');
       const afterLive=JSON.stringify(Object.values((D.live_markets||{}).markets||{}).map(m=>[m.market,m.sampled_at,m.sample_date,m.last,m.source]));
       const changed=before.snapshot!==(D.snapshot_date||D.embedded_snapshot)||before.prices!==afterPrices||before.live!==afterLive;

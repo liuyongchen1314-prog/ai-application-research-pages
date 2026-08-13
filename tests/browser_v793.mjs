@@ -98,6 +98,8 @@ for (const profile of [
       message: document.querySelector("#v74RefreshMessage")?.textContent || "",
     }));
     if (/取得新行情/.test(refreshState.message)) check(refreshState.fingerprint !== initial.liveFingerprint, "manual refresh claimed new market data but market fingerprint did not change");
+    const strategyAfterRefresh = await page.evaluate(() => Object.keys(window.__V7_DATA__?.strategy_current || {}).length);
+    check(strategyAfterRefresh === 142, `manual refresh destroyed close-strategy snapshot: ${strategyAfterRefresh}/142`);
     const marketsAfterRefresh = await page.$$eval("[data-live-market]", (nodes) => nodes.map((node) => node.textContent));
     check(marketsAfterRefresh.length === 4 && marketsAfterRefresh.every((text) => text.includes("%")), "manual refresh fallback damaged four-market cards");
 
