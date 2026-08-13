@@ -1,0 +1,52 @@
+name: Bootstrap V7.9.4 preserve close strategy
+
+on:
+  push:
+    branches: [fix/unified-engine-20260812]
+    paths:
+      - '.github/workflows/bootstrap-preserve-close-strategy-v794.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Preserve complete close-strategy snapshot during intraday refresh
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('frontend/V7_9_统一前端.js')
+          s=p.read_text(encoding='utf-8')
+          needle="const before={snapshot:D.snapshot_date||D.embedded_snapshot,prices:allCompanies().map(c=>`${c.code}:${c.price}:${c.price_date}`).join('|'),live:JSON.stringify(Object.values((D.live_markets||{}).markets||{}).map(m=>[m.market,m.sampled_at,m.sample_date,m.last,m.source]))};"
+          insert="const preservedCloseStrategy={current:D.strategy_current,meta:D.strategy_meta,positions:D.user_positions};\n      "+needle
+          assert needle in s, 'refresh fingerprint anchor missing'
+          s=s.replace(needle,insert,1)
+          anchor="const afterPrices=allCompanies().map(c=>`${c.code}:${c.price}:${c.price_date}`).join('|');"
+          restore="if(!D.strategy_current||Object.keys(D.strategy_current).length!==142){\n        D.strategy_current=preservedCloseStrategy.current;\n        D.strategy_meta=preservedCloseStrategy.meta;\n        D.user_positions=preservedCloseStrategy.positions;\n      }\n      "+anchor
+          assert anchor in s, 'after-price anchor missing'
+          s=s.replace(anchor,restore,1)
+          p.write_text(s,encoding='utf-8')
+
+          t=Path('tests/browser_v793.mjs')
+          b=t.read_text(encoding='utf-8')
+          marker="const marketsAfterRefresh = await page.$$eval(\"[data-live-market]\", (nodes) => nodes.map((node) => node.textContent));"
+          check="const strategyAfterRefresh = await page.evaluate(() => Object.keys(window.__V7_DATA__?.strategy_current || {}).length);\n    check(strategyAfterRefresh === 142, `manual refresh destroyed close-strategy snapshot: ${strategyAfterRefresh}/142`);\n    "+marker
+          assert marker in b, 'browser refresh anchor missing'
+          b=b.replace(marker,check,1)
+          t.write_text(b,encoding='utf-8')
+          PY
+          node --check frontend/V7_9_统一前端.js
+          node --check tests/browser_v793.mjs
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend/V7_9_统一前端.js tests/browser_v793.mjs
+          git commit -m "V7.9.4 盘中刷新保留完整收盘策略快照"
+          git push origin HEAD:fix/unified-engine-20260812
