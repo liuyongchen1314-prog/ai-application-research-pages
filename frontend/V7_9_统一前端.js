@@ -78,6 +78,11 @@ function init(){registerCustomIndicators();$$('.scope-btn').forEach(b=>b.onclick
 function renderCurrentBase(){['valuation','strategy','sector','sepa','kline','daily','chain','operations'].forEach(id=>$('#panel-'+id)?.classList.remove('active'));$('#commonControls').classList.toggle('hidden',scope==='full'&&!['chain-companies','strategy'].includes(tab));if(scope==='full'&&tab==='strategy'){$('#panel-strategy').classList.add('active');renderStrategy();return}if(scope==='full'){$('#panel-chain').classList.add('active');renderFullChain();return}const p=tab==='chain'?'chain':tab;$('#panel-'+p)?.classList.add('active');if(tab==='valuation')renderValuation();else if(tab==='strategy')renderStrategy();else if(tab==='sector')renderSector();else if(tab==='sepa')renderSepa();else if(tab==='kline')renderKline();else if(tab==='daily')renderAttribution();else if(tab==='chain')renderIndustryMap();else if(tab==='operations')renderOperations();}
 
 function strategyFor(c){return D.strategy_current?.[typeof c==='string'?c:c?.code]||{}}
+function canonicalStrategyCompare(A,B){
+  const a=strategyFor(A),b=strategyFor(B),n=(v,d=0)=>Number.isFinite(+v)?+v:d,abs=(v)=>Number.isFinite(+v)?Math.abs(+v):999;
+  const order=[n(a.action_priority,99)-n(b.action_priority,99),n(a.trend_stage_priority,99)-n(b.trend_stage_priority,99),n(b.trend_quality_score)-n(a.trend_quality_score),n(b.technical?.relative_strength_12m)-n(a.technical?.relative_strength_12m),n(b.technical?.relative_strength_6m)-n(a.technical?.relative_strength_6m),n(b.technical?.relative_strength_3m)-n(a.technical?.relative_strength_3m),n(b.technical?.industry_relative_rank)-n(a.technical?.industry_relative_rank),abs(a.distance_to_pivot)-abs(b.distance_to_pivot),n(b.setup_quality_score)-n(a.setup_quality_score),n(b.sector_score)-n(a.sector_score),n(b.company_quality??B.quality)-n(a.company_quality??A.quality)];
+  return order.find(x=>Math.abs(x)>1e-12)||String(A.code).localeCompare(String(B.code));
+}
 function strategyNumber(v,digits=2){return v!==null&&v!==undefined&&v!==''&&Number.isFinite(Number(v))?Number(v).toLocaleString('zh-CN',{maximumFractionDigits:digits}):'—'}
 function strategyRange(s){
   if(s.first_buy_zone_low!==null&&s.first_buy_zone_low!==undefined&&s.first_buy_zone_high!==null&&s.first_buy_zone_high!==undefined&&Number.isFinite(Number(s.first_buy_zone_low))&&Number.isFinite(Number(s.first_buy_zone_high)))return `${strategyNumber(s.first_buy_zone_low)}–${strategyNumber(s.first_buy_zone_high)}`;
@@ -95,7 +100,7 @@ function renderStrategy(){
   const counts=Object.fromEntries(actions.map(a=>[a,allRows.filter(x=>x.s.action===a).length]));
   const markets=['A股','港股','美股','韩国'];
   const marketOf=c=>/\.SH$|\.SZ$|\.BJ$/.test(c.code)?'A股':/\.HK$/.test(c.code)?'港股':/\.KS$|\.KQ$/.test(c.code)?'韩国':'美股';
-  const cmp=(a,b)=>v794CanonicalCompare(a.c,b.c);
+  const cmp=(a,b)=>canonicalStrategyCompare(a.c,b.c);
   const marketBlocks=markets.map(m=>{
     const marketRows=rows.filter(x=>marketOf(x.c)===m);if(!marketRows.length)return'';
     const sectors=uniq(marketRows.map(x=>x.c.sector)).sort((a,b)=>{
@@ -1114,11 +1119,7 @@ async function refreshOnline({silent=false}={}){return refreshPublicHardware({si
   }
   function v7Action(c) { return strategyFor(c).action || '等待趋势修复'; }
 
-  function v794CanonicalCompare(A,B){
-    const a=strategyFor(A),b=strategyFor(B),n=(v,d=0)=>Number.isFinite(+v)?+v:d,abs=(v)=>Number.isFinite(+v)?Math.abs(+v):999;
-    const asc=[n(a.action_priority,99)-n(b.action_priority,99),n(a.trend_stage_priority,99)-n(b.trend_stage_priority,99),n(b.trend_quality_score)-n(a.trend_quality_score),n(b.technical?.relative_strength_12m)-n(a.technical?.relative_strength_12m),n(b.technical?.relative_strength_6m)-n(a.technical?.relative_strength_6m),n(b.technical?.relative_strength_3m)-n(a.technical?.relative_strength_3m),n(b.technical?.industry_relative_rank)-n(a.technical?.industry_relative_rank),abs(a.distance_to_pivot)-abs(b.distance_to_pivot),n(b.setup_quality_score)-n(a.setup_quality_score),n(b.sector_score)-n(a.sector_score),n(b.company_quality??B.quality)-n(a.company_quality??A.quality)];
-    return asc.find(x=>Math.abs(x)>1e-12)||String(A.code).localeCompare(String(B.code));
-  }
+  function v794CanonicalCompare(A,B){ return canonicalStrategyCompare(A,B); }
   let v7SortKey = "canonical", v7SortDir = "desc";
   function v7SortRows(rows) {
     if(v7SortKey==='canonical')return [...rows].sort(v794CanonicalCompare);
