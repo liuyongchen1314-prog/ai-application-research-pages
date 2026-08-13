@@ -1,0 +1,51 @@
+name: V7.9.4 Repair Branch QA
+
+on:
+  push:
+    branches: [fix/unified-engine-20260812]
+    paths:
+      - '.github/workflows/qa-v794-branch.yml'
+      - 'frontend/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'config/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install deterministic test dependencies
+        run: |
+          python -m pip install --disable-pip-version-check exchange-calendars==4.13.2 pytest
+          npm ci
+      - name: Rebuild canonical V7.9.4 data and run rule tests
+        run: |
+          python scripts/rebuild_strategy.py
+          python scripts/audit_factual_closure_v794.py
+          python scripts/update_live_markets.py --offline
+          python scripts/publish_data_index.py
+          python scripts/build_public_site.py
+          python scripts/regression_v793.py
+          python tests/test_v794.py
+      - name: Desktop mobile and file browser regression
+        run: npm run test:browser
+      - name: Upload browser diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v794-repair-branch-qa
+          path: test-results/browser-v793/
+          if-no-files-found: warn
