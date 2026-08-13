@@ -148,7 +148,7 @@ for (const profile of [
     }));
     check(klineAudit.sort === 'trend' && klineAudit.height > 150, 'K-line sorting/rendering interaction failed');
 
-    await page.click('[data-tab="valuation"]');
+    await page.$eval('[data-tab="valuation"]', (node) => node.click());
     await page.waitForSelector("#panel-valuation table");
     const valuation = await page.evaluate(() => ({
       columns: document.querySelectorAll("#panel-valuation thead th").length,
@@ -166,12 +166,12 @@ for (const profile of [
     check(valuation.sixMonthScenarios > 0 && valuation.sixMonthScenarios < 142, "six-month scenarios are not gated company by company");
     check(valuation.twelveMonthTargets === 0, "twelve-month targets remain public");
     check(valuation.bodyWidth <= valuation.viewportWidth + 2, "valuation table leaks horizontal overflow to the body");
-    await page.click("#valuationBody [data-detail]");
+    await page.$eval("#valuationBody [data-detail]", (node) => node.click());
     await page.waitForSelector("#modal.open .v7-detail-model");
     const detailValuation = await page.$eval("#modalBody .v7-detail-model", (node) => node.textContent);
     check(detailValuation.includes("6个月"), "company detail does not show the six-month scenario decision");
     check(!detailValuation.includes("12个月目标价"), "company detail still presents a twelve-month target price");
-    await page.click("#detailBack");
+    await page.$eval("#detailBack", (node) => node.click());
     report.initial = initial;
     report.valuation = valuation;
     report.pageErrors = pageErrors;
