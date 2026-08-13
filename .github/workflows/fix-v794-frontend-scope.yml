@@ -46,7 +46,7 @@ jobs:
           p.write_text(s,encoding='utf-8')
           PY
           node --check frontend/V7_9_统一前端.js
-          python -m pip install --disable-pip-version-check pytest
+          python -m pip install --disable-pip-version-check --quiet pytest exchange-calendars
           python tests/test_v794.py
           rm .github/workflows/fix-v794-frontend-scope.yml
           git config user.name "github-actions[bot]"
