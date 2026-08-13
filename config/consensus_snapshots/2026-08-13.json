@@ -1,6 +1,6 @@
 {
   "date": "2026-08-13",
-  "coverage": 100,
+  "coverage": 101,
   "consensus": {
     "300308.SZ": {
       "forecast_date": "2026-08-13",
@@ -41,14 +41,27 @@
       "analyst_count": 24,
       "source": "东方财富公开一致预期"
     },
+    "688825.SH": {
+      "forecast_date": "2026-08-13",
+      "year1": 2025,
+      "eps1": 0.028032813095,
+      "year2": 2026,
+      "eps2": 2.18,
+      "year3": 2027,
+      "eps3": 3.6135,
+      "target_min": 72.97,
+      "target_max": 72.97,
+      "analyst_count": 4,
+      "source": "东方财富公开一致预期"
+    },
     "601138.SH": {
       "forecast_date": "2026-08-13",
       "year1": 2025,
       "eps1": 1.7781393321,
       "year2": 2026,
-      "eps2": 3.0686,
+      "eps2": 3.0671,
       "year3": 2027,
-      "eps3": 4.1251,
+      "eps3": 4.1231,
       "target_min": 72.57,
       "target_max": 100.0,
       "analyst_count": 21,
@@ -124,12 +137,12 @@
       "year1": 2025,
       "eps1": 1.094888439627,
       "year2": 2026,
-      "eps2": 1.906428571429,
+      "eps2": 1.908620689655,
       "year3": 2027,
-      "eps3": 2.881785714286,
+      "eps3": 2.890344827586,
       "target_min": 270.0,
-      "target_max": 417.0,
-      "analyst_count": 27,
+      "target_max": 500.0,
+      "analyst_count": 28,
       "source": "东方财富公开一致预期"
     },
     "688256.SH": {
@@ -137,9 +150,9 @@
       "year1": 2025,
       "eps1": 3.277497346417,
       "year2": 2026,
-      "eps2": 10.520666666667,
+      "eps2": 10.328666666667,
       "year3": 2027,
-      "eps3": 21.266666666667,
+      "eps3": 21.161333333333,
       "target_min": 1350.0,
       "target_max": 1918.71,
       "analyst_count": 15,
@@ -428,7 +441,7 @@
       "eps3": 2.91,
       "target_min": 146.95,
       "target_max": 174.93,
-      "analyst_count": 8,
+      "analyst_count": 7,
       "source": "东方财富公开一致预期"
     },
     "001389.SZ": {
@@ -852,11 +865,11 @@
       "year1": 2025,
       "eps1": 3.312552178216,
       "year2": 2026,
-      "eps2": 32.71625,
+      "eps2": 33.9125,
       "year3": 2027,
-      "eps3": 27.41125,
-      "target_min": 455.4,
-      "target_max": 455.4,
+      "eps3": 27.60625,
+      "target_min": 494.5,
+      "target_max": 494.5,
       "analyst_count": 8,
       "source": "东方财富公开一致预期"
     },
