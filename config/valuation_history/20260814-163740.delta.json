@@ -1,0 +1,238 @@
+{
+  "schema": "v79-valuation-delta-1",
+  "meta": {
+    "version": "V7.9",
+    "generated_at": "2026-08-14T16:37:40.686806+00:00",
+    "companies": 142,
+    "single_source": true,
+    "public_targets": [
+      "current_research_range",
+      "six_month_value_scenario"
+    ],
+    "internal_audit_targets": [
+      "2026-12-31",
+      "2027-02-28",
+      "12_month"
+    ],
+    "public_six_month_scenarios": 24,
+    "public_twelve_month_targets": 0,
+    "queued_companies": [
+      "600183.SH"
+    ],
+    "numeric_research_ranges": 142,
+    "formal_closed": 0,
+    "evidence_distribution": {
+      "正式闭环": 0,
+      "部分闭环": 65,
+      "条件成立": 1,
+      "证据较弱": 76
+    },
+    "separation_rule": "估值对象不保存交易行动；操作策略由独立策略对象生成"
+  },
+  "previous_sha256": "857d735c0e9f94ed865c6414504c7d7b9adcc47aa9e65dd38540d35bc68c9688",
+  "current_sha256": "6a2de0ce60db2131fcd1893da39b6012292d71eb9d20d83842e66d1ffc6deb7c",
+  "changed": {
+    "600183.SH": {
+      "scope": "hardware",
+      "code": "600183.SH",
+      "name": "生益科技",
+      "sector": "AI服务器PCB / 覆铜板",
+      "quality": 9.25,
+      "price_as_of": 143.21,
+      "price_date": "2026-08-14",
+      "model_family": "ccl",
+      "version": "V7.9",
+      "audit_status": "P1候选复算待二次对账",
+      "blocked": false,
+      "current": "94–134",
+      "six": "94–134",
+      "twelve": "94–134",
+      "current_low": 93.958824,
+      "current_high": 134.226891,
+      "six_low": 93.958824,
+      "six_high": 134.226891,
+      "twelve_low": 93.958824,
+      "twelve_high": 134.226891,
+      "buy_zone": "79.9–94",
+      "buy_low": 79.8650004,
+      "buy_high": 93.958824,
+      "safety_margin": 0.25,
+      "status": "偏高观察",
+      "decision_gate": "观察",
+      "confidence": "C+",
+      "forward_confidence": "C",
+      "calibration_grade": "B",
+      "eps_2026": 2.546,
+      "eps_2027": 3.738,
+      "eps_2028": 4.8594,
+      "growth_2027": 0.46818538884524763,
+      "growth_2028_assumption": 0.3,
+      "model_note": "中周期EPS×周期PE（EV/EBITDA、PB待交叉）；价格和量价不参与反推合理价值。",
+      "eps_source": "东方财富公开一致预期，2026-08-07，覆盖10家机构",
+      "eps_2028_method": "以2027E为基数；旧底稿2028增速、2027增速70%衰减和30%上限取保守值",
+      "institution_check": null,
+      "missing_inputs": [],
+      "sector_method": "PCB龙头、高成长PCB、覆铜板分别设基础PE；覆铜板额外做中周期正常化，均受现金流和EPS修正门禁约束。",
+      "revision_gate": "不通过",
+      "realization_gate": "通过",
+      "dynamic_pe_multiplier": null,
+      "dynamic_pe_breakdown": {
+        "growth": 0.0,
+        "quality": -0.02,
+        "revision": -0.02,
+        "total": -0.04,
+        "hard_floor": 0.88,
+        "hard_cap": 1.08,
+        "roe": 6.68,
+        "ocf_to_eps": 0.490204424125,
+        "roe_adjustment": -0.02,
+        "cash_adjustment": 0.0
+      },
+      "revision_metrics": {
+        "as_of": "2026-07-30",
+        "eps_revision_1m": 0.010157218992467465,
+        "eps_revision_3m": 0.022315469476812178,
+        "upward_breadth_1m": 0.5,
+        "upward_breadth_3m": 0.0,
+        "matched_brokers_1m": 2,
+        "matched_brokers_3m": 1,
+        "current_broker_count": 2,
+        "source": "点时研报PDF重建"
+      },
+      "realization_metrics": {
+        "profit_yoy": 105.47,
+        "expected_eps_growth": 85.49274053586026,
+        "gap_pct_points": 19.977259464139735,
+        "ocf_per_share": 0.23529812358
+      },
+      "pe_base_current": [
+        25,
+        35
+      ],
+      "pe_base_six": [
+        23.5,
+        32.5
+      ],
+      "pe_base_twelve": [
+        22,
+        30
+      ],
+      "eps_anchor_current": 3.572334254451812,
+      "eps_anchor_six": 3.7806032149107316,
+      "eps_anchor_twelve": 4.00101436498603,
+      "cycle_normalization": {
+        "trend_cap": 0.12,
+        "normalized_inputs": [
+          2.546,
+          3.3374999999999995,
+          3.873883928571428
+        ],
+        "normalized_base_eps": 3.3374999999999995,
+        "horizon_offsets_years": [
+          0.6,
+          1.1,
+          1.6
+        ]
+      },
+      "valuation_judgement": "偏高观察",
+      "technical_judgement": "由RSI/均线/回撤独立判断",
+      "trend_judgement": "由SEPA趋势门独立判断",
+      "buy_point_judgement": "由估值、第二阶段趋势和低风险入场点共同决定",
+      "valuation_gate": "观察",
+      "realization_note": "累计收入/利润方向未恶化",
+      "confidence_role": "置信度只影响结论强度与仓位，不再一票否决",
+      "valuation_as_of": "2026-08-14",
+      "year_end_low": 93.958824,
+      "year_end_high": 134.226891,
+      "year_end": "94–134",
+      "year_end_date": "2026-12-31",
+      "next_year_start_low": 93.958824,
+      "next_year_start_high": 134.226891,
+      "next_year_start": "94–134",
+      "next_year_start_date": "2027-02-28",
+      "twelve_date": "2027-08-14",
+      "revaluation_status": "numeric_research_range_retained",
+      "revaluation_reason": "保留数值研究区间，同时明确证据等级；不继承V7.6正式结论",
+      "latest_report_date": "2026-06-30",
+      "model_source": "唯一生产配置 config/valuation_model.json（V7.9全量重建）",
+      "data_inputs": {
+        "report_date": "2026-06-30",
+        "revenue": 19025611766.13,
+        "revenue_yoy": 50.0454791459,
+        "net_profit": 3286977278.33,
+        "net_profit_yoy": 130.42,
+        "gross_margin": 30.6922750301,
+        "ocf_per_share": 1.228101686219,
+        "consensus_2026_eps": 2.546,
+        "consensus_2027_eps": 3.738,
+        "consensus_2028_eps": 4.8594,
+        "analyst_count": 10,
+        "target_min": 101.1,
+        "target_max": 201.66,
+        "deduct_net_profit": null,
+        "deduct_net_profit_yoy": null
+      },
+      "model_kind_frozen": "earnings_multiple",
+      "primary_model": "中周期EPS×CCL PE",
+      "cross_check_model": "EV/EBITDA＋原料周期",
+      "required_inputs": "中周期EPS、铜/树脂价格、产品结构、现金流",
+      "fit_test": "原料涨价与产品升级不能重复计入",
+      "mapping_audit": "通过",
+      "model_audit_status": "P1候选复算待二次对账",
+      "price_feedback_policy": "价格、回撤、趋势和量价只触发复核，不反推合理价",
+      "model_fit_test": "原料涨价与产品升级不能重复计入",
+      "valuation_basis": "低置信度数值研究区间",
+      "technical_snapshot": {
+        "close": 139.98,
+        "ma20": 125.022,
+        "ma50": 145.00379999999998,
+        "ma150": 95.99326666666667,
+        "ma200": 86.8057,
+        "r5": 0.3250662627792502,
+        "volume_ratio": 1.0510377804384177,
+        "strict_stage2": false,
+        "setup": false,
+        "improving": true,
+        "clear_stage4": false
+      },
+      "audit_stage": "P1候选复算待二次对账",
+      "evidence_state": "部分闭环",
+      "confidence_display": "中低",
+      "formal_closed": false,
+      "range_origin": "2026-08-11过渡生产区间，仅作V7.9重建起点",
+      "legacy_v76_range_rejected": true,
+      "legacy_public_label": "已审计估值区间",
+      "evidence_sources": [
+        {
+          "source": "V7.6历史估值配置",
+          "role": "只作模型结构与差异对照，不作价格锚",
+          "as_of": "2026-08-07"
+        },
+        {
+          "source": "公开生产过渡数据",
+          "role": "数值研究区间起点，不等于正式审计结论",
+          "as_of": "2026-08-11"
+        },
+        {
+          "source": "公司公告/东方财富/同花顺/券商研报",
+          "role": "V7.9逐家补证目标",
+          "as_of": null
+        }
+      ],
+      "report_date": "2026-03-31",
+      "forecast_date": "2026-08-07",
+      "capture_date": "2026-08-12",
+      "forward_ranges_formal": false,
+      "calculation_route": "low_confidence_numeric_research_range",
+      "forward_public_horizon_months": 6,
+      "forward_scenario_status": "unavailable",
+      "forward_scenario": null,
+      "forward_scenario_date": "2027-02-14",
+      "forward_scenario_note": "前瞻盈利或模型证据未闭环，暂不公开数值",
+      "twelve_public": false,
+      "forward_scenario_calculation": null,
+      "model_kind": "earnings_multiple"
+    }
+  },
+  "deleted": []
+}
