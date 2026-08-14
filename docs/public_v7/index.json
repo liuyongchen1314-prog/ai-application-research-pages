@@ -4,8 +4,8 @@
   "release": "V7.9.3",
   "latest": "data/latest-v7.json",
   "live_markets": "data/live-markets.json",
-  "live_markets_sha256": "0e3b6ff2370649c5ca3e57c85d318a83e05c6639055657dab84fcc2ffd159462",
-  "snapshot_sha256": "75e417a308bd3d7d5e08381c5f3ae243d5131e4ddcd8ec66dbed2c28eb95209c",
+  "live_markets_sha256": "fbf58a51eaa177dbad8f7d05f14f82212cfa693cae5304f8951c0a66c09a0852",
+  "snapshot_sha256": "ff95f3e90144c009bf88f75572a2d2cd19cae7358e6036be21568cfcf668c6df",
   "snapshot_date": "2026-08-13",
   "generated_at_cn": "2026-08-14T13:18:23.940681+08:00",
   "coverage": {
