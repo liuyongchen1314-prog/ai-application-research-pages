@@ -1,8 +1,8 @@
 {
   "schema": "v793-live-markets-1",
   "release": "V7.9.3",
-  "generated_at": "2026-08-18T15:49:45.507263+00:00",
-  "generated_at_beijing": "2026-08-18T23:49:45.507263+08:00",
+  "generated_at": "2026-08-18T23:42:13.950914+00:00",
+  "generated_at_beijing": "2026-08-19T07:42:13.950914+08:00",
   "formal_snapshot_date": "2026-08-18",
   "separate_from_valuation": true,
   "market_count": 4,
@@ -78,33 +78,33 @@
         {
           "symbol": "^IXIC",
           "name": "纳斯达克",
-          "price": 26337.09,
+          "price": 26289.71,
           "previous_close": 26644.91,
-          "change_pct": -0.01155267553915551,
+          "change_pct": -0.013330876328724761,
           "date": "2026-08-18",
-          "as_of": "2026-08-18T11:49:38-04:00",
+          "as_of": "2026-08-18T17:15:59-04:00",
           "source": "海外即时行情",
           "realtime": true
         },
         {
           "symbol": "^SOX",
           "name": "费城半导体",
-          "price": 11947.417,
+          "price": 11992.463,
           "previous_close": 12621.005,
-          "change_pct": -0.05337039324522885,
+          "change_pct": -0.049801263845470234,
           "date": "2026-08-18",
-          "as_of": "2026-08-18T11:49:44-04:00",
+          "as_of": "2026-08-18T17:15:59-04:00",
           "source": "海外即时行情",
           "realtime": true
         },
         {
           "symbol": "SMH",
           "name": "AI芯片ETF",
-          "price": 567.805,
+          "price": 569.77,
           "previous_close": 594.07,
-          "change_pct": -0.0442119615533525,
+          "change_pct": -0.040904270540508825,
           "date": "2026-08-18",
-          "as_of": "2026-08-18T11:49:44-04:00",
+          "as_of": "2026-08-18T16:00:01-04:00",
           "source": "海外即时行情",
           "realtime": true
         }
