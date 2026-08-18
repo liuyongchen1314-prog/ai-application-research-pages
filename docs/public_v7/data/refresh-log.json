@@ -4,6 +4,12 @@
     {
       "mode": "live",
       "status": "success",
+      "finished_at_utc": "2026-08-18T05:05:46.843469+00:00",
+      "finished_at_beijing": "2026-08-18T13:05:46.843469+08:00"
+    },
+    {
+      "mode": "live",
+      "status": "success",
       "finished_at_utc": "2026-08-18T04:02:23.858802+00:00",
       "finished_at_beijing": "2026-08-18T12:02:23.858802+08:00"
     },
@@ -251,7 +257,7 @@
   "last_success": {
     "mode": "live",
     "status": "success",
-    "finished_at_utc": "2026-08-18T04:02:23.858802+00:00",
-    "finished_at_beijing": "2026-08-18T12:02:23.858802+08:00"
+    "finished_at_utc": "2026-08-18T05:05:46.843469+00:00",
+    "finished_at_beijing": "2026-08-18T13:05:46.843469+08:00"
   }
 }
