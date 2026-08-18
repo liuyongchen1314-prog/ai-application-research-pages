@@ -2,6 +2,12 @@
   "version": "V7.9.3",
   "runs": [
     {
+      "mode": "asia",
+      "status": "success",
+      "finished_at_utc": "2026-08-18T10:03:13.991599+00:00",
+      "finished_at_beijing": "2026-08-18T18:03:13.991599+08:00"
+    },
+    {
       "mode": "live",
       "status": "success",
       "finished_at_utc": "2026-08-18T09:06:03.006537+00:00",
@@ -267,9 +273,9 @@
     }
   ],
   "last_success": {
-    "mode": "live",
+    "mode": "asia",
     "status": "success",
-    "finished_at_utc": "2026-08-18T09:06:03.006537+00:00",
-    "finished_at_beijing": "2026-08-18T17:06:03.006537+08:00"
+    "finished_at_utc": "2026-08-18T10:03:13.991599+00:00",
+    "finished_at_beijing": "2026-08-18T18:03:13.991599+08:00"
   }
 }
