@@ -2,6 +2,12 @@
   "version": "V7.9.3",
   "runs": [
     {
+      "mode": "final",
+      "status": "failure",
+      "finished_at_utc": "2026-08-19T14:47:46.504302+00:00",
+      "finished_at_beijing": "2026-08-19T22:47:46.504302+08:00"
+    },
+    {
       "mode": "fundamental",
       "status": "failure",
       "finished_at_utc": "2026-08-19T10:44:42.032518+00:00",
