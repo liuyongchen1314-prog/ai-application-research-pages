@@ -1,8 +1,8 @@
 {
   "schema": "v793-live-markets-1",
   "release": "V7.9.3",
-  "generated_at": "2026-08-21T08:00:51.924630+00:00",
-  "generated_at_beijing": "2026-08-21T16:00:51.924630+08:00",
+  "generated_at": "2026-08-21T09:10:35.145104+00:00",
+  "generated_at_beijing": "2026-08-21T17:10:35.145104+08:00",
   "formal_snapshot_date": "2026-08-20",
   "separate_from_valuation": true,
   "market_count": 4,
@@ -17,7 +17,7 @@
           "previous_close": 3903.72,
           "change_pct": 0.0003791255520375625,
           "date": "2026-08-21",
-          "as_of": "20260821160002",
+          "as_of": "20260821161402",
           "source": "腾讯即时行情",
           "realtime": true
         },
@@ -28,7 +28,7 @@
           "previous_close": 3495.59,
           "change_pct": 0.014300876246928107,
           "date": "2026-08-21",
-          "as_of": "20260821155951",
+          "as_of": "20260821161451",
           "source": "腾讯即时行情",
           "realtime": true
         },
@@ -39,7 +39,7 @@
           "previous_close": 1652.97,
           "change_pct": 0.0003569332776758305,
           "date": "2026-08-21",
-          "as_of": "20260821160014",
+          "as_of": "20260821161414",
           "source": "腾讯即时行情",
           "realtime": true
         }
@@ -51,22 +51,22 @@
         {
           "symbol": "hkHSI",
           "name": "恒生指数",
-          "price": 25976.1,
+          "price": 26009.46,
           "previous_close": 25698.49,
-          "change_pct": 0.010802580229421821,
+          "change_pct": 0.012100710975625262,
           "date": "2026-08-21",
-          "as_of": "2026/08/21 15:45:50",
+          "as_of": "2026/08/21 16:55:07",
           "source": "腾讯即时行情",
           "realtime": true
         },
         {
           "symbol": "hkHSTECH",
           "name": "恒生科技",
-          "price": 4758.82,
+          "price": 4766.16,
           "previous_close": 4700.53,
-          "change_pct": 0.012400729279464118,
+          "change_pct": 0.013962255320144834,
           "date": "2026-08-21",
-          "as_of": "2026/08/21 15:45:50",
+          "as_of": "2026/08/21 16:08:30",
           "source": "腾讯即时行情",
           "realtime": true
         }
