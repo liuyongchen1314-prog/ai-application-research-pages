@@ -4,6 +4,12 @@
     {
       "mode": "live",
       "status": "success",
+      "finished_at_utc": "2026-09-02T12:09:16.011151+00:00",
+      "finished_at_beijing": "2026-09-02T20:09:16.011151+08:00"
+    },
+    {
+      "mode": "live",
+      "status": "success",
       "finished_at_utc": "2026-09-02T09:32:57.953849+00:00",
       "finished_at_beijing": "2026-09-02T17:32:57.953849+08:00"
     },
@@ -714,18 +720,12 @@
       "status": "success",
       "finished_at_utc": "2026-08-12T11:29:04.515604+00:00",
       "finished_at_beijing": "2026-08-12T19:29:04.515604+08:00"
-    },
-    {
-      "mode": "all",
-      "status": "success",
-      "finished_at_utc": "2026-08-12T11:18:31.336289+00:00",
-      "finished_at_beijing": "2026-08-12T19:18:31.336289+08:00"
     }
   ],
   "last_success": {
     "mode": "live",
     "status": "success",
-    "finished_at_utc": "2026-09-02T09:32:57.953849+00:00",
-    "finished_at_beijing": "2026-09-02T17:32:57.953849+08:00"
+    "finished_at_utc": "2026-09-02T12:09:16.011151+00:00",
+    "finished_at_beijing": "2026-09-02T20:09:16.011151+08:00"
   }
 }
