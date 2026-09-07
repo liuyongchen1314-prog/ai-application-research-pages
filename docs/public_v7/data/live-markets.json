@@ -1,8 +1,8 @@
 {
   "schema": "v793-live-markets-1",
   "release": "V7.9.3",
-  "generated_at": "2026-09-07T08:37:09.584360+00:00",
-  "generated_at_beijing": "2026-09-07T16:37:09.584360+08:00",
+  "generated_at": "2026-09-07T10:11:50.964075+00:00",
+  "generated_at_beijing": "2026-09-07T18:11:50.964075+08:00",
   "formal_snapshot_date": "2026-09-04",
   "separate_from_valuation": true,
   "market_count": 4,
@@ -55,7 +55,7 @@
           "previous_close": 25650.87,
           "change_pct": -0.009268691471283397,
           "date": "2026-09-07",
-          "as_of": "2026/09/07 16:21:15",
+          "as_of": "2026/09/07 17:56:15",
           "source": "腾讯即时行情",
           "realtime": true
         },
@@ -120,7 +120,7 @@
           "previous_close": 6687.21,
           "change_pct": 0.04608498910606973,
           "date": "2026-09-07",
-          "as_of": "2026-09-07T15:32:50+09:00",
+          "as_of": "2026-09-07T18:05:40+09:00",
           "source": "海外即时行情",
           "realtime": true
         },
@@ -131,7 +131,7 @@
           "previous_close": 813.5,
           "change_pct": 0.010682237246465887,
           "date": "2026-09-07",
-          "as_of": "2026-09-07T15:32:50+09:00",
+          "as_of": "2026-09-07T18:05:40+09:00",
           "source": "海外即时行情",
           "realtime": true
         },
