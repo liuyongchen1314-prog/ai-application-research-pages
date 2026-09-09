@@ -1,74 +1,74 @@
 {
   "schema": "v793-live-markets-1",
   "release": "V7.9.3",
-  "generated_at": "2026-09-09T09:40:17.763079+00:00",
-  "generated_at_beijing": "2026-09-09T17:40:17.763079+08:00",
+  "generated_at": "2026-09-09T12:22:34.603128+00:00",
+  "generated_at_beijing": "2026-09-09T20:22:34.603128+08:00",
   "formal_snapshot_date": "2026-09-08",
   "separate_from_valuation": true,
   "market_count": 4,
   "markets": {
     "china": {
-      "status": "completed_session_fallback",
+      "status": "realtime",
       "items": [
         {
-          "symbol": "sh000300",
-          "name": "沪深300",
-          "price": 4558.74,
-          "previous_close": 4575.02,
-          "change_pct": -0.0035584543892706044,
-          "date": "2026-09-08",
-          "as_of": "2026-09-08 收盘",
-          "source": "正式收盘快照",
-          "realtime": false
+          "symbol": "sh000001",
+          "name": "上证指数",
+          "price": 3951.51,
+          "previous_close": 3940.55,
+          "change_pct": 0.0027813376305338977,
+          "date": "2026-09-09",
+          "as_of": "20260909161403",
+          "source": "腾讯即时行情",
+          "realtime": true
         },
         {
           "symbol": "sz399006",
           "name": "创业板指",
-          "price": 3359.72,
-          "previous_close": 3398.68,
-          "change_pct": -0.01146327397695579,
-          "date": "2026-09-08",
-          "as_of": "2026-09-08 收盘",
-          "source": "正式收盘快照",
-          "realtime": false
+          "price": 3354.97,
+          "previous_close": 3359.72,
+          "change_pct": -0.0014138082935483132,
+          "date": "2026-09-09",
+          "as_of": "20260909161427",
+          "source": "腾讯即时行情",
+          "realtime": true
         },
         {
           "symbol": "sh000688",
           "name": "科创50",
-          "price": 1591.0,
-          "previous_close": 1615.53,
-          "change_pct": -0.0151838715467989,
-          "date": "2026-09-08",
-          "as_of": "2026-09-08 收盘",
-          "source": "正式收盘快照",
-          "realtime": false
+          "price": 1580.06,
+          "previous_close": 1591.0,
+          "change_pct": -0.006876178504085506,
+          "date": "2026-09-09",
+          "as_of": "20260909161415",
+          "source": "腾讯即时行情",
+          "realtime": true
         }
       ]
     },
     "hk": {
-      "status": "completed_session_fallback",
+      "status": "realtime",
       "items": [
         {
           "symbol": "hkHSI",
           "name": "恒生指数",
-          "price": 25317.18,
-          "previous_close": 25413.12,
-          "change_pct": -0.0037752153218494344,
-          "date": "2026-09-08",
-          "as_of": "2026-09-08 收盘",
-          "source": "正式收盘快照",
-          "realtime": false
+          "price": 25274.96,
+          "previous_close": 25317.18,
+          "change_pct": -0.0016676422887541564,
+          "date": "2026-09-09",
+          "as_of": "2026/09/09 18:31:05",
+          "source": "腾讯即时行情",
+          "realtime": true
         },
         {
           "symbol": "hkHSTECH",
           "name": "恒生科技",
-          "price": 4454.85,
-          "previous_close": 4527.71,
-          "change_pct": -0.016092020027784426,
-          "date": "2026-09-08",
-          "as_of": "2026-09-08 收盘",
-          "source": "正式收盘快照",
-          "realtime": false
+          "price": 4420.79,
+          "previous_close": 4454.85,
+          "change_pct": -0.007645599739609765,
+          "date": "2026-09-09",
+          "as_of": "2026/09/09 16:08:28",
+          "source": "腾讯即时行情",
+          "realtime": true
         }
       ]
     },
@@ -149,8 +149,5 @@
       ]
     }
   },
-  "errors": {
-    "china": "URLError(OSError(101, 'Network is unreachable'))",
-    "hk": "URLError(OSError(101, 'Network is unreachable'))"
-  }
+  "errors": {}
 }
