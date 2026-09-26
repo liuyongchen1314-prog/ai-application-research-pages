@@ -4,6 +4,7 @@ import argparse, concurrent.futures, datetime as dt, json, os, pathlib, statisti
 from zoneinfo import ZoneInfo
 from v7_config import load_config
 from snapshot_io import save_snapshot
+from market_clock import expected_completed_session, phase
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 PUBLIC=ROOT/'docs'/'public_v7'; DATA=PUBLIC/'data'; INTRADAY=DATA/'intraday'
 HEAD={'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/144 Safari/537.36','Referer':'https://gu.qq.com/','Accept':'application/json,text/plain,*/*'}
@@ -83,21 +84,16 @@ def fetch_quotes(rows):
             except Exception:pass
     return out
 
-def _market_clock(group):
-    if group=='us':return ZoneInfo('America/New_York'),dt.time(16,15)
-    if group=='korea':return ZoneInfo('Asia/Seoul'),dt.time(15,40)
-    return dt.timezone.utc,dt.time(23,59)
-
 def yahoo(item,target_date=None):
     t=urllib.parse.quote(item['ticker'],safe='');j=json.loads(request(f'https://query1.finance.yahoo.com/v8/finance/chart/{t}?range=15d&interval=1d&events=history',25));chart=((j.get('chart') or {}).get('result') or [None])[0]
     if not chart:raise RuntimeError((j.get('chart') or {}).get('error'))
     ts=chart.get('timestamp') or [];cl=((((chart.get('indicators') or {}).get('quote') or [{}])[0]).get('close') or [])
-    tz,finalize=_market_clock(item['group']);now_local=dt.datetime.now(dt.timezone.utc).astimezone(tz)
+    clock=phase(item['group']);tz=ZoneInfo(clock['local_timezone']);expected=expected_completed_session(item['group'])
     pts=[]
     for stamp,close in zip(ts,cl):
         if close is None:continue
         local_date=dt.datetime.fromtimestamp(stamp,dt.timezone.utc).astimezone(tz).date()
-        if item['group'] in ('us','korea') and now_local.time()<finalize and local_date>=now_local.date():continue
+        if expected and local_date.isoformat()>expected:continue
         pts.append((stamp,float(close),local_date))
     if len(pts)<2:raise RuntimeError('insufficient completed points')
     index=len(pts)-1
@@ -126,8 +122,10 @@ def aligned_yahoo_items(wanted,benchmark):
 def freshness(items,group,benchmark):
     rows=[x for x in items if x.get('group')==group];b=next((x for x in rows if x.get('ticker')==benchmark),None)
     if not b:return {'fresh':False,'date':None,'reason':'基准数据缺失'}
-    date=b['date'];bad=[x.get('ticker') for x in rows if x.get('date')!=date]
-    return {'fresh':not bad,'date':date,'reason':'' if not bad else '部分成分日期不一致','count':len(rows)}
+    date=b['date'];bad=[x.get('ticker') for x in rows if x.get('date')!=date];expected=expected_completed_session(group)
+    stale_session=bool(expected and str(date)!=str(expected));fresh=not bad and not stale_session
+    reason='部分成分日期不一致' if bad else (f'最新完整交易日应为{expected}' if stale_session else '')
+    return {'fresh':fresh,'date':date,'expected_completed_session':expected,'reason':reason,'count':len(rows)}
 
 def period_return(b,n):return b[-1][2]/b[-n-1][2]-1 if len(b)>n and b[-n-1][2] else None
 
@@ -175,7 +173,7 @@ def atomic_write_text(path,text):
         except FileNotFoundError:pass
 
 def public_index(data):
-    return {'schema':INDEX_SCHEMA,'data_schema':DATA_SCHEMA,'release':'V7.9.3','latest':'data/latest-v7.json','snapshot_date':data.get('snapshot_date'),'generated_at_cn':data.get('generated_at_cn'),'coverage':data.get('coverage'),'intraday':data.get('intraday'),'market_freshness':data.get('market_freshness'),'privacy':'仅公开市场与基础信息'}
+    return {'schema':INDEX_SCHEMA,'data_schema':DATA_SCHEMA,'release':'V7.9.4','latest':'data/latest-v7.json','snapshot_date':data.get('snapshot_date'),'generated_at_cn':data.get('generated_at_cn'),'coverage':data.get('coverage'),'intraday':data.get('intraday'),'market_freshness':data.get('market_freshness'),'privacy':'仅公开市场与基础信息'}
 
 def write(data):
     DATA.mkdir(parents=True,exist_ok=True);INTRADAY.mkdir(parents=True,exist_ok=True)
