@@ -27,12 +27,15 @@ def main() -> None:
     data["strategy_current"] = companies
     data["strategy_meta"] = {
         "schema": strategy["schema"],
-        "version": "V7.9.3",
+        "version": "V7.9.4",
         "generated_at": strategy["generated_at"],
         "snapshot_date": strategy["snapshot_date"],
         "action_counts": counts,
         "valuation_source": "valuation_current",
         "separated_from_valuation": True,
+        "sort_contract": strategy.get("sort_contract"),
+        "rolling_validation": strategy.get("rolling_validation"),
+        "authority": strategy.get("authority"),
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(strategy, ensure_ascii=False, indent=2), "utf-8")
