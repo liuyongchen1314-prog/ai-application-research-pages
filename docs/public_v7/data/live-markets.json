@@ -1,8 +1,8 @@
 {
   "schema": "v793-live-markets-1",
   "release": "V7.9.3",
-  "generated_at": "2026-10-02T01:50:30.687767+00:00",
-  "generated_at_beijing": "2026-10-02T09:50:30.687767+08:00",
+  "generated_at": "2026-10-02T07:28:46.381911+00:00",
+  "generated_at_beijing": "2026-10-02T15:28:46.381911+08:00",
   "formal_snapshot_date": "2026-09-25",
   "separate_from_valuation": true,
   "market_count": 4,
@@ -51,22 +51,22 @@
         {
           "symbol": "hkHSI",
           "name": "恒生指数",
-          "price": 23968.58,
+          "price": 23919.57,
           "previous_close": 24613.27,
-          "change_pct": -0.026192781373624796,
+          "change_pct": -0.028183983680348024,
           "date": "2026-10-02",
-          "as_of": "2026/10/02 09:35:28",
+          "as_of": "2026/10/02 15:13:37",
           "source": "腾讯即时行情",
           "realtime": true
         },
         {
           "symbol": "hkHSTECH",
           "name": "恒生科技",
-          "price": 4152.33,
+          "price": 4140.37,
           "previous_close": 4253.89,
-          "change_pct": -0.02387461829055293,
+          "change_pct": -0.02668616254769174,
           "date": "2026-10-02",
-          "as_of": "2026/10/02 09:35:28",
+          "as_of": "2026/10/02 15:13:36",
           "source": "腾讯即时行情",
           "realtime": true
         }
@@ -116,33 +116,33 @@
         {
           "symbol": "^KS11",
           "name": "韩国KOSPI",
-          "price": 6961.31,
+          "price": 7003.74,
           "previous_close": 6971.35,
-          "change_pct": -0.0014401801659650326,
+          "change_pct": 0.004646158921872923,
           "date": "2026-10-02",
-          "as_of": "2026-10-02T10:30:20+09:00",
+          "as_of": "2026-10-02T15:30:40+09:00",
           "source": "海外即时行情",
           "realtime": true
         },
         {
           "symbol": "^KQ11",
           "name": "韩国KOSDAQ",
-          "price": 898.68,
-          "previous_close": 894.29,
-          "change_pct": 0.0049089221617149015,
+          "price": 893.29,
+          "previous_close": 855.91,
+          "change_pct": 0.04367281606710982,
           "date": "2026-10-02",
-          "as_of": "2026-10-02T10:30:20+09:00",
+          "as_of": "2026-10-02T15:32:50+09:00",
           "source": "海外即时行情",
           "realtime": true
         },
         {
           "symbol": "000660.KS",
           "name": "SK海力士",
-          "price": 1837000.0,
+          "price": 1841000.0,
           "previous_close": 1833000.0,
-          "change_pct": 0.0021822149481725006,
+          "change_pct": 0.004364429896344779,
           "date": "2026-10-02",
-          "as_of": "2026-10-02T10:30:29+09:00",
+          "as_of": "2026-10-02T15:30:16+09:00",
           "source": "海外即时行情",
           "realtime": true
         }
