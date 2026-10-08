@@ -9,7 +9,7 @@ import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 LATEST = ROOT / "docs" / "public_v7" / "data" / "latest-v7.json"
-RELEASE = "V7.9.3"
+RELEASE = "V7.9.4"
 
 
 def _finite(value: object) -> float | None:
@@ -43,7 +43,7 @@ def _rewrite_generated_copy(company: dict, current: dict, action: dict) -> None:
     if core:
         company["one_liner"] = (
             f"{core}；最新价{company.get('price', '—')}，{RELEASE}当前合理区间{current.get('current', '待核验')}，"
-            f"估值状态为“{current.get('status', '待核验')}”；当前行动为“{action.get('action', '等待突破')}”。"
+            f"估值状态为“{current.get('status', '待核验')}”；当前行动为“{action.get('action', '等待趋势修复')}”。"
         )
     forward_status = current.get("forward_scenario_status")
     if forward_status in ("formal", "research") and current.get("forward_scenario"):
@@ -68,7 +68,7 @@ def _rewrite_generated_copy(company: dict, current: dict, action: dict) -> None:
                 detail["content"] = valuation_text
         if "出现哪些信号才考虑买入" in title and isinstance(detail.get("items"), list):
             detail["items"] = [
-                f"当前行动：{action.get('action') or '等待突破'}。{action.get('reason') or '等待趋势、估值和风险条件共同确认'}；"
+                f"当前行动：{action.get('action') or '等待趋势修复'}。{action.get('reason') or '等待趋势、估值和风险条件共同确认'}；"
                 f"第一买入区：{_strategy_zone(action)}。"
             ]
             if "content" in detail:
@@ -86,12 +86,10 @@ def _strategy_zone(action: dict) -> str:
         return f"{low:.2f}–{high:.2f}"
     label = action.get("action")
     return {
-        "等待突破": "当前不买，等待突破",
-        "持有": "持仓管理，不新增",
-        "减仓": "减仓管理，不新增",
-        "回避/退出": "不设买入区",
-        "暂不参与": "不设买入区",
-    }.get(label, "尚未形成买点")
+        "已持仓继续持有": "持仓管理，不新增",
+        "已持仓减仓或退出": "减仓/退出管理，不新增",
+        "不追/回避": "不设买入区",
+    }.get(label, "触发条件未满足，当前不买")
 
 
 def _normalize_fund_flow_summary(data: dict) -> None:
@@ -198,5 +196,5 @@ def save_snapshot(data: dict) -> None:
         "https://liuyongchen1314-prog.github.io/ai-application-research-pages/mirror/latest-v7.json",
     ]
     data["public_data"]["repository"] = "liuyongchen1314-prog/ai-application-research-pages"
-    data["public_data"]["schedule_cn"] = "美股06:50；A股/港股/韩国16:35；财报估值18:10；公告审计22:10"
+    data["public_data"]["schedule_cn"] = "亚洲多时点；美股常规时段每10分钟轻量采样；财报估值18:10；公告审计22:10。实际完成时间另记。"
     atomic_write(LATEST, json.dumps(data, ensure_ascii=False, separators=(",", ":")))

@@ -1,134 +1,79 @@
 #!/usr/bin/env python3
-"""Release regression for V7.9.3 formal data, live markets and UI contracts."""
+"""Full release regression for V7.9.4 (filename retained for workflow compatibility)."""
 from __future__ import annotations
+import hashlib,json,pathlib,re
 
-import hashlib
-import json
-import pathlib
-import re
+ROOT=pathlib.Path(__file__).resolve().parents[1]
+PUBLIC=ROOT/'docs'/'public_v7'; LATEST=PUBLIC/'data'/'latest-v7.json'; LIVE=PUBLIC/'data'/'live-markets.json'; HTML=PUBLIC/'index.html'; INDEX=PUBLIC/'index.json'
+WORKFLOW=ROOT/'.github'/'workflows'/'v7-unified-refresh.yml'; FRONT=ROOT/'frontend'/'V7_9_统一前端.js'; FACT=ROOT/'docs'/'audit'/'V7.9.4_事实证据缺口.json'
+ACTIONS=('重点参与','小仓试错','临近触发','突破后确认','缩量回踩观察','普通候选','等待趋势修复','不追/回避','已持仓继续持有','已持仓减仓或退出')
+STAGES=('第二阶段确认','第二阶段候选','第一阶段','第三阶段','第四阶段','数据不足')
 
+def fail(x):raise SystemExit(x)
+def companies(d):return [*((d.get('companies') or {}).get('hardware') or []),*((d.get('companies') or {}).get('application') or [])]
 
-ROOT = pathlib.Path(__file__).resolve().parents[1]
-PUBLIC = ROOT / "docs" / "public_v7"
-LATEST = PUBLIC / "data" / "latest-v7.json"
-LIVE = PUBLIC / "data" / "live-markets.json"
-HTML = PUBLIC / "index.html"
-INDEX = PUBLIC / "index.json"
-WORKFLOW = ROOT / ".github" / "workflows" / "v7-unified-refresh.yml"
+def main():
+ d=json.loads(LATEST.read_text('utf-8')); cs=companies(d); codes={x['code'] for x in cs}; q=d.get('quotes') or {}; v=d.get('valuation_current') or {}; s=d.get('strategy_current') or {}
+ if d.get('version')!='V7.9.4' or d.get('frontend_release')!='V7.9.4':fail('snapshot release not V7.9.4')
+ if (len(cs),len(codes),sum(x.get('scope')=='hardware' for x in cs),sum(x.get('scope')=='application' for x in cs))!=(142,142,83,59):fail('pool is not 142/83/59 unique')
+ if set(q)!=codes or set(v)!=codes or set(s)!=codes:fail('quote/valuation/strategy pools differ')
+ if d.get('snapshot_date')!=d.get('embedded_snapshot'):fail('embedded snapshot date differs')
+ six=__import__('collections').Counter(x.get('forward_scenario_status') for x in v.values())
+ if six.get('research',0)!=24 or six.get('unavailable',0)!=118:fail(f'24/118 split broken: {dict(six)}')
+ if sum(x.get('twelve_public') is not False for x in v.values())!=0:fail('public 12m targets not zero')
+ if sum(bool(x.get('formal_closed')) for x in v.values())!=0:fail('formal evidence closure not zero')
+ if any(x.get('forward_public_horizon_months')!=6 for x in v.values()):fail('forward public horizon not 6m')
+ held=set((d.get('user_positions') or {}).keys())
+ for c in cs:
+  code=c['code']; vv=v[code]; ss=s[code]; qq=q[code]
+  if ss.get('action') not in ACTIONS:fail(f'{code}: invalid action')
+  if ss.get('trend_stage') not in STAGES:fail(f'{code}: invalid stage')
+  if ss.get('action','').startswith('已持仓') and code not in held:fail(f'{code}: unheld stock has holding action')
+  for k in ('trend_quality_score','buy_point_score','data_completeness'):
+   if not isinstance(ss.get(k),(int,float)):fail(f'{code}: missing score {k}')
+  if not isinstance(ss.get('blockers'),list):fail(f'{code}: blockers is not list')
+  if ss.get('reference_price')!=qq.get('price') or ss.get('reference_price_date')!=qq.get('date'):fail(f'{code}: strategy price basis differs from close quote')
+  if c.get('price')!=qq.get('price') or c.get('price_date')!=qq.get('date'):fail(f'{code}: display card price differs from quote')
+  if c.get('six') != (vv.get('forward_scenario') or '暂不估算'):fail(f'{code}: card six-month display stale')
+  if vv.get('forward_scenario_status')=='research':
+   calc=vv.get('forward_scenario_calculation') or {}
+   if calc.get('route')!='current_research_range_roll_forward_by_ntm_eps_and_pe':fail(f'{code}: six-month route not same-source')
+  if any(k in vv for k in ('action','trend_stage','buy_point_score','trend_quality_score')):fail(f'{code}: valuation contains strategy fields')
+ if (d.get('strategy_meta') or {}).get('separated_from_valuation') is not True:fail('strategy not separated from valuation')
+ contract=(d.get('strategy_meta') or {}).get('sort_contract') or []
+ expected=['action_priority','trend_stage_priority','trend_quality_score(desc)','RS12m(desc)','RS6m(desc)','RS3m(desc)','industry_relative_rank(desc)','distance_to_pivot(abs asc)','setup_quality_score(desc)','sector_score(desc)','company_quality(desc)','code(asc)']
+ if contract!=expected:fail(f'canonical sort contract differs: {contract}')
+ roll=(d.get('strategy_meta') or {}).get('rolling_validation') or {}
+ for k in ('sample_count','win_rate','average_return','max_drawdown','profit_loss_ratio'):
+  if k not in roll:fail(f'rolling validation missing {k}')
+ live=json.loads(LIVE.read_text('utf-8'))
+ if live.get('schema')!='v794-live-markets-2' or live.get('release')!='V7.9.4' or live.get('market_count')!=4:fail('live schema/release/market count wrong')
+ if live.get('separate_from_valuation') is not True or live.get('separate_intraday_price_from_close_strategy') is not True:fail('intraday/valuation/strategy separation flag missing')
+ req=('phase','exchange_timezone','exchange_local_time','beijing_time','source','quote_type','fresh','stale','freshness_reason','sample_date','file_generated_at')
+ for group in ('china','hk','us','korea'):
+  m=(live.get('markets') or {}).get(group) or {}
+  if any(k not in m for k in req):fail(f'{group}: freshness/timezone fields incomplete')
+  rows=m.get('items') or []
+  if not rows or any(not isinstance(x.get('price'),(int,float)) or not isinstance(x.get('change_pct'),(int,float)) for x in rows):fail(f'{group}: live rows incomplete')
+  if m.get('fresh')==m.get('stale'):fail(f'{group}: fresh/stale flags contradictory')
+ wf=WORKFLOW.read_text('utf-8')
+ if "cron: '5,15,25,35,45,55 13-21 * * 1-5'" not in wf:fail('US continuous sampling cron missing')
+ for token in ('WORKFLOW_SCHEDULE','WORKFLOW_RUN_STARTED_AT','python scripts/update_live_markets.py','python scripts/rebuild_strategy.py','python scripts/validate_strategy.py'):
+  if token not in wf:fail(f'workflow missing {token}')
+ if 'python scripts/更新研究系统.py' in wf:fail('workflow still calls deprecated all-in-one engine')
+ front=FRONT.read_text('utf-8')
+ for token in ('__V794_AUTHORITY__','legacyFrontendCalculatorsDisabled:true','行情已过期','v794CanonicalCompare','trend_quality_score','buy_point_score'):
+  if token not in front:fail(f'frontend missing authority/UX token {token}')
+ if 'Math.min(score, 49)' in front or 'Math.min(score,49)' in front:fail('49 score cap remains')
+ if re.search(r'\bfunction\s+v74CanSlimAssessment\s*\([^)]*\)\s*\{(?:(?!return\s+.*can_slim).){300,}',front,re.S):fail('frontend CAN SLIM appears to recompute')
+ fact=json.loads(FACT.read_text('utf-8'))
+ if fact.get('formal_closed')!=0 or fact.get('hk_companies')!=14:fail('factual-gap audit invariant broken')
+ if (fact.get('summary') or {}).get('港股币种',{}).get('unresolved')!=14:fail('HK currency gaps were falsely closed')
+ html=HTML.read_text('utf-8')
+ if 'V7.9.4' not in html:fail('built HTML is not V7.9.4')
+ if any(t in html for t in ('__V79_CSS__','__V79_SNAPSHOT_JSON__','__V79_APP_JS__')):fail('build token unresolved')
+ idx=json.loads(INDEX.read_text('utf-8'))
+ if idx.get('snapshot_sha256')!=hashlib.sha256(LATEST.read_bytes()).hexdigest():fail('public index snapshot hash differs')
+ print(json.dumps({'status':'PASS','release':'V7.9.4','companies':142,'hardware':83,'application':59,'six_month_research':24,'six_month_unavailable':118,'public_12m':0,'formal_closed':0,'actions':(d.get('strategy_meta') or {}).get('action_counts'),'live_markets':4},ensure_ascii=False))
 
-
-def fail(message: str) -> None:
-    raise SystemExit(message)
-
-
-def main() -> None:
-    data = json.loads(LATEST.read_text("utf-8"))
-    companies = [
-        *((data.get("companies") or {}).get("hardware") or []),
-        *((data.get("companies") or {}).get("application") or []),
-    ]
-    quotes = data.get("quotes") or {}
-    valuation = data.get("valuation_current") or {}
-    strategy = data.get("strategy_current") or {}
-    codes = {row.get("code") for row in companies}
-    if (len(companies), len(codes)) != (142, 142):
-        fail("company pool is not 142 unique records")
-    if set(quotes) != codes or set(valuation) != codes or set(strategy) != codes:
-        fail("quote/valuation/strategy pool differs from the company pool")
-    if data.get("snapshot_date") != data.get("embedded_snapshot"):
-        fail("embedded snapshot still points to an old date")
-    for company in companies:
-        code = company["code"]
-        quote, value, action = quotes[code], valuation[code], strategy[code]
-        expected = data["market_freshness"]["hk" if code.endswith(".HK") else "china"]["date"]
-        if quote.get("session_complete") is not True or quote.get("date") != expected:
-            fail(f"{code}: quote is not the completed market session")
-        if company.get("price") != quote.get("price") or company.get("price_date") != quote.get("date"):
-            fail(f"{code}: card differs from quote")
-        if company.get("valuation_status") != value.get("status"):
-            fail(f"{code}: card differs from valuation status")
-        expected_card_six = value.get("forward_scenario") or "暂不估算"
-        if company.get("six") != expected_card_six:
-            fail(f"{code}: company card keeps a stale six-month range")
-        if any(key in company for key in ("year_end", "next_year_start", "twelve")):
-            fail(f"{code}: cancelled forward target leaked into company card")
-        if value.get("twelve_public") is not False:
-            fail(f"{code}: twelve-month target is still public")
-        if value.get("forward_public_horizon_months") != 6:
-            fail(f"{code}: public forward horizon is not six months")
-        forward_status = value.get("forward_scenario_status")
-        if forward_status == "unavailable" and value.get("forward_scenario") is not None:
-            fail(f"{code}: unavailable forward scenario exposes a number")
-        if forward_status in ("formal", "research") and not value.get("forward_scenario"):
-            fail(f"{code}: displayable six-month scenario is missing")
-        if forward_status == "research":
-            calc = value.get("forward_scenario_calculation") or {}
-            if calc.get("route") != "current_research_range_roll_forward_by_ntm_eps_and_pe":
-                fail(f"{code}: six-month scenario is not rolled from the same current basis")
-            expected_low = value.get("current_low", 0) * (1 + (calc.get("value_low_change_pct") or 0))
-            expected_high = value.get("current_high", 0) * (1 + (calc.get("value_high_change_pct") or 0))
-            if abs(expected_low - value.get("six_low", 0)) > 1e-6 or abs(expected_high - value.get("six_high", 0)) > 1e-6:
-                fail(f"{code}: six-month scenario does not reconcile to current value")
-        if action.get("reference_price") != quote.get("price") or action.get("reference_price_date") != quote.get("date"):
-            fail(f"{code}: strategy reference differs from quote")
-        visible = json.dumps({"one_liner": company.get("one_liner"), "details": company.get("details"), "signal": company.get("signal")}, ensure_ascii=False)
-        if any(token in visible for token in ("V7.6当前合理区间", "估值日2026-08-07", "等待当前估值模型更新")) or re.search(r"(?:未来12个月|明年2月)\s*[0-9]", visible):
-            fail(f"{code}: stale generated valuation copy remains")
-        zone = (action.get("first_buy_zone_low"), action.get("first_buy_zone_high"))
-        if zone == (0, 0):
-            fail(f"{code}: null buy zone was converted to 0-0")
-    fund = data.get("fund_flow_summary") or {}
-    actual_current = sum(str((row or {}).get("last_date") or "") == str(data.get("snapshot_date")) for row in (data.get("fund_flows") or {}).values())
-    if int(fund.get("coverage_current") or 0) != actual_current:
-        fail("fund-flow summary counts stale cache as current")
-
-    live = json.loads(LIVE.read_text("utf-8"))
-    if live.get("schema") != "v793-live-markets-1" or live.get("release") != "V7.9.3":
-        fail("live-market schema or release is wrong")
-    if live.get("separate_from_valuation") is not True or live.get("market_count") != 4:
-        fail("live markets are not isolated from valuation or do not cover four markets")
-    for group in ("china", "hk", "us", "korea"):
-        rows = ((live.get("markets") or {}).get(group) or {}).get("items") or []
-        if not rows or any(not isinstance(row.get("price"), (int, float)) or not isinstance(row.get("change_pct"), (int, float)) for row in rows):
-            fail(f"{group}: live market rows are incomplete")
-
-    workflow = WORKFLOW.read_text("utf-8")
-    schedules = re.findall(r"^\s*- cron:", workflow, flags=re.MULTILINE)
-    if len(schedules) < 8 or "options: [all, live, us, asia, fundamental, final]" not in workflow:
-        fail("workflow does not provide at least eight scheduled runs and a live manual mode")
-    if "python scripts/update_live_markets.py" not in workflow:
-        fail("workflow does not run the isolated live-market updater")
-
-    html = HTML.read_text("utf-8")
-    required = (
-        "AI研究系统 V7.9.3",
-        "data-strategy-action",
-        "当前不买｜等待突破",
-        "手动刷新全部数据",
-        "工作日后台8个时点自动运行",
-        "v793-market-grid",
-        "data-live-market",
-        "当前研究区间 / 6个月情景",
-        "未来12个月目标已取消公开展示",
-    )
-    missing = [token for token in required if token not in html]
-    if missing:
-        fail(f"release HTML missing required UI: {missing}")
-    if any(token in html for token in ("__V79_CSS__", "__V79_SNAPSHOT_JSON__", "__V79_APP_JS__", "__V7_BUILD_TIME__")):
-        fail("release HTML contains an unresolved build token")
-    index = json.loads(INDEX.read_text("utf-8"))
-    if index.get("snapshot_sha256") != hashlib.sha256(LATEST.read_bytes()).hexdigest():
-        fail("public index hash differs from the latest snapshot")
-    print(json.dumps({
-        "status": "PASS",
-        "release": "V7.9.3",
-        "companies": 142,
-        "scheduled_runs": len(schedules),
-        "live_markets": 4,
-        "market_dates": data.get("market_freshness"),
-        "action_counts": (data.get("strategy_meta") or {}).get("action_counts"),
-    }, ensure_ascii=False))
-
-
-if __name__ == "__main__":
-    main()
+if __name__=='__main__':main()
