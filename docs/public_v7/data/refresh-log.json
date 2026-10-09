@@ -2,6 +2,12 @@
   "version": "V7.9.3",
   "runs": [
     {
+      "mode": "final",
+      "status": "success",
+      "finished_at_utc": "2026-10-09T19:30:31.671961+00:00",
+      "finished_at_beijing": "2026-10-10T03:30:31.671961+08:00"
+    },
+    {
       "mode": "fundamental",
       "status": "success",
       "finished_at_utc": "2026-10-09T16:59:40.339665+00:00",
@@ -714,18 +720,12 @@
       "status": "failure",
       "finished_at_utc": "2026-09-19T00:42:17.831663+00:00",
       "finished_at_beijing": "2026-09-19T08:42:17.831663+08:00"
-    },
-    {
-      "mode": "final",
-      "status": "failure",
-      "finished_at_utc": "2026-09-18T17:38:56.426902+00:00",
-      "finished_at_beijing": "2026-09-19T01:38:56.426902+08:00"
     }
   ],
   "last_success": {
-    "mode": "fundamental",
+    "mode": "final",
     "status": "success",
-    "finished_at_utc": "2026-10-09T16:59:40.339665+00:00",
-    "finished_at_beijing": "2026-10-10T00:59:40.339665+08:00"
+    "finished_at_utc": "2026-10-09T19:30:31.671961+00:00",
+    "finished_at_beijing": "2026-10-10T03:30:31.671961+08:00"
   }
 }
