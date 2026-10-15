@@ -4,10 +4,10 @@
   "release": "V7.9.3",
   "latest": "data/latest-v7.json",
   "live_markets": "data/live-markets.json",
-  "live_markets_sha256": "cd1b8374a07da027fcdced833ef514ef6a643d26ea76403663bc46594da2676c",
-  "snapshot_sha256": "39d7fda804914ca3f7cccf151934dde9796d89ce886501acd8886d95d76640c8",
+  "live_markets_sha256": "ba5dc178eae6ed2ef6ff49da66a14f4db6e153f15ebfbecab56632795b719939",
+  "snapshot_sha256": "e330d2bb6c486b0e3a290950c8b47d98c144c407e7e43829a2a10492bd72aee1",
   "snapshot_date": "2026-10-14",
-  "generated_at_cn": "2026-10-14T21:59:57.289225+08:00",
+  "generated_at_cn": "2026-10-15T08:58:36.493780+08:00",
   "coverage": {
     "histories": 142,
     "quotes": 142,
@@ -187,9 +187,9 @@
     },
     "us": {
       "fresh": true,
-      "date": "2026-10-13",
+      "date": "2026-10-14",
       "reason": "",
-      "count": 2
+      "count": 4
     }
   },
   "privacy": "仅公开市场与基础信息"
