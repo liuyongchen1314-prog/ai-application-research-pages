@@ -1,0 +1,367 @@
+{
+  "schema": "v75-history-delta-1",
+  "snapshot_date": "2026-10-21",
+  "globals": {
+    "market_context": {
+      "china": {
+        "snapshot_date": "2026-10-21",
+        "hardware": {
+          "count": 83,
+          "median_1d": 0.006603773584905603,
+          "median_5d": -0.030600593742863613,
+          "median_20d": -0.17476627642550324,
+          "breadth": 0.6144578313253012
+        },
+        "application": {
+          "count": 59,
+          "median_1d": 0.004366812227074135,
+          "median_5d": -0.0044280442804427445,
+          "median_20d": 0.0014245014245015675,
+          "breadth": 0.576271186440678
+        }
+      },
+      "hk": {
+        "snapshot_date": "2026-10-21"
+      },
+      "korea": {
+        "items": [
+          {
+            "ticker": "^KS11",
+            "name": "韩国KOSPI",
+            "group": "korea",
+            "date": "2026-10-21",
+            "close": 5735.66015625,
+            "change_pct": 0.03294227969509711,
+            "source": "海外公开行情",
+            "session_complete": true
+          },
+          {
+            "ticker": "^KQ11",
+            "name": "韩国KOSDAQ",
+            "group": "korea",
+            "date": "2026-10-21",
+            "close": 792.760009765625,
+            "change_pct": 0.013798533788705436,
+            "source": "海外公开行情",
+            "session_complete": true
+          },
+          {
+            "ticker": "000660.KS",
+            "name": "SK海力士",
+            "group": "korea",
+            "date": "2026-10-21",
+            "close": 1294000.0,
+            "change_pct": 0.05805396565821752,
+            "source": "海外公开行情",
+            "session_complete": true
+          },
+          {
+            "ticker": "005930.KS",
+            "name": "三星电子",
+            "group": "korea",
+            "date": "2026-10-21",
+            "close": 223500.0,
+            "change_pct": 0.05673758865248235,
+            "source": "海外公开行情",
+            "session_complete": true
+          }
+        ],
+        "status": "正常"
+      },
+      "us": {
+        "items": [
+          {
+            "ticker": "^IXIC",
+            "name": "纳斯达克",
+            "group": "us",
+            "date": "2026-10-21",
+            "close": 26702.857421875,
+            "change_pct": 0.010521816462209843,
+            "source": "海外公开行情",
+            "session_complete": true
+          },
+          {
+            "ticker": "^SOX",
+            "name": "费城半导体",
+            "group": "us",
+            "date": "2026-10-21",
+            "close": 11505.5556640625,
+            "change_pct": 0.01965170471623434,
+            "source": "海外公开行情",
+            "session_complete": true
+          }
+        ],
+        "status": "正常"
+      }
+    },
+    "market_freshness": {
+      "china": {
+        "fresh": true,
+        "date": "2026-10-21",
+        "coverage": "128/128"
+      },
+      "hk": {
+        "fresh": true,
+        "date": "2026-10-21",
+        "coverage": "14/14"
+      },
+      "korea": {
+        "fresh": true,
+        "date": "2026-10-21",
+        "reason": "",
+        "count": 4
+      },
+      "us": {
+        "fresh": true,
+        "date": "2026-10-21",
+        "reason": "",
+        "count": 2
+      }
+    },
+    "errors": {
+      "us:CIBR": "RuntimeError('CIBR missing completed session 2026-10-21')",
+      "us:CLOU": "RuntimeError('CLOU missing completed session 2026-10-21')",
+      "us:SMH": "RuntimeError('SMH missing completed session 2026-10-21')",
+      "us:IGV": "RuntimeError('IGV missing completed session 2026-10-21')",
+      "fund:600183.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688041.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002916.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688012.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:000938.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:603019.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002281.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:600406.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300476.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:603893.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688521.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002409.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688082.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002028.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300548.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:600522.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688019.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688629.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:001389.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:600487.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002049.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688072.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688120.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:603501.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:603083.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002156.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:600584.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002179.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:000063.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688668.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002335.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688702.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300570.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300054.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:000400.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002851.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688183.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688981.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688313.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300346.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300620.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300124.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688213.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300913.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:000021.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002130.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300604.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688676.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300442.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300693.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:301200.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688519.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300870.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688001.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688126.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:301018.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:301308.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300857.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688525.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300563.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:600588.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300170.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:603039.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:301236.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688111.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300634.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688095.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688369.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300378.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688365.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002153.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:603171.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300058.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:301171.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:600986.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002400.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300229.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300766.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688031.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688228.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300624.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300364.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:000681.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:301052.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002555.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002517.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002602.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002624.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:002230.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300010.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300559.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300359.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300253.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300451.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688246.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300078.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300033.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300059.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:600570.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:601519.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300454.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688561.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688023.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688225.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688777.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:600845.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:603859.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300682.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:688229.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:605398.SH": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")",
+      "fund:300738.SZ": "RuntimeError(\"RemoteDisconnected('Remote end closed connection without response')\")"
+    },
+    "stale_cache": {
+      "us": [
+        {
+          "ticker": "^IXIC",
+          "name": "纳斯达克",
+          "group": "us",
+          "date": "2026-10-20",
+          "close": 26424.81640625,
+          "change_pct": -0.0002298151369993784,
+          "source": "海外公开行情",
+          "session_complete": true
+        },
+        {
+          "ticker": "^SOX",
+          "name": "费城半导体",
+          "group": "us",
+          "date": "2026-10-20",
+          "close": 11283.8115234375,
+          "change_pct": -0.0028744559426133742,
+          "source": "海外公开行情",
+          "session_complete": true
+        }
+      ],
+      "korea": []
+    },
+    "generated_at_cn": "2026-10-22T08:58:39.374953+08:00",
+    "refresh_summary": {
+      "version": "V7.9.3",
+      "last_success": {
+        "mode": "us",
+        "status": "success",
+        "finished_at_utc": "2026-10-22T00:58:41.547692+00:00",
+        "finished_at_beijing": "2026-10-22T08:58:41.547692+08:00"
+      },
+      "recent_runs": [
+        {
+          "mode": "us",
+          "status": "success",
+          "finished_at_utc": "2026-10-22T00:58:41.547692+00:00",
+          "finished_at_beijing": "2026-10-22T08:58:41.547692+08:00"
+        },
+        {
+          "mode": "final",
+          "status": "failure",
+          "finished_at_utc": "2026-10-21T18:33:45.356715+00:00",
+          "finished_at_beijing": "2026-10-22T02:33:45.356715+08:00"
+        },
+        {
+          "mode": "fundamental",
+          "status": "failure",
+          "finished_at_utc": "2026-10-21T15:12:45.670184+00:00",
+          "finished_at_beijing": "2026-10-21T23:12:45.670184+08:00"
+        },
+        {
+          "mode": "asia",
+          "status": "success",
+          "finished_at_utc": "2026-10-21T14:08:33.605919+00:00",
+          "finished_at_beijing": "2026-10-21T22:08:33.605919+08:00"
+        },
+        {
+          "mode": "live",
+          "status": "success",
+          "finished_at_utc": "2026-10-21T12:59:18.611349+00:00",
+          "finished_at_beijing": "2026-10-21T20:59:18.611349+08:00"
+        },
+        {
+          "mode": "live",
+          "status": "success",
+          "finished_at_utc": "2026-10-21T10:04:21.624397+00:00",
+          "finished_at_beijing": "2026-10-21T18:04:21.624397+08:00"
+        },
+        {
+          "mode": "live",
+          "status": "success",
+          "finished_at_utc": "2026-10-21T08:51:25.157333+00:00",
+          "finished_at_beijing": "2026-10-21T16:51:25.157333+08:00"
+        },
+        {
+          "mode": "live",
+          "status": "success",
+          "finished_at_utc": "2026-10-21T06:30:36.413777+00:00",
+          "finished_at_beijing": "2026-10-21T14:30:36.413777+08:00"
+        },
+        {
+          "mode": "us",
+          "status": "success",
+          "finished_at_utc": "2026-10-21T01:03:43.228402+00:00",
+          "finished_at_beijing": "2026-10-21T09:03:43.228402+08:00"
+        },
+        {
+          "mode": "final",
+          "status": "failure",
+          "finished_at_utc": "2026-10-20T18:26:19.390784+00:00",
+          "finished_at_beijing": "2026-10-21T02:26:19.390784+08:00"
+        },
+        {
+          "mode": "fundamental",
+          "status": "failure",
+          "finished_at_utc": "2026-10-20T15:01:45.247419+00:00",
+          "finished_at_beijing": "2026-10-20T23:01:45.247419+08:00"
+        },
+        {
+          "mode": "asia",
+          "status": "success",
+          "finished_at_utc": "2026-10-20T13:51:34.271561+00:00",
+          "finished_at_beijing": "2026-10-20T21:51:34.271561+08:00"
+        }
+      ],
+      "expected_daily_runs": 8
+    },
+    "strategy_meta": {
+      "schema": "v79-strategy-1",
+      "version": "V7.9.3",
+      "generated_at": "2026-10-22T00:58:39.863852+00:00",
+      "snapshot_date": "2026-10-21",
+      "action_counts": {
+        "等待突破": 53,
+        "暂不参与": 1,
+        "回避/退出": 73,
+        "减仓": 14,
+        "试仓": 1
+      },
+      "valuation_source": "valuation_current",
+      "separated_from_valuation": true
+    }
+  },
+  "maps": {},
+  "companies": {},
+  "histories": {}
+}
