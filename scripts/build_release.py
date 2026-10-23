@@ -95,11 +95,11 @@ def validate_contract(data: dict, contract: dict) -> None:
 def main() -> None:
     data = read_json(SNAPSHOT)
     contract = read_json(CONTRACT)
-    data["version"] = "V7.9.3"
-    data["frontend_release"] = "V7.9.3"
+    data["version"] = "V7.9.4"
+    data["frontend_release"] = "V7.9.4"
     data["generated_at_cn"] = normalize_beijing(data.get("generated_at_cn"))
     refresh = data.setdefault("refresh_summary", {})
-    refresh["version"] = "V7.9.3"
+    refresh["version"] = "V7.9.4"
     for row in [refresh.get("last_success"), *(refresh.get("recent_runs") or [])]:
         if isinstance(row, dict):
             row["finished_at_beijing"] = normalize_beijing(
@@ -124,7 +124,7 @@ def main() -> None:
     index = {
         "schema": "v7-public-index-3",
         "data_schema": "v7-public-market-1",
-        "release": "V7.9.3",
+        "release": "V7.9.4",
         "latest": "data/latest-v7.json",
         "live_markets": "data/live-markets.json",
         "live_markets_sha256": sha256_bytes(LIVE_MARKETS.read_bytes()) if LIVE_MARKETS.exists() else None,
@@ -140,7 +140,7 @@ def main() -> None:
 
     if REFRESH_LOG.exists():
         log = read_json(REFRESH_LOG)
-        log["version"] = "V7.9.3"
+        log["version"] = "V7.9.4"
         for row in log.get("runs") or []:
             row["finished_at_beijing"] = normalize_beijing(
                 row.get("finished_at_utc") or row.get("finished_at_beijing")
@@ -171,8 +171,8 @@ def main() -> None:
         model_families[family] = model_families.get(family, 0) + 1
     audit = {
         "schema": "v79-valuation-audit-summary-1",
-        "release": "V7.9.3",
-        "valuation_model": data.get("valuation_meta", {}).get("version", "V7.9.3"),
+        "release": "V7.9.4",
+        "valuation_model": data.get("valuation_meta", {}).get("version", "V7.9.4"),
         "snapshot_date": data.get("snapshot_date"),
         "companies": len(data["valuation_current"]),
         "model_family_counts": model_families,
@@ -190,7 +190,7 @@ def main() -> None:
         "note": "完整估值只存在于正式快照；本文件仅保存审计计数与哈希，不复制142家公司全量结果。",
     }
     atomic_text(AUDIT, json.dumps(audit, ensure_ascii=False, indent=2))
-    print(json.dumps({"status": "PASS", "release": "V7.9.3", "companies": 142, "snapshot_sha256": snapshot_hash, "html_bytes": len(html.encode("utf-8"))}, ensure_ascii=False))
+    print(json.dumps({"status": "PASS", "release": "V7.9.4", "companies": 142, "snapshot_sha256": snapshot_hash, "html_bytes": len(html.encode("utf-8"))}, ensure_ascii=False))
 
 
 if __name__ == "__main__":
