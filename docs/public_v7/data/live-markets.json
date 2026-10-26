@@ -1,8 +1,8 @@
 {
   "schema": "v793-live-markets-1",
   "release": "V7.9.3",
-  "generated_at": "2026-10-26T06:52:52.338437+00:00",
-  "generated_at_beijing": "2026-10-26T14:52:52.338437+08:00",
+  "generated_at": "2026-10-26T09:20:02.576144+00:00",
+  "generated_at_beijing": "2026-10-26T17:20:02.576144+08:00",
   "formal_snapshot_date": "2026-10-23",
   "separate_from_valuation": true,
   "market_count": 4,
@@ -13,33 +13,33 @@
         {
           "symbol": "sh000001",
           "name": "上证指数",
-          "price": 3690.33,
+          "price": 3697.52,
           "previous_close": 3690.48,
-          "change_pct": -4.0645119334103974e-05,
+          "change_pct": 0.0019076109340789849,
           "date": "2026-10-26",
-          "as_of": "20261026145248",
+          "as_of": "20261026161400",
           "source": "腾讯即时行情",
           "realtime": true
         },
         {
           "symbol": "sz399006",
           "name": "创业板指",
-          "price": 2634.06,
+          "price": 2638.23,
           "previous_close": 2684.1,
-          "change_pct": -0.018643120599083463,
+          "change_pct": -0.01708952721582646,
           "date": "2026-10-26",
-          "as_of": "20261026145245",
+          "as_of": "20261026161412",
           "source": "腾讯即时行情",
           "realtime": true
         },
         {
           "symbol": "sh000688",
           "name": "科创50",
-          "price": 1308.73,
+          "price": 1315.5,
           "previous_close": 1345.51,
-          "change_pct": -0.027335359826385464,
+          "change_pct": -0.022303810451055672,
           "date": "2026-10-26",
-          "as_of": "20261026145248",
+          "as_of": "20261026161412",
           "source": "腾讯即时行情",
           "realtime": true
         }
@@ -51,22 +51,22 @@
         {
           "symbol": "hkHSI",
           "name": "恒生指数",
-          "price": 23212.45,
+          "price": 23211.81,
           "previous_close": 23093.37,
-          "change_pct": 0.005156458325484836,
+          "change_pct": 0.0051287447436212386,
           "date": "2026-10-26",
-          "as_of": "2026/10/26 14:37:47",
+          "as_of": "2026/10/26 17:04:05",
           "source": "腾讯即时行情",
           "realtime": true
         },
         {
           "symbol": "hkHSTECH",
           "name": "恒生科技",
-          "price": 3861.68,
+          "price": 3857.53,
           "previous_close": 3871.66,
-          "change_pct": -0.0025777056869663584,
+          "change_pct": -0.003649597330343979,
           "date": "2026-10-26",
-          "as_of": "2026/10/26 14:37:46",
+          "as_of": "2026/10/26 16:08:28",
           "source": "腾讯即时行情",
           "realtime": true
         }
@@ -127,11 +127,11 @@
         {
           "symbol": "^KQ11",
           "name": "韩国KOSDAQ",
-          "price": 727.22,
+          "price": 727.21,
           "previous_close": 751.69,
-          "change_pct": -0.032553313200920586,
+          "change_pct": -0.032566616557357486,
           "date": "2026-10-26",
-          "as_of": "2026-10-26T15:32:50+09:00",
+          "as_of": "2026-10-26T15:33:00+09:00",
           "source": "海外即时行情",
           "realtime": true
         },
