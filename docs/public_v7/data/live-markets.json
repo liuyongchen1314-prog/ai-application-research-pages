@@ -1,8 +1,8 @@
 {
   "schema": "v793-live-markets-1",
   "release": "V7.9.3",
-  "generated_at": "2026-11-02T11:39:12.884310+00:00",
-  "generated_at_beijing": "2026-11-02T19:39:12.884310+08:00",
+  "generated_at": "2026-11-02T13:25:56.016129+00:00",
+  "generated_at_beijing": "2026-11-02T21:25:56.016129+08:00",
   "formal_snapshot_date": "2026-10-27",
   "separate_from_valuation": true,
   "market_count": 4,
