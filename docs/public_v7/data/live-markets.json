@@ -1,8 +1,8 @@
 {
   "schema": "v793-live-markets-1",
   "release": "V7.9.3",
-  "generated_at": "2026-11-02T08:11:33.111310+00:00",
-  "generated_at_beijing": "2026-11-02T16:11:33.111310+08:00",
+  "generated_at": "2026-11-02T11:39:12.884310+00:00",
+  "generated_at_beijing": "2026-11-02T19:39:12.884310+08:00",
   "formal_snapshot_date": "2026-10-27",
   "separate_from_valuation": true,
   "market_count": 4,
@@ -17,7 +17,7 @@
           "previous_close": 3599.02,
           "change_pct": 0.010839061744586154,
           "date": "2026-11-02",
-          "as_of": "20261102161100",
+          "as_of": "20261102161500",
           "source": "腾讯即时行情",
           "realtime": true
         },
@@ -28,7 +28,7 @@
           "previous_close": 2413.63,
           "change_pct": 0.018673118912177822,
           "date": "2026-11-02",
-          "as_of": "20261102161115",
+          "as_of": "20261102161415",
           "source": "腾讯即时行情",
           "realtime": true
         },
@@ -39,7 +39,7 @@
           "previous_close": 1160.84,
           "change_pct": 0.031098170290479343,
           "date": "2026-11-02",
-          "as_of": "20261102161112",
+          "as_of": "20261102161412",
           "source": "腾讯即时行情",
           "realtime": true
         }
@@ -51,22 +51,22 @@
         {
           "symbol": "hkHSI",
           "name": "恒生指数",
-          "price": 23371.0,
+          "price": 23393.32,
           "previous_close": 23294.42,
-          "change_pct": 0.0032874825816655573,
+          "change_pct": 0.004245651963002306,
           "date": "2026-11-02",
-          "as_of": "2026/11/02 15:56:26",
+          "as_of": "2026/11/02 18:31:13",
           "source": "腾讯即时行情",
           "realtime": true
         },
         {
           "symbol": "hkHSTECH",
           "name": "恒生科技",
-          "price": 3836.7,
+          "price": 3839.41,
           "previous_close": 3754.9,
-          "change_pct": 0.021784867772776773,
+          "change_pct": 0.02250659138725397,
           "date": "2026-11-02",
-          "as_of": "2026/11/02 15:56:26",
+          "as_of": "2026/11/02 16:08:38",
           "source": "腾讯即时行情",
           "realtime": true
         }
@@ -120,7 +120,7 @@
           "previous_close": 5730.74,
           "change_pct": 0.02239501355845852,
           "date": "2026-11-02",
-          "as_of": "2026-11-02T15:32:20+09:00",
+          "as_of": "2026-11-02T20:05:40+09:00",
           "source": "海外即时行情",
           "realtime": true
         },
@@ -131,7 +131,7 @@
           "previous_close": 724.38,
           "change_pct": 0.013777299207598181,
           "date": "2026-11-02",
-          "as_of": "2026-11-02T15:33:00+09:00",
+          "as_of": "2026-11-02T20:05:40+09:00",
           "source": "海外即时行情",
           "realtime": true
         },
