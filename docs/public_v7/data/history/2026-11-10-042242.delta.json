@@ -1,0 +1,268 @@
+{
+  "schema": "v75-history-delta-1",
+  "snapshot_date": "2026-10-27",
+  "globals": {
+    "market_context": {
+      "china": {
+        "snapshot_date": "2026-10-27",
+        "hardware": {
+          "count": 83,
+          "median_1d": -0.03653956330765806,
+          "median_5d": -0.08392267798208397,
+          "median_20d": -0.3012422360248447,
+          "breadth": 0.08433734939759036
+        },
+        "application": {
+          "count": 59,
+          "median_1d": -0.04057565460723567,
+          "median_5d": -0.021739130434782483,
+          "median_20d": -0.045253863134657846,
+          "breadth": 0.03389830508474576
+        }
+      },
+      "hk": {
+        "snapshot_date": "2026-10-27"
+      },
+      "korea": {
+        "items": [
+          {
+            "ticker": "^KS11",
+            "name": "韩国KOSPI",
+            "group": "korea",
+            "date": "2026-10-27",
+            "close": 5638.33984375,
+            "change_pct": 0.030874951736266976,
+            "source": "海外公开行情",
+            "session_complete": true
+          },
+          {
+            "ticker": "^KQ11",
+            "name": "韩国KOSDAQ",
+            "group": "korea",
+            "date": "2026-10-27",
+            "close": 743.8300170898438,
+            "change_pct": 0.022854463793146707,
+            "source": "海外公开行情",
+            "session_complete": true
+          },
+          {
+            "ticker": "000660.KS",
+            "name": "SK海力士",
+            "group": "korea",
+            "date": "2026-10-27",
+            "close": 1341000.0,
+            "change_pct": 0.051764705882352935,
+            "source": "海外公开行情",
+            "session_complete": true
+          },
+          {
+            "ticker": "005930.KS",
+            "name": "三星电子",
+            "group": "korea",
+            "date": "2026-10-27",
+            "close": 222000.0,
+            "change_pct": 0.04225352112676051,
+            "source": "海外公开行情",
+            "session_complete": true
+          }
+        ],
+        "status": "正常"
+      },
+      "us": {
+        "items": [
+          {
+            "ticker": "^IXIC",
+            "name": "纳斯达克",
+            "group": "us",
+            "date": "2026-11-09",
+            "close": 25253.138671875,
+            "change_pct": 0.027409463642584786,
+            "source": "海外公开行情",
+            "session_complete": true
+          },
+          {
+            "ticker": "^SOX",
+            "name": "费城半导体",
+            "group": "us",
+            "date": "2026-11-09",
+            "close": 10033.9326171875,
+            "change_pct": 0.06854797446154248,
+            "source": "海外公开行情",
+            "session_complete": true
+          },
+          {
+            "ticker": "SMH",
+            "name": "AI芯片ETF",
+            "group": "us",
+            "date": "2026-11-09",
+            "close": 487.4100036621094,
+            "change_pct": 0.05054317751297255,
+            "source": "海外公开行情",
+            "session_complete": true
+          },
+          {
+            "ticker": "IGV",
+            "name": "软件ETF",
+            "group": "us",
+            "date": "2026-11-09",
+            "close": 101.45999908447266,
+            "change_pct": 0.02609225225241918,
+            "source": "海外公开行情",
+            "session_complete": true
+          },
+          {
+            "ticker": "CIBR",
+            "name": "网络安全ETF",
+            "group": "us",
+            "date": "2026-11-09",
+            "close": 94.68000030517578,
+            "change_pct": 0.03998241820126802,
+            "source": "海外公开行情",
+            "session_complete": true
+          },
+          {
+            "ticker": "CLOU",
+            "name": "云计算ETF",
+            "group": "us",
+            "date": "2026-11-09",
+            "close": 26.149999618530273,
+            "change_pct": 0.011605386175374877,
+            "source": "海外公开行情",
+            "session_complete": true
+          }
+        ],
+        "status": "正常"
+      }
+    },
+    "market_freshness": {
+      "china": {
+        "fresh": true,
+        "date": "2026-10-27",
+        "coverage": "128/128"
+      },
+      "hk": {
+        "fresh": true,
+        "date": "2026-10-27",
+        "coverage": "14/14"
+      },
+      "korea": {
+        "fresh": true,
+        "date": "2026-10-27",
+        "reason": "",
+        "count": 4
+      },
+      "us": {
+        "fresh": true,
+        "date": "2026-11-09",
+        "reason": "",
+        "count": 6
+      }
+    },
+    "stale_cache": {
+      "us": [],
+      "korea": []
+    },
+    "generated_at_cn": "2026-11-10T12:22:38.539330+08:00",
+    "refresh_summary": {
+      "version": "V7.9.3",
+      "last_success": {
+        "mode": "us",
+        "status": "success",
+        "finished_at_utc": "2026-11-10T04:22:41.237470+00:00",
+        "finished_at_beijing": "2026-11-10T12:22:41.237470+08:00"
+      },
+      "recent_runs": [
+        {
+          "mode": "us",
+          "status": "success",
+          "finished_at_utc": "2026-11-10T04:22:41.237470+00:00",
+          "finished_at_beijing": "2026-11-10T12:22:41.237470+08:00"
+        },
+        {
+          "mode": "final",
+          "status": "success",
+          "finished_at_utc": "2026-11-09T23:25:45.680043+00:00",
+          "finished_at_beijing": "2026-11-10T07:25:45.680043+08:00"
+        },
+        {
+          "mode": "fundamental",
+          "status": "success",
+          "finished_at_utc": "2026-11-09T20:42:30.017106+00:00",
+          "finished_at_beijing": "2026-11-10T04:42:30.017106+08:00"
+        },
+        {
+          "mode": "asia",
+          "status": "failure",
+          "finished_at_utc": "2026-11-09T19:05:45.953815+00:00",
+          "finished_at_beijing": "2026-11-10T03:05:45.953815+08:00"
+        },
+        {
+          "mode": "live",
+          "status": "success",
+          "finished_at_utc": "2026-11-09T17:37:26.519222+00:00",
+          "finished_at_beijing": "2026-11-10T01:37:26.519222+08:00"
+        },
+        {
+          "mode": "live",
+          "status": "success",
+          "finished_at_utc": "2026-11-09T13:49:39.863774+00:00",
+          "finished_at_beijing": "2026-11-09T21:49:39.863774+08:00"
+        },
+        {
+          "mode": "live",
+          "status": "success",
+          "finished_at_utc": "2026-11-09T12:03:53.795885+00:00",
+          "finished_at_beijing": "2026-11-09T20:03:53.795885+08:00"
+        },
+        {
+          "mode": "live",
+          "status": "success",
+          "finished_at_utc": "2026-11-09T08:37:32.474508+00:00",
+          "finished_at_beijing": "2026-11-09T16:37:32.474508+08:00"
+        },
+        {
+          "mode": "us",
+          "status": "success",
+          "finished_at_utc": "2026-11-07T02:25:22.226438+00:00",
+          "finished_at_beijing": "2026-11-07T10:25:22.226438+08:00"
+        },
+        {
+          "mode": "final",
+          "status": "success",
+          "finished_at_utc": "2026-11-06T20:26:33.073695+00:00",
+          "finished_at_beijing": "2026-11-07T04:26:33.073695+08:00"
+        },
+        {
+          "mode": "fundamental",
+          "status": "success",
+          "finished_at_utc": "2026-11-06T17:30:06.394115+00:00",
+          "finished_at_beijing": "2026-11-07T01:30:06.394115+08:00"
+        },
+        {
+          "mode": "asia",
+          "status": "failure",
+          "finished_at_utc": "2026-11-06T16:14:15.848022+00:00",
+          "finished_at_beijing": "2026-11-07T00:14:15.848022+08:00"
+        }
+      ],
+      "expected_daily_runs": 8
+    },
+    "strategy_meta": {
+      "schema": "v79-strategy-1",
+      "version": "V7.9.3",
+      "generated_at": "2026-11-10T04:22:39.129016+00:00",
+      "snapshot_date": "2026-10-27",
+      "action_counts": {
+        "等待突破": 57,
+        "暂不参与": 1,
+        "回避/退出": 74,
+        "减仓": 10
+      },
+      "valuation_source": "valuation_current",
+      "separated_from_valuation": true
+    }
+  },
+  "maps": {},
+  "companies": {},
+  "histories": {}
+}
