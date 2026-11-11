@@ -1,8 +1,8 @@
 {
   "schema": "v793-live-markets-1",
   "release": "V7.9.3",
-  "generated_at": "2026-11-11T08:18:12.403994+00:00",
-  "generated_at_beijing": "2026-11-11T16:18:12.403994+08:00",
+  "generated_at": "2026-11-11T11:25:21.046187+00:00",
+  "generated_at_beijing": "2026-11-11T19:25:21.046187+08:00",
   "formal_snapshot_date": "2026-10-27",
   "separate_from_valuation": true,
   "market_count": 4,
@@ -51,22 +51,22 @@
         {
           "symbol": "hkHSI",
           "name": "恒生指数",
-          "price": 24296.22,
+          "price": 24315.92,
           "previous_close": 24557.04,
-          "change_pct": -0.010620986894185891,
+          "change_pct": -0.009818772946576737,
           "date": "2026-11-11",
-          "as_of": "2026/11/11 16:03:07",
+          "as_of": "2026/11/11 18:31:03",
           "source": "腾讯即时行情",
           "realtime": true
         },
         {
           "symbol": "hkHSTECH",
           "name": "恒生科技",
-          "price": 4026.51,
+          "price": 4027.06,
           "previous_close": 4084.45,
-          "change_pct": -0.014185508452790319,
+          "change_pct": -0.014050851399821207,
           "date": "2026-11-11",
-          "as_of": "2026/11/11 16:03:06",
+          "as_of": "2026/11/11 16:08:28",
           "source": "腾讯即时行情",
           "realtime": true
         }
